@@ -1,5 +1,5 @@
 # OTPView
-## A QT interface for E1.59  (Entertainment  Technology  Object  Transform  Protocol  (OTP)) 
+## A QT Frontend for E1.59  (Entertainment  Technology  Object  Transform  Protocol  (OTP)) 
 
 Based upon the ESTA 10 January 2019 _Draft_ - Document Number: CP/2018-1034r1
 

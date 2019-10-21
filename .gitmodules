@@ -1,0 +1,3 @@
+[submodule "libs/OTPLib"]
+	path = libs/OTPLib
+	url = https://github.com/marcusbirkin/OTPLib.git
