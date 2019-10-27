@@ -144,11 +144,13 @@ MainWindow::MainWindow(QWidget *parent) :
                 [timer](uint value) {
                     timer->setInterval(static_cast<int>(value) * 1000);
                 });
+        otpConsumer->UpdateOTPMap();
     }
 }
 
 MainWindow::~MainWindow()
 {
+    otpConsumer.get()->disconnect();
     delete ui;
 }
 
