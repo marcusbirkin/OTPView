@@ -70,7 +70,7 @@ QAbstractSocket::NetworkLayerProtocol Settings::getNetworkTransport()
 {
     QSettings settings;
     settings.beginGroup(S_NETWORK);
-    return static_cast<QAbstractSocket::NetworkLayerProtocol>(settings.value(S_NETWORK_TRANSPORT, QAbstractSocket::IPv4Protocol).toInt());
+    return static_cast<QAbstractSocket::NetworkLayerProtocol>(settings.value(S_NETWORK_TRANSPORT, QAbstractSocket::AnyIPProtocol).toInt());
 }
 
 void Settings::setComponentSettings(QString settingsGroup, componentDetails_t details)

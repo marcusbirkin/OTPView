@@ -29,13 +29,13 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui->setupUi(this);
     setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 
-    // Interface list
-    QObject::connect<void(QComboBox::*)(int)>(ui->cbInterface, &QComboBox::currentIndexChanged, [=]() { checkSaveAllowed(); });
-    populateInterfaceList();
-
     // Interface Protocol
     QObject::connect<void(QComboBox::*)(int)>(ui->cbProtocol, &QComboBox::currentIndexChanged, [=]() { checkSaveAllowed(); });
     populateProtocolList();
+
+    // Interface list
+    QObject::connect<void(QComboBox::*)(int)>(ui->cbInterface, &QComboBox::currentIndexChanged, [=]() { checkSaveAllowed(); });
+    populateInterfaceList();
 
     // System Request Interval
     ui->sbSystemRequestInterval->setValue(static_cast<int>(Settings::getInstance().getSystemRequestInterval()));
@@ -85,10 +85,10 @@ void SettingsDialog::populateInterfaceList()
         if (interface.flags().testFlag(QNetworkInterface::IsUp) && interface.flags().testFlag(QNetworkInterface::CanMulticast))
         {
             QString ipAddrString;
-            int protocol = ui->cbProtocol->itemData(ui->cbProtocol->currentIndex()).toInt();
+            auto protocol = static_cast<QAbstractSocket::NetworkLayerProtocol>(ui->cbProtocol->itemData(ui->cbProtocol->currentIndex()).toInt());
             for (auto addr : interface.addressEntries())
             {
-                if (addr.ip().protocol() == protocol)
+                if ((addr.ip().protocol() == protocol) || (protocol == QAbstractSocket::AnyIPProtocol))
                 {
                     if (!ipAddrString.isEmpty())
                         ipAddrString.append(" / ");
@@ -119,7 +119,13 @@ void SettingsDialog::populateProtocolList()
     ui->cbProtocol->addItem("IPv4", QAbstractSocket::IPv4Protocol);
     ui->cbProtocol->addItem("IPv6", QAbstractSocket::IPv6Protocol);
     ui->cbProtocol->addItem("IPv4 & IPv6", QAbstractSocket::AnyIPProtocol);
-    ui->cbProtocol->setEnabled(false); // IPv4 only for now....
+
+    for (int idx = 0; idx < ui->cbProtocol->count(); idx++)
+    {
+       if (static_cast<QAbstractSocket::NetworkLayerProtocol>(ui->cbProtocol->itemData(idx).toInt())
+               == Settings::getInstance().getNetworkTransport())
+           ui->cbProtocol->setCurrentIndex(idx);
+    }
 }
 
 void SettingsDialog::on_cbProtocol_currentIndexChanged(int index)

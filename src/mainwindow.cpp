@@ -77,6 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // OTP Consumer Object
     otpConsumer.reset(new class Consumer(
                           Settings::getInstance().getNetworkInterface(),
+                          Settings::getInstance().getNetworkTransport(),
                           QList<system_t>(),
                           Settings::getInstance().getComponentSettings(componentSettingsGroup_CONSUMER).Name,
                           Settings::getInstance().getComponentSettings(componentSettingsGroup_CONSUMER).CID,
@@ -86,6 +87,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&Settings::getInstance(), &Settings::newNetworkInterface,
             [this](QNetworkInterface interface) {
                 otpConsumer->setConsumerNetworkInterface(interface);
+                updateStatusBar();
+            });
+    updateStatusBar();
+
+    // OTP Consumer Transport
+    connect(&Settings::getInstance(), &Settings::newNetworkTransport,
+            [this](QAbstractSocket::NetworkLayerProtocol transport) {
+                otpConsumer->setConsumerNetworkTransport(transport);
                 updateStatusBar();
             });
     updateStatusBar();
@@ -156,21 +165,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateStatusBar()
 {
-    if (!otpConsumer)
+    QString message = QObject::tr("Not connected");
+    if (otpConsumer)
     {
-        ui->statusbar->showMessage(QObject::tr("Not connected"));
-    } else {
-        if (otpConsumer->getConsumerNetworkinterfaceState() == QAbstractSocket::BoundState)
+        message = QObject::tr("Selected interface: %1").arg(
+                    otpConsumer->getConsumerNetworkInterface().humanReadableName());
+
+        if ((otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::IPv4Protocol) ||
+                (otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
         {
-            ui->statusbar->showMessage(
-                        QObject::tr("Selected interface: %1").arg(
-                            otpConsumer->getConsumerNetworkInterface().humanReadableName()));
-        } else {
-            ui->statusbar->showMessage(
-                        QObject::tr("Error binding to interface: %1").arg(
-                            otpConsumer->getConsumerNetworkInterface().humanReadableName()));
+            auto status = otpConsumer->getConsumerNetworkinterfaceState(QAbstractSocket::IPv4Protocol);
+            message.append(QString(" IPv4 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
+        }
+
+        if ((otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::IPv6Protocol) ||
+                (otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
+        {
+            auto status = otpConsumer->getConsumerNetworkinterfaceState(QAbstractSocket::IPv6Protocol);
+            message.append(QString(" IPv6 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
         }
     }
+
+    ui->statusbar->showMessage(message);
 }
 
 void MainWindow::saveComponentDetails()

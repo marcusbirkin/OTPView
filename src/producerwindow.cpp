@@ -36,6 +36,7 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
     // OTP Producer Object
     otpProducer.reset(new class Producer(
                           Settings::getInstance().getNetworkInterface(),
+                          Settings::getInstance().getNetworkTransport(),
                           Settings::getInstance().getComponentSettings(componentSettingsGroup).Name,
                           Settings::getInstance().getComponentSettings(componentSettingsGroup).CID,
                           this));
@@ -44,6 +45,14 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
     connect(&Settings::getInstance(), &Settings::newNetworkInterface,
             [this](QNetworkInterface interface) {
                 otpProducer->setProducerNetworkInterface(interface);
+                updateStatusBar();
+            });
+    updateStatusBar();
+
+    // OTP Producer Transport
+    connect(&Settings::getInstance(), &Settings::newNetworkTransport,
+            [this](QAbstractSocket::NetworkLayerProtocol transport) {
+                otpProducer->setProducerNetworkTransport(transport);
                 updateStatusBar();
             });
     updateStatusBar();
@@ -89,21 +98,28 @@ ProducerWindow::~ProducerWindow()
 
 void ProducerWindow::updateStatusBar()
 {
-    if (!otpProducer)
+    QString message = QObject::tr("Not connected");
+    if (otpProducer)
     {
-        ui->statusbar->showMessage(QObject::tr("Not connected"));
-    } else {
-        if (otpProducer->getProducerNetworkinterfaceState() == QAbstractSocket::BoundState)
+        message = QObject::tr("Selected interface: %1").arg(
+                    otpProducer->getProducerNetworkInterface().humanReadableName());
+
+        if ((otpProducer->getProducerNetworkTransport() == QAbstractSocket::IPv4Protocol) ||
+                (otpProducer->getProducerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
         {
-            ui->statusbar->showMessage(
-                        QObject::tr("Selected interface: %1").arg(
-                            otpProducer->getProducerNetworkInterface().humanReadableName()));
-        } else {
-            ui->statusbar->showMessage(
-                        QObject::tr("Error binding to interface: %1").arg(
-                            otpProducer->getProducerNetworkInterface().humanReadableName()));
+            auto status = otpProducer->getProducerNetworkinterfaceState(QAbstractSocket::IPv4Protocol);
+            message.append(QString(" IPv4 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
+        }
+
+        if ((otpProducer->getProducerNetworkTransport() == QAbstractSocket::IPv6Protocol) ||
+                (otpProducer->getProducerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
+        {
+            auto status = otpProducer->getProducerNetworkinterfaceState(QAbstractSocket::IPv6Protocol);
+            message.append(QString(" IPv6 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
         }
     }
+
+    ui->statusbar->showMessage(message);
 }
 
 void ProducerWindow::updateWindowTitle()
