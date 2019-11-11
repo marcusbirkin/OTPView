@@ -129,17 +129,16 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+         <widget class="QGroupBox" name="gbResolution">
+          <property name="title">
+           <string>Multiple Source Resolution</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QComboBox" name="cbResolution"/>
+           </item>
+          </layout>
+         </widget>
         </item>
        </layout>
       </item>

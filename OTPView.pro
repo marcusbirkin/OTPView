@@ -40,6 +40,9 @@ SOURCES += \
     src/pointselectiondialog.cpp \
     src/systemselectiondialog.cpp \
     src/systemwindow.cpp \
+    src/models/pointstablemodel.cpp \
+    src/models/componentsmodel.cpp \
+    src/models/systemmodel.cpp \
     src/widgets/systemspinbox.cpp \
     src/widgets/groupspinbox.cpp \
     src/widgets/pointspinbox.cpp \
@@ -55,6 +58,9 @@ HEADERS += \
     src/pointselectiondialog.h \
     src/systemselectiondialog.h \
     src/systemwindow.h \
+    src/models/pointstablemodel.h \
+    src/models/componentsmodel.h \
+    src/models/systemmodel.h \
     src/widgets/systemspinbox.h \
     src/widgets/groupspinbox.h \
     src/widgets/pointspinbox.h \

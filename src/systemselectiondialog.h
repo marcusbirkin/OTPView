@@ -42,7 +42,7 @@ private slots:
 
 private:
     Ui::SystemSelectionDialog *ui;
-    SystemSpinBox *sbSystem = Q_NULLPTR;
+    SystemSpinBox *sbSystem = nullptr;
 };
 
 #endif // GROUPSELECTIONDIALOG_H

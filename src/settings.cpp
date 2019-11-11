@@ -23,6 +23,7 @@
 // Settings Strings
 static const QString S_GENERAL("GENERAL");
 static const QString S_GENERAL_SYSTEMREQUESTINTERVAL("SYSTEMREQUESTINTERVAL");
+static const QString S_GENERAL_SOURCERESOLUTION("RESOLUTION");
 
 static const QString S_NETWORK("NETWORK");
 static const QString S_NETWORK_HARDWAREADDRESS("HARDWAREADDRESS");
@@ -105,4 +106,20 @@ uint Settings::getSystemRequestInterval()
     QSettings settings;
     settings.beginGroup(S_GENERAL);
     return settings.value(S_GENERAL_SYSTEMREQUESTINTERVAL, 3).toUInt();
+}
+
+void Settings::setSourceResolution(ACN::OTP::Consumer::multipleProducerResolution_e resolution)
+{
+    QSettings settings;
+    settings.beginGroup(S_GENERAL);
+    settings.setValue(S_GENERAL_SOURCERESOLUTION, resolution);
+    settings.sync();
+}
+ACN::OTP::Consumer::multipleProducerResolution_e Settings::getSourceResolution()
+{
+    using namespace ACN::OTP;
+    QSettings settings;
+    settings.beginGroup(S_GENERAL);
+    auto ret = settings.value(S_GENERAL_SOURCERESOLUTION, Consumer::Newest).toInt();
+    return static_cast<Consumer::multipleProducerResolution_e>(ret);
 }

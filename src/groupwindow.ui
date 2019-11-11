@@ -49,7 +49,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_1">
           <item>
-           <widget class="QTableWidget" name="tablePoints">
+           <widget class="QTableView" name="tablePoints">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -65,8 +65,8 @@
             <property name="selectionBehavior">
              <enum>QAbstractItemView::SelectRows</enum>
             </property>
-            <attribute name="verticalHeaderVisible">
-             <bool>false</bool>
+            <attribute name="verticalHeaderDefaultSectionSize">
+             <number>21</number>
             </attribute>
            </widget>
           </item>

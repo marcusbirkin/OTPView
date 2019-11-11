@@ -21,6 +21,7 @@
 #include "producerwindow.h"
 #include "pointselectiondialog.h"
 #include "widgets/spacialspinbox.h"
+#include "models/pointstablemodel.h"
 
 using namespace ACN::OTP;
 
@@ -45,15 +46,16 @@ GroupWindow::GroupWindow(
     otpProducer->addProducerGroup(system, group);
 
     // Points
-    ui->tablePoints->setColumnCount(1);
-    ui->tablePoints->setHorizontalHeaderLabels(QStringList(tr("Point")));
+    ui->tablePoints->setModel(new PointsTableModel(otpProducer, system, group, this));
+    ui->tablePoints->verticalHeader()->hide();
     ui->tablePoints->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tablePoints->horizontalHeader()->setStretchLastSection(true);
-    connect(otpProducer.get(), &Producer::newPoint, this, &GroupWindow::newPoint);
-    connect(otpProducer.get(), &Producer::removedPoint, this, &GroupWindow::removedPoint);
 
     // Producer Points Details
     on_tablePoints_itemSelectionChanged();
+    connect(ui->tablePoints->selectionModel(), &QItemSelectionModel::selectionChanged,
+             this, &GroupWindow::on_tablePoints_itemSelectionChanged);
+
     // - Name
     ui->leName->setMaxLength(name_t::maxSize());
 
@@ -106,8 +108,6 @@ GroupWindow::~GroupWindow()
 void GroupWindow::setSystem(ACN::OTP::system_t newSystem)
 {
     auto pointsList = otpProducer->getProducerPoints(system, group);
-    for (auto point : pointsList)
-        removedPoint(otpProducer->getProducerCID(), system, group, point);
     otpProducer->removeProducerGroup(system, group);
 
     system = newSystem;
@@ -115,6 +115,20 @@ void GroupWindow::setSystem(ACN::OTP::system_t newSystem)
     otpProducer->addProducerGroup(newSystem, group);
     for (auto point : pointsList)
         otpProducer->addProducerPoint(newSystem, group, point);
+
+    qobject_cast<PointsTableModel*>(ui->tablePoints->model())->setSystem(newSystem);
+}
+
+QList<address_t> GroupWindow::getSelectedAddress()
+{
+    QList<address_t> ret;
+    for (auto index : ui->tablePoints->selectionModel()->selectedRows())
+    {
+        auto model = qobject_cast<PointsTableModel*>(ui->tablePoints->model());
+        if (model->getAddress(index).isValid())
+            ret << model->getAddress(index);
+    }
+    return ret;
 }
 
 void GroupWindow::on_pbAddPoint_clicked()
@@ -131,74 +145,18 @@ void GroupWindow::on_pbAddPoint_clicked()
 
 void GroupWindow::on_pbRemovePoint_clicked()
 {
-    if (!ui->tablePoints->selectedItems().count()) return;
-    for (auto index : ui->tablePoints->selectionModel()->selectedRows())
-    {
-        auto item = ui->tablePoints->takeItem(index.row(), index.column());
-        ui->tablePoints->removeRow(index.row());
-        point_t point = item->text().toUInt();
-        otpProducer->removeProducerPoint(system, group, point);
-        delete item;
-    }
-}
-
-void GroupWindow::newPoint(cid_t cid, system_t system, group_t group, point_t point)
-{
-    if (!(cid == otpProducer->getProducerCID() &&
-        (system == this->system) &&
-        (group == this->group))) { return; }
-
-    ui->tablePoints->setUpdatesEnabled(false);
-
-    auto row = ui->tablePoints->rowCount();
-    ui->tablePoints->insertRow(row);
-    auto item = new QTableWidgetItem();
-    item->setText(QString("%1").arg(point));
-    ui->tablePoints->setItem(row, 0, item);
-
-    ui->tablePoints->sortItems(0);
-
-    ui->tablePoints->setUpdatesEnabled(true);
-}
-
-void GroupWindow::removedPoint(cid_t cid, system_t system, group_t group, point_t point)
-{
-    if (!(cid == otpProducer->getProducerCID() &&
-        (system == this->system) &&
-        (group == this->group))) { return; }
-
-    ui->tablePoints->setUpdatesEnabled(false);
-    for (int row = 0; row < ui->tablePoints->rowCount(); row++)
-    {
-        if (ui->tablePoints->item(row,0)->text() == QString("%1").arg(point))
-        {
-            ui->tablePoints->removeRow(row);
-        }
-    }
-
-    ui->tablePoints->sortItems(0);
-
-    ui->tablePoints->setUpdatesEnabled(true);
+    for (auto address : getSelectedAddress())
+        otpProducer->removeProducerPoint(address);
 }
 
 void GroupWindow::on_tablePoints_itemSelectionChanged()
 {
     // Only show details for a single point
-    if (ui->tablePoints->selectedItems().count() != 1)
-    {
-        ui->frameDetails->setDisabled(true);
-        return;
-    }
-
-    ui->frameDetails->setDisabled(false);
+    ui->frameDetails->setDisabled(getSelectedAddress().count() != 1);
+    if (getSelectedAddress().count() != 1) return;
 
     // Address
-    if (!getSelectedAddress().isValid())
-    {
-        ui->frameDetails->setDisabled(true);
-        return;
-    }
-    auto address = getSelectedAddress();
+    auto address = getSelectedAddress().first();
 
     // - Name
     ui->leName->setText(otpProducer->getProducerPointName(address));
@@ -237,18 +195,8 @@ void GroupWindow::on_tablePoints_itemSelectionChanged()
     }
 }
 
-ACN::OTP::address_t GroupWindow::getSelectedAddress()
-{
-    auto point = point_t(ui->tablePoints->selectedItems().first()->text().toUInt());
-    return address_t(system, group, point);
-}
-
 void GroupWindow::on_leName_textChanged(const QString &arg1)
 {
-    if (!ui->tablePoints->selectedItems().count()) return;
-    auto point = point_t(ui->tablePoints->selectedItems().first()->text().toUInt());
-    auto address = address_t(system, group, point);
-    if (!address.isValid()) return;
-
-    otpProducer->setProducerPointName(address, arg1);
+    if (getSelectedAddress().count() != 1) return;
+    otpProducer->setProducerPointName(getSelectedAddress().first(), arg1);
 }

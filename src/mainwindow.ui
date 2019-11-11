@@ -140,7 +140,7 @@
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
    <property name="windowTitle">
-    <string>Components</string>
+    <string notr="true"/>
    </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
@@ -154,15 +154,10 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
-      <widget class="QTreeWidget" name="twComponents">
-       <attribute name="headerVisible">
-        <bool>false</bool>
+      <widget class="QTreeView" name="tvComponents">
+       <attribute name="headerDefaultSectionSize">
+        <number>57</number>
        </attribute>
-       <column>
-        <property name="text">
-         <string notr="true">1</string>
-        </property>
-       </column>
       </widget>
      </item>
     </layout>
