@@ -43,19 +43,14 @@ private slots:
     void on_actionSettings_triggered();
     void on_actionNew_Producer_triggered();
     void on_actionNew_Consumer_triggered();
+    void on_tvComponents_doubleClicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
     void updateStatusBar();
     void saveComponentDetails();
 
-    void updatedComponent(const ACN::OTP::cid_t&, const ACN::OTP::name_t&);
-    void updatedComponent(const ACN::OTP::cid_t&, const QHostAddress&);
-    void updatedComponent(const ACN::OTP::cid_t&, const ACN::OTP::moduleList_t &);
-    void updatedComponent(const ACN::OTP::cid_t&, ACN::OTP::component_t::type_t);
-
-    void newSystem(ACN::OTP::cid_t, ACN::OTP::system_t);
-    void removedSystem(ACN::OTP::cid_t, ACN::OTP::system_t);
+    bool openSystemWindow(ACN::OTP::system_t system);
 
     std::shared_ptr<class ACN::OTP::Consumer> otpConsumer;
     QList<ProducerWindow*> producerWindows;

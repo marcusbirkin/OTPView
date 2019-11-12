@@ -16,63 +16,36 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef GROUPWINDOW_H
-#define GROUPWINDOW_H
+#ifndef POINTSTABLEMODEL_H
+#define POINTSTABLEMODEL_H
 
-#include <QWidget>
-#include <QMainWindow>
-#include <memory>
+#include <QAbstractTableModel>
 #include "libs/OTPLib/otp.hpp"
 
-namespace Ui {
-class GroupWindow;
-}
-
-class GroupWindow : public QWidget
+class PointsTableModel : public QAbstractTableModel
 {
     Q_OBJECT
-
 public:
-    explicit GroupWindow(
+    PointsTableModel(
             std::shared_ptr<class ACN::OTP::Producer> otpProducer,
             ACN::OTP::system_t system,
             ACN::OTP::group_t group,
-            QWidget *parent = nullptr);
-    ~GroupWindow();
+            QObject *parent);
+    void setGroup(ACN::OTP::group_t value) { group = value; }
+    void setSystem(ACN::OTP::system_t value) { system = value; }
 
-public slots:
-    void setSystem(ACN::OTP::system_t newSystem);
+    ACN::OTP::address_t getAddress(const QModelIndex &index) const;
 
-private slots:
-    void on_pbAddPoint_clicked();
-    void on_pbRemovePoint_clicked();
+    int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-    void on_tablePoints_itemSelectionChanged();
-
-    void on_leName_textChanged(const QString &arg1);
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
 private:
-    Ui::GroupWindow *ui;
-
     std::shared_ptr<class ACN::OTP::Producer> otpProducer;
     ACN::OTP::system_t system;
     ACN::OTP::group_t group;
-
-    QStringList Axes {QStringLiteral("X"),QStringLiteral("Y"),QStringLiteral("Z")};
-
-    enum PointsDetailsHeaders_e
-    {
-        Value,
-        Velocity,
-        Acceleration
-    };
-    QStringList PointsDetailsHeaders = {
-        tr("Value"),
-        tr("Velocity"),
-        tr("Acceleration")
-    };
-
-    QList<ACN::OTP::address_t> getSelectedAddress();
 };
 
-#endif // GROUPWINDOW_H
+#endif // POINTSTABLEMODEL_H

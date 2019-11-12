@@ -22,7 +22,9 @@
 #include "settings.h"
 #include <QMessageBox>
 #include <QTimer>
+#include <QMdiSubWindow>
 #include "systemselectiondialog.h"
+#include "models/componentsmodel.h"
 
 using namespace ACN::OTP;
 
@@ -122,46 +124,42 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lblConsumerCID->setText(otpConsumer->getConsumerCID().toString());
 
     // OTP Components Table
-    connect(otpConsumer.get(), &Consumer::newComponent,
-            [this](cid_t cid) {
-                auto component = otpConsumer->getComponent(cid);
-                QTreeWidgetItem *rootItem = new QTreeWidgetItem(ui->twComponents, QStringList(cid.toString()));
-                updatedComponent(cid, component.getType());
-                Q_UNUSED(rootItem)
-            });
-    connect(otpConsumer.get(), qOverload<const cid_t&, const name_t&>(&Consumer::updatedComponent),
-            this, qOverload<const cid_t&, const name_t&>(&MainWindow::updatedComponent));
-    connect(otpConsumer.get(), qOverload<const cid_t&, const QHostAddress&>(&Consumer::updatedComponent),
-            this, qOverload<const cid_t&, const QHostAddress&>(&MainWindow::updatedComponent));
-    connect(otpConsumer.get(), qOverload<const cid_t&, const moduleList_t&>(&Consumer::updatedComponent),
-            this, qOverload<const cid_t&, const moduleList_t&>(&MainWindow::updatedComponent));
-    connect(otpConsumer.get(), qOverload<const cid_t&, component_t::type_t>(&Consumer::updatedComponent),
-            this, qOverload<const cid_t&, const component_t::type_t>(&MainWindow::updatedComponent));
-    connect(otpConsumer.get(), qOverload<cid_t, system_t>(&Consumer::newSystem),
-            this, qOverload<cid_t, system_t>(&MainWindow::newSystem));
-    connect(otpConsumer.get(), qOverload<cid_t, system_t>(&Consumer::removedSystem),
-            this, qOverload<cid_t, system_t>(&MainWindow::removedSystem));
+    ui->tvComponents->setModel(new ComponentsModel(otpConsumer, this));
+    connect(ui->tvComponents, &QTreeView::doubleClicked, this, &MainWindow::on_tvComponents_doubleClicked);
 
-    {
-        // Keep table updated
-        QTimer *timer = new QTimer(this);
-        connect(timer, &QTimer::timeout,
-            [this]() {
-               otpConsumer->UpdateOTPMap();
+    // System requests
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout,
+        [this]() {
+           otpConsumer->UpdateOTPMap();
+        });
+    timer->start(static_cast<int>(Settings::getInstance().getSystemRequestInterval()) * 1000);
+    connect(&Settings::getInstance(), &Settings::newSystemRequestInterval,
+            [timer](uint value) {
+                timer->setInterval(static_cast<int>(value) * 1000);
             });
-        timer->start(static_cast<int>(Settings::getInstance().getSystemRequestInterval()) * 1000);
-        connect(&Settings::getInstance(), &Settings::newSystemRequestInterval,
-                [timer](uint value) {
-                    timer->setInterval(static_cast<int>(value) * 1000);
-                });
-        otpConsumer->UpdateOTPMap();
-    }
+    otpConsumer->UpdateOTPMap();
 }
 
 MainWindow::~MainWindow()
 {
     otpConsumer.get()->disconnect();
     delete ui;
+}
+
+void MainWindow::on_tvComponents_doubleClicked(const QModelIndex &index)
+{
+    auto item = static_cast<ComponentsItem*>(index.internalPointer());
+    switch(item->getType())
+    {
+        // Open consumer for selected system
+        case ComponentsItem::ComponentSystemListItem:
+        {
+           openSystemWindow(system_t(item->data().toInt()));
+        } return;
+
+        default: return;
+    }
 }
 
 void MainWindow::updateStatusBar()
@@ -196,124 +194,33 @@ void MainWindow::saveComponentDetails()
     Settings::getInstance().setComponentSettings(componentSettingsGroup_CONSUMER, details);
 }
 
-
-void MainWindow::updatedComponent(const cid_t &cid, const name_t &name)
+bool MainWindow::openSystemWindow(system_t system)
 {
-    auto rootList = ui->twComponents->findItems(cid.toString(), Qt::MatchExactly);
-    if (rootList.isEmpty()) return;
+    if (!system.isValid()) return false;
 
-    auto rootItem = rootList.first();
-
-    auto string = QString("Name: %1").arg(name.toString());
-    for (int idx = 0; idx < rootItem->childCount(); idx++)
+    // Already open?
+    if (otpConsumer->getConsumerSystems().contains(system))
     {
-        if (rootItem->child(idx)->text(0).startsWith("Name: "))
+        for (auto subWindow : ui->mdiArea->subWindowList())
         {
-            rootItem->child(idx)->setText(0, string);
-            return;
-        }
-    }
-    rootItem->addChild(new QTreeWidgetItem(QStringList(string)));
-}
-
-void MainWindow::updatedComponent(const cid_t &cid, const QHostAddress &IPAddr)
-{
-    auto rootList = ui->twComponents->findItems(cid.toString(), Qt::MatchExactly);
-    if (rootList.isEmpty()) return;
-
-    auto rootItem = rootList.first();
-
-    auto string = QString("IP: %1").arg(IPAddr.toString());
-    for (int idx = 0; idx < rootItem->childCount(); idx++)
-    {
-        if (rootItem->child(idx)->text(0).startsWith("IP: "))
-        {
-            rootItem->child(idx)->setText(0, string);
-            return;
-        }
-    }
-    rootItem->addChild(new QTreeWidgetItem(QStringList(string)));
-}
-
-void MainWindow::updatedComponent(const cid_t &cid, const moduleList_t &moduleList)
-{
-    auto rootList = ui->twComponents->findItems(cid.toString(), Qt::MatchExactly);
-    if (rootList.isEmpty()) return;
-
-    auto rootItem = rootList.first();
-
-    for (int idx = 0; idx < rootItem->childCount(); idx++)
-    {
-        if (rootItem->child(idx)->text(0).startsWith("Modules"))
-            rootItem->removeChild(rootItem->child(idx));
-    }
-
-    auto childItem = new QTreeWidgetItem(rootItem, QStringList(QString("Modules")));
-
-    for (auto module : moduleList)
-    {
-        childItem->addChild(
-                    new QTreeWidgetItem(QStringList(QString("%1").arg(ACN::OTP::component_s::getModuleString(module)))));
-    }
-}
-
-void MainWindow::updatedComponent(const cid_t& cid, component_t::type_t type)
-{
-    auto rootList = ui->twComponents->findItems(cid.toString(), Qt::MatchExactly);
-    if (rootList.isEmpty()) return;
-
-    auto rootItem = rootList.first();
-
-    QString typeString = (type == component_t::type_t::consumer) ? "Consumer" : "Producer";
-    auto string = QString("Type: %1").arg(typeString);
-    for (int idx = 0; idx < rootItem->childCount(); idx++)
-    {
-        if (rootItem->child(idx)->text(0).startsWith("Type: "))
-        {
-            rootItem->child(idx)->setText(0, string);
-            return;
-        }
-    }
-    rootItem->addChild(new QTreeWidgetItem(QStringList(string)));
-}
-
-void MainWindow::newSystem(cid_t cid, system_t system)
-{
-    auto rootList = ui->twComponents->findItems(cid.toString(), Qt::MatchExactly);
-    if (rootList.isEmpty()) return;
-
-    auto rootItem = rootList.first();
-
-    QTreeWidgetItem *childItem = Q_NULLPTR;
-    for (int idx = 0; idx < rootItem->childCount(); idx++)
-    {
-        if (rootItem->child(idx)->text(0).startsWith("System Numbers:"))
-            childItem = rootItem->child(idx);
-    }
-    if (!childItem) childItem = new QTreeWidgetItem(rootItem, QStringList(QString("System Numbers:")));
-
-    childItem->addChild(
-                new QTreeWidgetItem(QStringList(QString("%1").arg(system))));
-
-    childItem->sortChildren(0, Qt::SortOrder::AscendingOrder);
-}
-
-void MainWindow::removedSystem(cid_t cid, system_t system)
-{
-    auto rootList = ui->twComponents->findItems(cid.toString(), Qt::MatchExactly);
-    if (rootList.isEmpty()) return;
-
-    auto rootItem = rootList.first();
-
-    for (int idx = 0; idx < rootItem->childCount(); idx++)
-    {
-        if (rootItem->child(idx)->text(0).startsWith("System Numbers:"))
-            for (auto sysIdx = 0; sysIdx < rootItem->child(idx)->childCount(); sysIdx++)
+            auto systemWindow = reinterpret_cast<SystemWindow*>(subWindow->widget());
+            if ( systemWindow->getSystem() == system)
             {
-                if (rootItem->child(idx)->child(sysIdx)->text(0) == QString("%1").arg(system))
-                    rootItem->child(idx)->removeChild(rootItem->child(idx)->child(sysIdx));
+                qDebug() << this << "Set focus system window" << systemWindow->windowTitle();
+                systemWindow->setFocus();
+                systemWindow->setWindowState(Qt::WindowState::WindowActive);
+                return true;
             }
+        }
     }
+
+    // Open new
+    qDebug() << this << "Open system window" << system;
+    auto systemWindow = new SystemWindow(otpConsumer, system, this);
+    systemWindow->setAttribute(Qt::WA_DeleteOnClose);
+    ui->mdiArea->addSubWindow(systemWindow);
+    systemWindow->show();
+    return true;
 }
 
 void MainWindow::on_actionSettings_triggered()
@@ -336,9 +243,5 @@ void MainWindow::on_actionNew_Consumer_triggered()
     if (dialog->exec() == QDialog::Rejected)
         return;
 
-    auto system = dialog->getSystem();
-    auto mdiWindow = new SystemWindow(otpConsumer, system, this);
-    mdiWindow->setAttribute(Qt::WA_DeleteOnClose);
-    ui->mdiArea->addSubWindow(mdiWindow);
-    mdiWindow->show();
+    openSystemWindow(dialog->getSystem());
 }

@@ -42,7 +42,7 @@ private slots:
 
 private:
     Ui::GroupSelectionDialog *ui;
-    GroupSpinBox *sbGroup = Q_NULLPTR;
+    GroupSpinBox *sbGroup = nullptr;
 };
 
 #endif // GROUPSELECTIONDIALOG_H

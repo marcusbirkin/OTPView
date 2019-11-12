@@ -33,7 +33,7 @@ public:
             std::shared_ptr<class ACN::OTP::Producer> otpProducer,
             ACN::OTP::axis_t axis,
             ACN::OTP::MODULES::STANDARD::VALUES::moduleValue_t moduleValue,
-            QWidget* parent = Q_NULLPTR);
+            QWidget* parent = nullptr);
 
     value_t value() const { return m_value; }
 

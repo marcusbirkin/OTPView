@@ -12,7 +12,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTreeWidget" name="twDetails">
+    <widget class="QTreeView" name="tvDetails">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
@@ -26,42 +26,14 @@
       <bool>true</bool>
      </property>
      <property name="headerHidden">
-      <bool>false</bool>
-     </property>
-     <property name="columnCount">
-      <number>5</number>
+      <bool>true</bool>
      </property>
      <attribute name="headerVisible">
-      <bool>true</bool>
-     </attribute>
-     <attribute name="headerStretchLastSection">
       <bool>false</bool>
      </attribute>
-     <column>
-      <property name="text">
-       <string notr="true"/>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string notr="true">X</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Y</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Z</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Timestamp</string>
-      </property>
-     </column>
+     <attribute name="headerShowSortIndicator" stdset="0">
+      <bool>false</bool>
+     </attribute>
     </widget>
    </item>
   </layout>

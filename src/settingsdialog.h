@@ -45,6 +45,7 @@ private:
 
     void populateInterfaceList();
     void populateProtocolList();
+    void populateResolutionList();
 };
 
 #endif // SETTINGSDIALOG_H

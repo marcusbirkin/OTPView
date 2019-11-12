@@ -42,7 +42,7 @@ private slots:
 
 private:
     Ui::PointSelectionDialog *ui;
-    PointSpinBox *sbPoint = Q_NULLPTR;
+    PointSpinBox *sbPoint = nullptr;
 };
 
 #endif // POINTSELECTIONDIALOG_H
