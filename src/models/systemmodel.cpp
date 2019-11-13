@@ -36,17 +36,17 @@ SystemItem::SystemItem(
     : QObject(parentItem), otpConsumer(otpConsumer), address(address), type(type)
 {}
 
-void SystemItem::insertChild(int key, SystemItem *item)
+void SystemItem::insertChild(key_t key, SystemItem *item)
 {
     childItems.insert(key, item);
 }
 
-void SystemItem::removeChild(int key)
+void SystemItem::removeChild(key_t key)
 {
     childItems.remove(key);
 }
 
-bool SystemItem::containsChildKey(int key)
+bool SystemItem::containsChildKey(key_t key)
 {
     return childItems.contains(key);
 }
@@ -260,7 +260,6 @@ QVariant SystemItem::data(int column, int roll) const
         case SystemPointRotationAccelItem:
             if (roll == Qt::DisplayRole && column == columnFirst) return QString("Acceleration");
             return QVariant();
-        return QVariant();
 
         case SystemPointAxis_X:
             if (roll == Qt::DisplayRole)
@@ -444,20 +443,16 @@ int SystemModel::columnCount(const QModelIndex &parent) const
 
 QModelIndex SystemModel::index(address_t address, SystemItem::itemType_t type) const
 {
-    auto system = address.system;
     auto group = address.group;
     auto point = address.point;
 
     switch (type) {
         case SystemItem::SystemRootItem:
-        {
-            if (rootItem->getSystem() == system)
-                return index(0,0);
-        } break;
+            return QModelIndex();
 
         case SystemItem::SystemGroupItem:
         {
-            auto parentIndex = index(address, SystemItem::SystemRootItem);
+            auto parentIndex = index(0,0);
             auto parentItem = item(address, SystemItem::SystemRootItem);
             if (!parentIndex.isValid() || !parentItem) break;
             for (int row = 0; row < parentItem->childCount(); ++row)
@@ -520,39 +515,44 @@ SystemItem *SystemModel::item(address_t address, SystemItem::itemType_t type) co
 
 void SystemModel::newGroup(cid_t cid, system_t system, group_t group)
 {
-    Q_UNUSED(cid);
+    Q_UNUSED(cid)
     auto address = address_t(system, group, point_t());
     auto rootItem = item(address, SystemItem::SystemRootItem);
     if (!rootItem) return;
     if (system != rootItem->getSystem()) return;
+    auto rootIndex = index(address, SystemItem::SystemRootItem);
 
     if (rootItem->containsChildKey(group)) return;
     auto groupItem = new SystemItem(this->otpConsumer, address_t(system, group, point_t()), SystemItem::SystemGroupItem, rootItem);
-    auto newRow = rootItem->childCount() + 1;
-    beginInsertRows(QModelIndex(), newRow, newRow);
+
+    auto newRow = rowCount(rootIndex);
+    for (; newRow > 0; --newRow)
+        if (rootItem->child(newRow - 1)->getGroup() < group) break;
+    beginInsertRows(rootIndex, newRow, newRow);
     rootItem->insertChild(group, groupItem);
     endInsertRows();
 }
 
 void SystemModel::removedGroup(cid_t cid, system_t system, group_t group)
 {
-    Q_UNUSED(cid);
+    Q_UNUSED(cid)
     auto address = address_t(system, group, point_t());
     auto rootItem = item(address, SystemItem::SystemRootItem);
     if (!rootItem) return;
     if (system != rootItem->getSystem()) return;
-    for (auto row = 0; row < rootItem->childCount(); ++row)
-        if (item(address, SystemItem::SystemRootItem)->child(row)->getGroup() == group)
-        {
-            beginRemoveRows(QModelIndex(), row, row);
-            rootItem->removeChild(row);
-            endRemoveRows();
-        }
+    auto rootIndex = index(address, SystemItem::SystemRootItem);
+
+    auto oldRow = 0;
+    for (; oldRow < rowCount(rootIndex); ++oldRow)
+        if (item(address, SystemItem::SystemRootItem)->child(oldRow - 1)->getGroup() == group) break;
+    beginRemoveRows(rootIndex, oldRow, oldRow);
+    rootItem->removeChild(group);
+    endRemoveRows();
 }
 
 void SystemModel::newPoint(cid_t cid, system_t system, group_t group, point_t point)
 {
-    Q_UNUSED(cid);
+    Q_UNUSED(cid)
     auto address = address_t(system, group, point);
     auto rootItem = item(address, SystemItem::SystemRootItem);
     if (!rootItem) return;
@@ -562,21 +562,23 @@ void SystemModel::newPoint(cid_t cid, system_t system, group_t group, point_t po
     auto groupIndex = index(address, SystemItem::SystemGroupItem);
     if (!groupIndex.isValid()) return;
 
-    if (groupItem->containsChildKey(point)) return;
+    if (groupItem->containsChildKey(static_cast<SystemItem::key_t>(point))) return;
     auto pointItem = new SystemItem(this->otpConsumer, address_t(system, group, point), SystemItem::SystemPointItem, groupItem);
     newPointDetails(pointItem);
     newPointPosition(pointItem);
     newPointRotation(pointItem);
 
-    auto newRow = groupItem->childCount() + 1;
+    auto newRow = rowCount(groupIndex);
+    for (; newRow > 0; --newRow)
+        if (groupItem->child(newRow - 1)->getPoint() < point) break;
     beginInsertRows(groupIndex, newRow, newRow);
-    groupItem->insertChild(point, pointItem);
+    groupItem->insertChild(static_cast<SystemItem::key_t>(point), pointItem);
     endInsertRows();
 }
 
 void SystemModel::removedPoint(cid_t cid, system_t system, group_t group, point_t point)
 {
-    Q_UNUSED(cid);
+    Q_UNUSED(cid)
     auto address = address_t(system, group, point);
     auto rootItem = item(address, SystemItem::SystemRootItem);
     if (!rootItem) return;
@@ -586,13 +588,12 @@ void SystemModel::removedPoint(cid_t cid, system_t system, group_t group, point_
     auto groupIndex = index(address, SystemItem::SystemGroupItem);
     if (!groupIndex.isValid()) return;
 
-    for (auto row = 0; row < groupItem->childCount(); ++row)
-        if (groupItem->child(row)->getPoint() == point)
-        {
-            beginRemoveRows(groupIndex, row, row);
-            groupItem->removeChild(row);
-            endRemoveRows();
-        }
+    auto oldRow = 0;
+    for (; oldRow < rowCount(groupIndex); ++oldRow)
+        if (groupItem->child(oldRow - 1)->getPoint() == point) break;
+    beginRemoveRows(groupIndex, oldRow, oldRow);
+    groupItem->removeChild(static_cast<SystemItem::key_t>(point));
+    endRemoveRows();
 }
 
 void SystemModel::updatedPoint(cid_t cid, system_t system, group_t group, point_t point)
@@ -621,7 +622,7 @@ void SystemModel::newPointDetails(SystemItem *parent)
     {
         auto detailItem =
                 new SystemItem(this->otpConsumer,  parent->getAddress(), static_cast<SystemItem::itemType_t>(type), pointDetailsItem);
-        pointDetailsItem->insertChild(type, detailItem);
+        pointDetailsItem->insertChild(static_cast<SystemItem::key_t>(type), detailItem);
     }
 }
 
@@ -636,21 +637,21 @@ void SystemModel::newPointPosition(SystemItem *parent)
     {
         auto PositionItem =
                 new SystemItem(this->otpConsumer, parent->getAddress(), static_cast<SystemItem::itemType_t>(type), pointPositionItem);
-        pointPositionItem->insertChild(type, PositionItem);
+        pointPositionItem->insertChild(static_cast<SystemItem::key_t>(type), PositionItem);
 
         // Axis
         for (int axisType = SystemItem::SystemPointAxis_First; axisType <= SystemItem::SystemPointAxis_Last; axisType++)
         {
             auto AxisItem =
                     new SystemItem(this->otpConsumer,  parent->getAddress(), static_cast<SystemItem::itemType_t>(axisType), PositionItem);
-            PositionItem->insertChild(axisType, AxisItem);
+            PositionItem->insertChild(static_cast<SystemItem::key_t>(axisType), AxisItem);
 
             // Axis Details
             for (int axisType = SystemItem::SystemPointAxisDetails_First; axisType <= SystemItem::SystemPointAxisDetails_Last; axisType++)
             {
                 auto AxisDetailItem =
                         new SystemItem(this->otpConsumer,  parent->getAddress(), static_cast<SystemItem::itemType_t>(axisType), AxisItem);
-                AxisItem->insertChild(axisType, AxisDetailItem);
+                AxisItem->insertChild(static_cast<SystemItem::key_t>(axisType), AxisDetailItem);
             }
         }
     }
@@ -667,21 +668,21 @@ void SystemModel::newPointRotation(SystemItem *parent)
     {
         auto RotationItem =
                 new SystemItem(this->otpConsumer, parent->getAddress(), static_cast<SystemItem::itemType_t>(type), pointRotationItem);
-        pointRotationItem->insertChild(type, RotationItem);
+        pointRotationItem->insertChild(static_cast<SystemItem::key_t>(type), RotationItem);
 
         // Axis
         for (int axisType = SystemItem::SystemPointAxis_First; axisType <= SystemItem::SystemPointAxis_Last; axisType++)
         {
             auto AxisItem =
                     new SystemItem(this->otpConsumer,  parent->getAddress(), static_cast<SystemItem::itemType_t>(axisType), RotationItem);
-            RotationItem->insertChild(axisType, AxisItem);
+            RotationItem->insertChild(static_cast<SystemItem::key_t>(axisType), AxisItem);
 
             // Axis Details
             for (int axisType = SystemItem::SystemPointAxisDetails_First; axisType <= SystemItem::SystemPointAxisDetails_Last; axisType++)
             {
                 auto AxisDetailItem =
                         new SystemItem(this->otpConsumer,  parent->getAddress(), static_cast<SystemItem::itemType_t>(axisType), AxisItem);
-                AxisItem->insertChild(axisType, AxisDetailItem);
+                AxisItem->insertChild(static_cast<SystemItem::key_t>(axisType), AxisDetailItem);
             }
         }
     }
