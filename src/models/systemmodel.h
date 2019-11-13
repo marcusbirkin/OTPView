@@ -79,9 +79,11 @@ public:
             itemType_t type = SystemRootItem,
             SystemItem *parentItem = nullptr);
 
-    void insertChild(int key, SystemItem *item);
-    void removeChild(int key);
-    bool containsChildKey(int key);
+    typedef unsigned long key_t;
+
+    void insertChild(key_t key, SystemItem *item);
+    void removeChild(key_t key);
+    bool containsChildKey(key_t key);
     SystemItem *child(int row);
     int childCount() const;
     int columnCount() const;
@@ -89,7 +91,7 @@ public:
     int row() const;
     SystemItem *parentItem() const;
 
-    itemType_t getType() const { return type; };
+    itemType_t getType() const { return type; }
 
     ACN::OTP::system_t getSystem() const { return address.system; }
     ACN::OTP::group_t getGroup() const { return address.group; }
@@ -104,7 +106,7 @@ private:
     ACN::OTP::address_t address;
     itemType_t type;
 
-    QMap<int, SystemItem*> childItems; // SortIndex, SystemItem*
+    QMap<key_t, SystemItem*> childItems; // SortIndex, SystemItem*
 
     enum column_e {
         columnFirst,
@@ -123,7 +125,7 @@ public:
             std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
             ACN::OTP::system_t system,
             QObject *parent = nullptr);
-    ~SystemModel();
+     ~SystemModel() override;
 
     QVariant data(const QModelIndex &index, int role) const override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
