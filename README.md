@@ -9,6 +9,12 @@ Extract (emphasis added) from  E1.59
 
 <b>Data transmitted is intended to coordinate visual and audio elements of a production and should not be used for safety critical applications.</b>"
 
-Windows: [![Build status (Windows)](https://ci.appveyor.com/api/projects/status/udsl1pusbho1o4c3/branch/master?svg=true)](https://ci.appveyor.com/project/marcusbirkin/otpview-windows)
+### Binaries
+https://github.com/marcusbirkin/OTPView/releases
 
-Linux: [![Build status (Linux)](https://ci.appveyor.com/api/projects/status/y1abi0gt1ib2lmlx/branch/master?svg=true)](https://ci.appveyor.com/project/marcusbirkin/otpview-windows)
+#### CI Status
+Windows:<br />
+[![Build status (Windows)](https://ci.appveyor.com/api/projects/status/udsl1pusbho1o4c3/branch/master?svg=true)](https://ci.appveyor.com/project/marcusbirkin/otpview-windows)
+
+Linux:<br />
+[![Build status (Linux)](https://ci.appveyor.com/api/projects/status/y1abi0gt1ib2lmlx/branch/master?svg=true)](https://ci.appveyor.com/project/marcusbirkin/otpview-linux)
