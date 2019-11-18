@@ -90,6 +90,10 @@ public:
     QVariant data(int column = 0, int roll = Qt::DisplayRole) const;
     int row() const;
     SystemItem *parentItem() const;
+    static SystemItem* indexToItem(QModelIndex index)
+    {
+        return  static_cast<SystemItem*>(index.internalPointer());
+    }
 
     itemType_t getType() const { return type; }
 
