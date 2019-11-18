@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -43,6 +43,7 @@ SOURCES += \
     src/models/pointstablemodel.cpp \
     src/models/componentsmodel.cpp \
     src/models/systemmodel.cpp \
+    src/widgets/linechart.cpp \
     src/widgets/systemspinbox.cpp \
     src/widgets/groupspinbox.cpp \
     src/widgets/pointspinbox.cpp \
@@ -61,6 +62,7 @@ HEADERS += \
     src/models/pointstablemodel.h \
     src/models/componentsmodel.h \
     src/models/systemmodel.h \
+    src/widgets/linechart.h \
     src/widgets/systemspinbox.h \
     src/widgets/groupspinbox.h \
     src/widgets/pointspinbox.h \

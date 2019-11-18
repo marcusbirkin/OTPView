@@ -85,7 +85,6 @@ private:
 
     std::pair<value_t,value_t> range = {std::numeric_limits<value_t>::min(),std::numeric_limits<value_t>::max()};
     value_t m_value = 0;
-    ACN::OTP::MODULES::STANDARD::PositionModule_t::scale_t scale;
 };
 
 #endif // SPACIALSPINBOX_H

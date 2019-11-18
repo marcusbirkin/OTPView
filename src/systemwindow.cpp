@@ -19,7 +19,9 @@
 #include "systemwindow.h"
 #include "ui_systemwindow.h"
 #include <QTimer>
+#include <QToolButton>
 #include "models/systemmodel.h"
+#include "widgets/linechart.h"
 
 using namespace ACN::OTP;
 
@@ -44,10 +46,33 @@ SystemWindow::SystemWindow(
     // Tree
     ui->tvDetails->setModel(new SystemModel(otpConsumer, system, this));
     ui->tvDetails->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    connect(ui->tvDetails, &QTreeView::doubleClicked, [this](const QModelIndex &index) {
+        if (ui->tvDetails->selectionModel()->currentIndex().column() != 1) return;
+        auto address = SystemItem::indexToItem(index)->getAddress();
+        if (!address.isValid()) return;
+
+        // Open and switch to
+        auto idx = ui->tabWidget->addTab(new LineChart(this->otpConsumer, address, this), address.toString());
+        ui->tabWidget->setCurrentIndex(idx);
+    });
+
+    // Tabs
+    ui->tabWidget->setTabsClosable(true);
+    ui->tabWidget->setMovable(true);
+    // - Remove close button from first tab
+    QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
+    tabBar->setTabButton(0, QTabBar::RightSide, 0);
+    tabBar->setTabButton(0, QTabBar::LeftSide, 0);
 }
 
 SystemWindow::~SystemWindow()
 {
     otpConsumer->removeConsumerSystem(system);
     delete ui;
+}
+
+
+void SystemWindow::on_tabWidget_tabCloseRequested(int index)
+{
+    ui->tabWidget->removeTab(index);
 }

@@ -40,6 +40,9 @@ public:
 
     ACN::OTP::system_t getSystem() const { return system; }
 
+private slots:
+    void on_tabWidget_tabCloseRequested(int index);
+
 private:
     Ui::SystemWindow *ui;
 
