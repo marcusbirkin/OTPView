@@ -166,10 +166,17 @@ SpacialSpinBox::value_t SpacialSpinBox::valueFromText(const QString &text, bool 
 
 QString SpacialSpinBox::textFromValue(value_t val) const
 {
-    return QString("%1 %2").arg(QString::number(val)).arg(
-                otpProducer->getUnitString(
-                    otpProducer->getProducerPosition(address, axis).scale,
-                    moduleValue));
+    switch (moduleValue) {
+        case VALUES::POSITION:
+            return QString("%1 %2").arg(QString::number(val)).arg(
+                        otpProducer->getUnitString(
+                            otpProducer->getProducerPosition(address, axis).scale,
+                            moduleValue));
+        default:
+            return QString("%1 %2").arg(QString::number(val)).arg(
+                        otpProducer->getUnitString(
+                            moduleValue));
+    }
 }
 
 QAbstractSpinBox::StepEnabled SpacialSpinBox::stepEnabled() const
