@@ -18,8 +18,6 @@
 */
 #include "systemwindow.h"
 #include "ui_systemwindow.h"
-#include <QTimer>
-#include <QToolButton>
 #include "models/systemmodel.h"
 #include "widgets/linechart.h"
 
@@ -74,5 +72,6 @@ SystemWindow::~SystemWindow()
 
 void SystemWindow::on_tabWidget_tabCloseRequested(int index)
 {
+    ui->tabWidget->widget(index)->deleteLater();
     ui->tabWidget->removeTab(index);
 }
