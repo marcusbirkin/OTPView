@@ -19,7 +19,7 @@
 #include "systemmodel.h"
 #include "settings.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 static QFont italic()
 {

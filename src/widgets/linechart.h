@@ -34,8 +34,8 @@ class LineChart : public QWidget
     Q_OBJECT
 public:
     explicit LineChart(
-            std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
-            ACN::OTP::address_t address,
+            std::shared_ptr<class OTP::Consumer> otpConsumer,
+            OTP::address_t address,
             QWidget *parent = nullptr);
 
 signals:
@@ -46,24 +46,24 @@ private slots:
 
     void redraw();
     void addPoint();
-    void updatedPosition(ACN::OTP::cid_t, ACN::OTP::address_t, ACN::OTP::axis_t);
-    void updatedPositionVelocity(ACN::OTP::cid_t, ACN::OTP::address_t, ACN::OTP::axis_t);
-    void updatedPositionAcceleration(ACN::OTP::cid_t, ACN::OTP::address_t, ACN::OTP::axis_t);
-    void updatedRotation(ACN::OTP::cid_t, ACN::OTP::address_t, ACN::OTP::axis_t);
-    void updatedRotationVelocity(ACN::OTP::cid_t, ACN::OTP::address_t, ACN::OTP::axis_t);
-    void updatedRotationAcceleration(ACN::OTP::cid_t, ACN::OTP::address_t, ACN::OTP::axis_t);
+    void updatedPosition(OTP::cid_t, OTP::address_t, OTP::axis_t);
+    void updatedPositionVelocity(OTP::cid_t, OTP::address_t, OTP::axis_t);
+    void updatedPositionAcceleration(OTP::cid_t, OTP::address_t, OTP::axis_t);
+    void updatedRotation(OTP::cid_t, OTP::address_t, OTP::axis_t);
+    void updatedRotationVelocity(OTP::cid_t, OTP::address_t, OTP::axis_t);
+    void updatedRotationAcceleration(OTP::cid_t, OTP::address_t, OTP::axis_t);
 
 private:
-    void setupLineSeries(ACN::OTP::MODULES::STANDARD::VALUES::moduleValue_t, QString, QHBoxLayout&);
+    void setupLineSeries(OTP::MODULES::STANDARD::VALUES::moduleValue_t, QString, QHBoxLayout&);
 
     QChartView *chartView;
-    QMap<ACN::OTP::MODULES::STANDARD::VALUES::moduleValue_t, QLineSeries*> lineSeries[ACN::OTP::axis_t::count];
+    QMap<OTP::MODULES::STANDARD::VALUES::moduleValue_t, QLineSeries*> lineSeries[OTP::axis_t::count];
     std::pair<int, int> yRange;
 
     QButtonGroup *buttonGroup;
 
-    std::shared_ptr<class ACN::OTP::Consumer> otpConsumer;
-    ACN::OTP::address_t address;
+    std::shared_ptr<class OTP::Consumer> otpConsumer;
+    OTP::address_t address;
 };
 
 #endif // LINECHART_H

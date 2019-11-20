@@ -18,7 +18,7 @@
 */
 #include "componentsmodel.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 ComponentsItem::ComponentsItem(
         std::shared_ptr<class Consumer> otpConsumer,
@@ -162,7 +162,7 @@ ComponentsModel::ComponentsModel(
         emit otpConsumer.get()->newComponent(cid);
 }
 
-void ComponentsModel::newComponent(ACN::OTP::cid_t cid)
+void ComponentsModel::newComponent(OTP::cid_t cid)
 {
     auto newItem = new ComponentsItem(
                 this->otpConsumer,

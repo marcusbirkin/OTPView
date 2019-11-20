@@ -19,9 +19,9 @@
 #include "pointselectiondialog.h"
 #include "ui_pointselectiondialog.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
-PointSelectionDialog::PointSelectionDialog(QList<ACN::OTP::point_t> usedPoint, QWidget *parent) :
+PointSelectionDialog::PointSelectionDialog(QList<OTP::point_t> usedPoint, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PointSelectionDialog)
 {

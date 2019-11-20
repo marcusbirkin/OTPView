@@ -28,46 +28,46 @@ class GroupSpinBox : public QAbstractSpinBox
 {
     Q_OBJECT
 public:
-    GroupSpinBox(QWidget* parent = nullptr) : GroupSpinBox(QList<ACN::OTP::group_t>(), parent) {}
-    GroupSpinBox(QList<ACN::OTP::group_t> usedGroups, QWidget* parent = nullptr);
+    GroupSpinBox(QWidget* parent = nullptr) : GroupSpinBox(QList<OTP::group_t>(), parent) {}
+    GroupSpinBox(QList<OTP::group_t> usedGroups, QWidget* parent = nullptr);
 
-    ACN::OTP::group_t value() const { return m_value; }
+    OTP::group_t value() const { return m_value; }
 
-    ACN::OTP::group_t minimum() const { return range.first; }
-    void setMinimum(ACN::OTP::group_t  min) { range.first = min; }
+    OTP::group_t minimum() const { return range.first; }
+    void setMinimum(OTP::group_t  min) { range.first = min; }
 
-    ACN::OTP::group_t maximum() const { return range.second; }
-    void setMaximum(ACN::OTP::group_t max) {  range.second = max; }
+    OTP::group_t maximum() const { return range.second; }
+    void setMaximum(OTP::group_t max) {  range.second = max; }
 
-    void setRange(ACN::OTP::group_t min, ACN::OTP::group_t max)
+    void setRange(OTP::group_t min, OTP::group_t max)
     {
         setMinimum(min);
         setMaximum(max);
     }
 
 public slots:
-    void setValue(ACN::OTP::group_t val);
+    void setValue(OTP::group_t val);
 
 signals:
-    void valueChanged(ACN::OTP::group_t value);
-    void valueChanged(ACN::OTP::group_t oldValue, ACN::OTP::group_t newValue);
+    void valueChanged(OTP::group_t value);
+    void valueChanged(OTP::group_t oldValue, OTP::group_t newValue);
 
 protected:
     void stepBy(int steps);
 
-    QValidator::State validate(const ACN::OTP::group_t &input) const;
+    QValidator::State validate(const OTP::group_t &input) const;
     QValidator::State validate(QString &input, int &pos) const;
 
-    ACN::OTP::group_t valueFromText(const QString &text) const;
-    QString textFromValue(ACN::OTP::group_t val) const;
+    OTP::group_t valueFromText(const QString &text) const;
+    QString textFromValue(OTP::group_t val) const;
 
     QAbstractSpinBox::StepEnabled stepEnabled() const {return StepUpEnabled | StepDownEnabled; }
 
 private:
-    QList<ACN::OTP::group_t> usedGroups;
+    QList<OTP::group_t> usedGroups;
 
-    std::pair<ACN::OTP::group_t,ACN::OTP::group_t> range;
-    ACN::OTP::group_t m_value;
+    std::pair<OTP::group_t,OTP::group_t> range;
+    OTP::group_t m_value;
 };
 
 #endif // GROUPSPINBOX_H

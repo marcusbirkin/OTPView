@@ -88,7 +88,7 @@ Settings::componentDetails_t Settings::getComponentSettings(QString settingsGrou
     QSettings settings;
     settings.beginGroup(settingsGroup);
     details.Name = settings.value(S_COMPONENT_NAME, details.Name).toString();
-    details.CID = ACN::OTP::cid_t(settings.value(S_COMPONENT_CID, details.CID.toByteArray()).toByteArray());
+    details.CID = OTP::cid_t(settings.value(S_COMPONENT_CID, details.CID.toByteArray()).toByteArray());
     return details;
 }
 
@@ -108,16 +108,16 @@ uint Settings::getSystemRequestInterval()
     return settings.value(S_GENERAL_SYSTEMREQUESTINTERVAL, 3).toUInt();
 }
 
-void Settings::setSourceResolution(ACN::OTP::Consumer::multipleProducerResolution_e resolution)
+void Settings::setSourceResolution(OTP::Consumer::multipleProducerResolution_e resolution)
 {
     QSettings settings;
     settings.beginGroup(S_GENERAL);
     settings.setValue(S_GENERAL_SOURCERESOLUTION, resolution);
     settings.sync();
 }
-ACN::OTP::Consumer::multipleProducerResolution_e Settings::getSourceResolution()
+OTP::Consumer::multipleProducerResolution_e Settings::getSourceResolution()
 {
-    using namespace ACN::OTP;
+    using namespace OTP;
     QSettings settings;
     settings.beginGroup(S_GENERAL);
     auto ret = settings.value(S_GENERAL_SOURCERESOLUTION, Consumer::Newest).toInt();

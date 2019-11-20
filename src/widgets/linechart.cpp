@@ -26,13 +26,13 @@
 #include <QLegendMarker>
 
 using namespace QtCharts;
-using namespace ACN::OTP;
+using namespace OTP;
 using namespace MODULES::STANDARD::VALUES;
 
 #define displayRange 60 // Number of seconds to show
 
-LineChart::LineChart(std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
-                     ACN::OTP::address_t address,
+LineChart::LineChart(std::shared_ptr<class OTP::Consumer> otpConsumer,
+                     OTP::address_t address,
                      QWidget *parent) :
     chartView(new QChartView(new QChart(), parent)),
     buttonGroup(new QButtonGroup(this)),
@@ -90,12 +90,12 @@ LineChart::LineChart(std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
     updateTimer->start(1000);
     addPoint();
 
-    connect(otpConsumer.get(), &ACN::OTP::Consumer::updatedPosition, this, &LineChart::updatedPosition);
-    connect(otpConsumer.get(), &ACN::OTP::Consumer::updatedPositionVelocity, this, &LineChart::updatedPositionVelocity);
-    connect(otpConsumer.get(), &ACN::OTP::Consumer::updatedPositionAcceleration, this, &LineChart::updatedPositionAcceleration);
-    connect(otpConsumer.get(), &ACN::OTP::Consumer::updatedRotation, this, &LineChart::updatedRotation);
-    connect(otpConsumer.get(), &ACN::OTP::Consumer::updatedRotationVelocity, this, &LineChart::updatedRotationVelocity);
-    connect(otpConsumer.get(), &ACN::OTP::Consumer::updatedRotationAcceleration, this, &LineChart::updatedRotationAcceleration);
+    connect(otpConsumer.get(), &OTP::Consumer::updatedPosition, this, &LineChart::updatedPosition);
+    connect(otpConsumer.get(), &OTP::Consumer::updatedPositionVelocity, this, &LineChart::updatedPositionVelocity);
+    connect(otpConsumer.get(), &OTP::Consumer::updatedPositionAcceleration, this, &LineChart::updatedPositionAcceleration);
+    connect(otpConsumer.get(), &OTP::Consumer::updatedRotation, this, &LineChart::updatedRotation);
+    connect(otpConsumer.get(), &OTP::Consumer::updatedRotationVelocity, this, &LineChart::updatedRotationVelocity);
+    connect(otpConsumer.get(), &OTP::Consumer::updatedRotationAcceleration, this, &LineChart::updatedRotationAcceleration);
 }
 
 void LineChart::setupLineSeries(moduleValue_t type, QString label, QHBoxLayout& hl)

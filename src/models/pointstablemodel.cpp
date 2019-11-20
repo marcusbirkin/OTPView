@@ -20,12 +20,12 @@
 #include "pointstablemodel.h"
 #include <QDebug>
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 PointsTableModel::PointsTableModel(
-        std::shared_ptr<class ACN::OTP::Producer> otpProducer,
-        ACN::OTP::system_t system,
-        ACN::OTP::group_t group,
+        std::shared_ptr<class OTP::Producer> otpProducer,
+        OTP::system_t system,
+        OTP::group_t group,
         QObject *parent) : QAbstractTableModel(parent),
     otpProducer(otpProducer),
     system(system),
@@ -35,7 +35,7 @@ PointsTableModel::PointsTableModel(
     connect(otpProducer.get(), &Producer::removedPoint, [this]() { emit layoutChanged(); });
 }
 
-ACN::OTP::address_t PointsTableModel::getAddress(const QModelIndex &index) const
+OTP::address_t PointsTableModel::getAddress(const QModelIndex &index) const
 {
     if (index.row() > rowCount(index)) return address_t();
     auto pointList = otpProducer->getProducerPoints(system, group);

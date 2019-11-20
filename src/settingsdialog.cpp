@@ -62,7 +62,7 @@ void SettingsDialog::on_buttonBox_accepted()
                 static_cast<uint>(ui->sbSystemRequestInterval->value()));
 
     instance.setSourceResolution(
-                static_cast<ACN::OTP::Consumer::multipleProducerResolution_e>(
+                static_cast<OTP::Consumer::multipleProducerResolution_e>(
                     ui->cbResolution->currentData(Qt::UserRole).toInt()));
 
     this->close();
@@ -137,13 +137,13 @@ void SettingsDialog::populateProtocolList()
 
 void SettingsDialog::populateResolutionList()
 {
-    ui->cbResolution->addItem("Newest", ACN::OTP::Consumer::multipleProducerResolution_e::Newest);
-    ui->cbResolution->addItem("Largest", ACN::OTP::Consumer::multipleProducerResolution_e::Largest);
-    ui->cbResolution->addItem("Smallest", ACN::OTP::Consumer::multipleProducerResolution_e::Smallest);
+    ui->cbResolution->addItem("Newest", OTP::Consumer::multipleProducerResolution_e::Newest);
+    ui->cbResolution->addItem("Largest", OTP::Consumer::multipleProducerResolution_e::Largest);
+    ui->cbResolution->addItem("Smallest", OTP::Consumer::multipleProducerResolution_e::Smallest);
 
     for (int idx = 0; idx < ui->cbResolution->count(); idx++)
     {
-        auto idxData = static_cast<ACN::OTP::Consumer::multipleProducerResolution_e>(
+        auto idxData = static_cast<OTP::Consumer::multipleProducerResolution_e>(
                     ui->cbResolution->itemData(idx).toInt());
         auto savedData = Settings::getInstance().getSourceResolution();
         if (idxData == savedData)

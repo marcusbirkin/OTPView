@@ -28,46 +28,46 @@ class PointSpinBox : public QAbstractSpinBox
 {
     Q_OBJECT
 public:
-    PointSpinBox(QWidget* parent = nullptr) : PointSpinBox(QList<ACN::OTP::point_t>(), parent) {}
-    PointSpinBox(QList<ACN::OTP::point_t> usedPoints, QWidget* parent = nullptr);
+    PointSpinBox(QWidget* parent = nullptr) : PointSpinBox(QList<OTP::point_t>(), parent) {}
+    PointSpinBox(QList<OTP::point_t> usedPoints, QWidget* parent = nullptr);
 
-    ACN::OTP::point_t value() const { return m_value; }
+    OTP::point_t value() const { return m_value; }
 
-    ACN::OTP::point_t minimum() const { return range.first; }
-    void setMinimum(ACN::OTP::point_t  min) { range.first = min; }
+    OTP::point_t minimum() const { return range.first; }
+    void setMinimum(OTP::point_t  min) { range.first = min; }
 
-    ACN::OTP::point_t maximum() const { return range.second; }
-    void setMaximum(ACN::OTP::point_t max) {  range.second = max; }
+    OTP::point_t maximum() const { return range.second; }
+    void setMaximum(OTP::point_t max) {  range.second = max; }
 
-    void setRange(ACN::OTP::point_t min, ACN::OTP::point_t max)
+    void setRange(OTP::point_t min, OTP::point_t max)
     {
         setMinimum(min);
         setMaximum(max);
     }
 
 public slots:
-    void setValue(ACN::OTP::point_t val);
+    void setValue(OTP::point_t val);
 
 signals:
-    void valueChanged(ACN::OTP::point_t value);
-    void valueChanged(ACN::OTP::point_t oldValue, ACN::OTP::point_t newValue);
+    void valueChanged(OTP::point_t value);
+    void valueChanged(OTP::point_t oldValue, OTP::point_t newValue);
 
 protected:
     void stepBy(int steps);
 
-    QValidator::State validate(const ACN::OTP::point_t &input) const;
+    QValidator::State validate(const OTP::point_t &input) const;
     QValidator::State validate(QString &input, int &pos) const;
 
-    ACN::OTP::point_t valueFromText(const QString &text) const;
-    QString textFromValue(ACN::OTP::point_t val) const;
+    OTP::point_t valueFromText(const QString &text) const;
+    QString textFromValue(OTP::point_t val) const;
 
     QAbstractSpinBox::StepEnabled stepEnabled() const {return StepUpEnabled | StepDownEnabled; }
 
 private:
-    QList<ACN::OTP::point_t> usedPoints;
+    QList<OTP::point_t> usedPoints;
 
-    std::pair<ACN::OTP::point_t,ACN::OTP::point_t> range;
-    ACN::OTP::point_t m_value;
+    std::pair<OTP::point_t,OTP::point_t> range;
+    OTP::point_t m_value;
 };
 
 #endif // POINTSPINBOX_H

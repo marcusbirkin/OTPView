@@ -34,14 +34,14 @@ class GroupWindow : public QWidget
 
 public:
     explicit GroupWindow(
-            std::shared_ptr<class ACN::OTP::Producer> otpProducer,
-            ACN::OTP::system_t system,
-            ACN::OTP::group_t group,
+            std::shared_ptr<class OTP::Producer> otpProducer,
+            OTP::system_t system,
+            OTP::group_t group,
             QWidget *parent = nullptr);
     ~GroupWindow();
 
 public slots:
-    void setSystem(ACN::OTP::system_t newSystem);
+    void setSystem(OTP::system_t newSystem);
 
 private slots:
     void on_pbAddPoint_clicked();
@@ -54,9 +54,9 @@ private slots:
 private:
     Ui::GroupWindow *ui;
 
-    std::shared_ptr<class ACN::OTP::Producer> otpProducer;
-    ACN::OTP::system_t system;
-    ACN::OTP::group_t group;
+    std::shared_ptr<class OTP::Producer> otpProducer;
+    OTP::system_t system;
+    OTP::group_t group;
 
     QStringList Axes {QStringLiteral("X"),QStringLiteral("Y"),QStringLiteral("Z")};
 
@@ -72,7 +72,7 @@ private:
         tr("Acceleration")
     };
 
-    QList<ACN::OTP::address_t> getSelectedAddress();
+    QList<OTP::address_t> getSelectedAddress();
 };
 
 #endif // GROUPWINDOW_H

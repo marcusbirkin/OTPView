@@ -40,8 +40,8 @@ public:
     } itemType_t;
 
     explicit ComponentsItem(
-            std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
-            ACN::OTP::cid_t CID = ACN::OTP::cid_t(),
+            std::shared_ptr<class OTP::Consumer> otpConsumer,
+            OTP::cid_t CID = OTP::cid_t(),
             itemType_t type = ComponentRootItem,
             ComponentsItem *parentItem = nullptr);
 
@@ -60,8 +60,8 @@ signals:
     void layoutChanged();
 
 private:
-    std::shared_ptr<class ACN::OTP::Consumer> otpConsumer;
-    ACN::OTP::cid_t CID;
+    std::shared_ptr<class OTP::Consumer> otpConsumer;
+    OTP::cid_t CID;
     itemType_t type;
 
     QVector<ComponentsItem*> childItems;
@@ -73,7 +73,7 @@ class ComponentsModel : public QAbstractItemModel
 
 public:
     explicit ComponentsModel(
-            std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
+            std::shared_ptr<class OTP::Consumer> otpConsumer,
             QObject *parent = nullptr);
 
     QVariant data(const QModelIndex &index, int role) const override;
@@ -87,10 +87,10 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
 private slots:
-    void newComponent(ACN::OTP::cid_t cid);
+    void newComponent(OTP::cid_t cid);
 
 private:
-    std::shared_ptr<class ACN::OTP::Consumer> otpConsumer;
+    std::shared_ptr<class OTP::Consumer> otpConsumer;
     ComponentsItem *rootItem;
 
 };

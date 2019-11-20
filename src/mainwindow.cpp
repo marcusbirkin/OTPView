@@ -26,7 +26,7 @@
 #include "systemselectiondialog.h"
 #include "models/componentsmodel.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 const static QString componentSettingsGroup_CONSUMER = "CONSUMER";
 const static QString componentSettingsGroup_PRODUCER = "PRODUCER";

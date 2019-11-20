@@ -74,8 +74,8 @@ public:
         SystemPointAxisDetails_Last = SystemPointAxisDetails_Timestamp,
     } itemType_t;
 
-    explicit SystemItem(std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
-            ACN::OTP::address_t address = ACN::OTP::address_t(),
+    explicit SystemItem(std::shared_ptr<class OTP::Consumer> otpConsumer,
+            OTP::address_t address = OTP::address_t(),
             itemType_t type = SystemRootItem,
             SystemItem *parentItem = nullptr);
 
@@ -97,17 +97,17 @@ public:
 
     itemType_t getType() const { return type; }
 
-    ACN::OTP::system_t getSystem() const { return address.system; }
-    ACN::OTP::group_t getGroup() const { return address.group; }
-    ACN::OTP::point_t getPoint() const { return address.point; }
-    ACN::OTP::address_t getAddress() const
-        { return ACN::OTP::address_t(getSystem(), getGroup(), getPoint()); }
+    OTP::system_t getSystem() const { return address.system; }
+    OTP::group_t getGroup() const { return address.group; }
+    OTP::point_t getPoint() const { return address.point; }
+    OTP::address_t getAddress() const
+        { return OTP::address_t(getSystem(), getGroup(), getPoint()); }
 
 private:
     QString getDataPositionRotationString() const;
 
-    std::shared_ptr<class ACN::OTP::Consumer> otpConsumer;
-    ACN::OTP::address_t address;
+    std::shared_ptr<class OTP::Consumer> otpConsumer;
+    OTP::address_t address;
     itemType_t type;
 
     QMap<key_t, SystemItem*> childItems; // SortIndex, SystemItem*
@@ -126,8 +126,8 @@ class SystemModel : public QAbstractItemModel
 
 public:
     explicit SystemModel(
-            std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
-            ACN::OTP::system_t system,
+            std::shared_ptr<class OTP::Consumer> otpConsumer,
+            OTP::system_t system,
             QObject *parent = nullptr);
      ~SystemModel() override;
 
@@ -142,22 +142,22 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
 private slots:
-    void newGroup(ACN::OTP::cid_t, ACN::OTP::system_t, ACN::OTP::group_t);
-    void removedGroup(ACN::OTP::cid_t, ACN::OTP::system_t, ACN::OTP::group_t);
+    void newGroup(OTP::cid_t, OTP::system_t, OTP::group_t);
+    void removedGroup(OTP::cid_t, OTP::system_t, OTP::group_t);
 
-    void newPoint(ACN::OTP::cid_t, ACN::OTP::system_t, ACN::OTP::group_t, ACN::OTP::point_t);
-    void removedPoint(ACN::OTP::cid_t, ACN::OTP::system_t, ACN::OTP::group_t, ACN::OTP::point_t);
-    void updatedPoint(ACN::OTP::cid_t, ACN::OTP::system_t, ACN::OTP::group_t, ACN::OTP::point_t);
+    void newPoint(OTP::cid_t, OTP::system_t, OTP::group_t, OTP::point_t);
+    void removedPoint(OTP::cid_t, OTP::system_t, OTP::group_t, OTP::point_t);
+    void updatedPoint(OTP::cid_t, OTP::system_t, OTP::group_t, OTP::point_t);
 
     void newPointDetails(SystemItem *parent);
     void newPointPosition(SystemItem *parent);
     void newPointRotation(SystemItem *parent);
 
 private:
-    QModelIndex index(ACN::OTP::address_t, SystemItem::itemType_t) const;
-    SystemItem *item(ACN::OTP::address_t, SystemItem::itemType_t) const;
+    QModelIndex index(OTP::address_t, SystemItem::itemType_t) const;
+    SystemItem *item(OTP::address_t, SystemItem::itemType_t) const;
 
-    std::shared_ptr<class ACN::OTP::Consumer> otpConsumer;
+    std::shared_ptr<class OTP::Consumer> otpConsumer;
     SystemItem *rootItem;
 };
 

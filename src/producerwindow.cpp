@@ -22,7 +22,7 @@
 #include "groupselectiondialog.h"
 #include <QMdiSubWindow>
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *parent) :
     QMainWindow(parent),
@@ -81,8 +81,8 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
 
     // OTP Producer System
     otpProducer->addProducerSystem(static_cast<system_t>(ui->sbSystem->value()));
-    connect(ui->sbSystem, qOverload<ACN::OTP::system_t, ACN::OTP::system_t>(&SystemSpinBox::valueChanged),
-        [this](ACN::OTP::system_t oldValue, ACN::OTP::system_t newValue) {
+    connect(ui->sbSystem, qOverload<OTP::system_t, OTP::system_t>(&SystemSpinBox::valueChanged),
+        [this](OTP::system_t oldValue, OTP::system_t newValue) {
             otpProducer->addProducerSystem(newValue);
             for (auto subWindow : ui->mdiArea->subWindowList())
                 static_cast<GroupWindow*>(subWindow->widget())->setSystem(newValue);

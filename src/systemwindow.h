@@ -33,12 +33,12 @@ class SystemWindow : public QWidget
 
 public:
     explicit SystemWindow(
-            std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
-            ACN::OTP::system_t system,
+            std::shared_ptr<class OTP::Consumer> otpConsumer,
+            OTP::system_t system,
             QWidget *parent = nullptr);
     ~SystemWindow();
 
-    ACN::OTP::system_t getSystem() const { return system; }
+    OTP::system_t getSystem() const { return system; }
 
 private slots:
     void on_tabWidget_tabCloseRequested(int index);
@@ -46,8 +46,8 @@ private slots:
 private:
     Ui::SystemWindow *ui;
 
-    std::shared_ptr<class ACN::OTP::Consumer> otpConsumer;
-    ACN::OTP::system_t system;
+    std::shared_ptr<class OTP::Consumer> otpConsumer;
+    OTP::system_t system;
 };
 
 #endif // SYSTEMWINDOW_H

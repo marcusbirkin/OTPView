@@ -28,46 +28,46 @@ class SystemSpinBox : public QAbstractSpinBox
 {
     Q_OBJECT
 public:
-    SystemSpinBox(QWidget* parent = nullptr) : SystemSpinBox(QList<ACN::OTP::system_t>(), parent) {}
-    SystemSpinBox(QList<ACN::OTP::system_t> usedSystems, QWidget* parent = nullptr);
+    SystemSpinBox(QWidget* parent = nullptr) : SystemSpinBox(QList<OTP::system_t>(), parent) {}
+    SystemSpinBox(QList<OTP::system_t> usedSystems, QWidget* parent = nullptr);
 
-    ACN::OTP::system_t value() const { return m_value; }
+    OTP::system_t value() const { return m_value; }
 
-    ACN::OTP::system_t minimum() const { return range.first; }
-    void setMinimum(ACN::OTP::system_t  min) { range.first = min; }
+    OTP::system_t minimum() const { return range.first; }
+    void setMinimum(OTP::system_t  min) { range.first = min; }
 
-    ACN::OTP::system_t maximum() const { return range.second; }
-    void setMaximum(ACN::OTP::system_t max) {  range.second = max; }
+    OTP::system_t maximum() const { return range.second; }
+    void setMaximum(OTP::system_t max) {  range.second = max; }
 
-    void setRange(ACN::OTP::system_t min, ACN::OTP::system_t max)
+    void setRange(OTP::system_t min, OTP::system_t max)
     {
         setMinimum(min);
         setMaximum(max);
     }
 
 public slots:
-    void setValue(ACN::OTP::system_t val);
+    void setValue(OTP::system_t val);
 
 signals:
-    void valueChanged(ACN::OTP::system_t value);
-    void valueChanged(ACN::OTP::system_t oldValue, ACN::OTP::system_t newValue);
+    void valueChanged(OTP::system_t value);
+    void valueChanged(OTP::system_t oldValue, OTP::system_t newValue);
 
 protected:
     void stepBy(int steps);
 
-    QValidator::State validate(const ACN::OTP::system_t &input) const;
+    QValidator::State validate(const OTP::system_t &input) const;
     QValidator::State validate(QString &input, int &pos) const;
 
-    ACN::OTP::system_t valueFromText(const QString &text) const;
-    QString textFromValue(ACN::OTP::system_t val) const;
+    OTP::system_t valueFromText(const QString &text) const;
+    QString textFromValue(OTP::system_t val) const;
 
     QAbstractSpinBox::StepEnabled stepEnabled() const {return StepUpEnabled | StepDownEnabled; }
 
 private:
-    QList<ACN::OTP::system_t> usedSystems;
+    QList<OTP::system_t> usedSystems;
 
-    std::pair<ACN::OTP::system_t,ACN::OTP::system_t> range;
-    ACN::OTP::system_t m_value;
+    std::pair<OTP::system_t,OTP::system_t> range;
+    OTP::system_t m_value;
 };
 
 #endif // SYSTEMSPINBOX_H

@@ -47,7 +47,7 @@ private:
     QString componentSettingsGroup;
     void saveComponentDetails();
 
-    std::shared_ptr<class ACN::OTP::Producer> otpProducer;
+    std::shared_ptr<class OTP::Producer> otpProducer;
 };
 
 #endif // PRODUCERWINDOW_H

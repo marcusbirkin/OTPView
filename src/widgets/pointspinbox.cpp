@@ -18,7 +18,7 @@
 */
 #include "pointspinbox.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 PointSpinBox::PointSpinBox(QList<point_t> usedPoints, QWidget* parent) : QAbstractSpinBox(parent),
     usedPoints(usedPoints)
@@ -66,7 +66,7 @@ void PointSpinBox::stepBy(int steps)
     setValue(newValue);
 }
 
-QValidator::State PointSpinBox::validate(const ACN::OTP::point_t &input) const
+QValidator::State PointSpinBox::validate(const OTP::point_t &input) const
 {
     if (input < minimum() || input > maximum())
         return QValidator::Invalid;
@@ -80,7 +80,7 @@ QValidator::State PointSpinBox::validate(const ACN::OTP::point_t &input) const
 QValidator::State PointSpinBox::validate(QString &input, int &pos) const
 {
     bool ok;
-    ACN::OTP::point_t val = input.mid(pos).toUInt(&ok);
+    OTP::point_t val = input.mid(pos).toUInt(&ok);
     if (!ok)
         return QValidator::Invalid;
 
@@ -88,12 +88,12 @@ QValidator::State PointSpinBox::validate(QString &input, int &pos) const
 }
 
 
-ACN::OTP::point_t PointSpinBox::valueFromText(const QString &text) const
+OTP::point_t PointSpinBox::valueFromText(const QString &text) const
 {
     return text.toUInt();
 }
 
-QString PointSpinBox::textFromValue(ACN::OTP::point_t val) const
+QString PointSpinBox::textFromValue(OTP::point_t val) const
 {
     return QString::number(val);
 }

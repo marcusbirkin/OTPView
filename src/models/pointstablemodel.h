@@ -27,14 +27,14 @@ class PointsTableModel : public QAbstractTableModel
     Q_OBJECT
 public:
     PointsTableModel(
-            std::shared_ptr<class ACN::OTP::Producer> otpProducer,
-            ACN::OTP::system_t system,
-            ACN::OTP::group_t group,
+            std::shared_ptr<class OTP::Producer> otpProducer,
+            OTP::system_t system,
+            OTP::group_t group,
             QObject *parent);
-    void setGroup(ACN::OTP::group_t value) { group = value; }
-    void setSystem(ACN::OTP::system_t value) { system = value; }
+    void setGroup(OTP::group_t value) { group = value; }
+    void setSystem(OTP::system_t value) { system = value; }
 
-    ACN::OTP::address_t getAddress(const QModelIndex &index) const;
+    OTP::address_t getAddress(const QModelIndex &index) const;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const ;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -43,9 +43,9 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
 private:
-    std::shared_ptr<class ACN::OTP::Producer> otpProducer;
-    ACN::OTP::system_t system;
-    ACN::OTP::group_t group;
+    std::shared_ptr<class OTP::Producer> otpProducer;
+    OTP::system_t system;
+    OTP::group_t group;
 };
 
 #endif // POINTSTABLEMODEL_H

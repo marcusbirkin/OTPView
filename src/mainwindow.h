@@ -50,9 +50,9 @@ private:
     void updateStatusBar();
     void saveComponentDetails();
 
-    bool openSystemWindow(ACN::OTP::system_t system);
+    bool openSystemWindow(OTP::system_t system);
 
-    std::shared_ptr<class ACN::OTP::Consumer> otpConsumer;
+    std::shared_ptr<class OTP::Consumer> otpConsumer;
     QList<ProducerWindow*> producerWindows;
 };
 

@@ -18,7 +18,7 @@
 */
 #include "systemspinbox.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 SystemSpinBox::SystemSpinBox(QList<system_t> usedSystems, QWidget* parent) : QAbstractSpinBox(parent),
     usedSystems(usedSystems)
@@ -66,7 +66,7 @@ void SystemSpinBox::stepBy(int steps)
     setValue(newValue);
 }
 
-QValidator::State SystemSpinBox::validate(const ACN::OTP::system_t &input) const
+QValidator::State SystemSpinBox::validate(const OTP::system_t &input) const
 {
     if (input < minimum() || input > maximum())
         return QValidator::Invalid;
@@ -80,7 +80,7 @@ QValidator::State SystemSpinBox::validate(const ACN::OTP::system_t &input) const
 QValidator::State SystemSpinBox::validate(QString &input, int &pos) const
 {
     bool ok;
-    ACN::OTP::system_t val = input.mid(pos).toUShort(&ok);
+    OTP::system_t val = input.mid(pos).toUShort(&ok);
     if (!ok)
         return QValidator::Invalid;
 
@@ -88,12 +88,12 @@ QValidator::State SystemSpinBox::validate(QString &input, int &pos) const
 }
 
 
-ACN::OTP::system_t SystemSpinBox::valueFromText(const QString &text) const
+OTP::system_t SystemSpinBox::valueFromText(const QString &text) const
 {
     return text.toUShort();
 }
 
-QString SystemSpinBox::textFromValue(ACN::OTP::system_t val) const
+QString SystemSpinBox::textFromValue(OTP::system_t val) const
 {
     return QString::number(val);
 }

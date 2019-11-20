@@ -21,11 +21,11 @@
 #include "models/systemmodel.h"
 #include "widgets/linechart.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 SystemWindow::SystemWindow(
-        std::shared_ptr<class ACN::OTP::Consumer> otpConsumer,
-        ACN::OTP::system_t system,
+        std::shared_ptr<class OTP::Consumer> otpConsumer,
+        OTP::system_t system,
         QWidget *parent) :
     QWidget(parent),
     ui(new Ui::SystemWindow),

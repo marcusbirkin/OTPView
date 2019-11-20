@@ -18,7 +18,7 @@
 */
 #include "groupspinbox.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 GroupSpinBox::GroupSpinBox(QList<group_t> usedGroups, QWidget* parent) : QAbstractSpinBox(parent),
     usedGroups(usedGroups)
@@ -66,7 +66,7 @@ void GroupSpinBox::stepBy(int steps)
     setValue(newValue);
 }
 
-QValidator::State GroupSpinBox::validate(const ACN::OTP::group_t &input) const
+QValidator::State GroupSpinBox::validate(const OTP::group_t &input) const
 {
     if (input < minimum() || input > maximum())
         return QValidator::Invalid;
@@ -80,7 +80,7 @@ QValidator::State GroupSpinBox::validate(const ACN::OTP::group_t &input) const
 QValidator::State GroupSpinBox::validate(QString &input, int &pos) const
 {
     bool ok;
-    ACN::OTP::group_t val = input.mid(pos).toUShort(&ok);
+    OTP::group_t val = input.mid(pos).toUShort(&ok);
     if (!ok)
         return QValidator::Invalid;
 
@@ -88,12 +88,12 @@ QValidator::State GroupSpinBox::validate(QString &input, int &pos) const
 }
 
 
-ACN::OTP::group_t GroupSpinBox::valueFromText(const QString &text) const
+OTP::group_t GroupSpinBox::valueFromText(const QString &text) const
 {
     return text.toUShort();
 }
 
-QString GroupSpinBox::textFromValue(ACN::OTP::group_t val) const
+QString GroupSpinBox::textFromValue(OTP::group_t val) const
 {
     return QString::number(val);
 }

@@ -39,15 +39,15 @@ public:
     typedef struct componentDetails_s
     {
         componentDetails_s() :
-            CID(ACN::OTP::cid_t::createUuid())
+            CID(OTP::cid_t::createUuid())
         {
             Name = QString("%1 %2").arg(QApplication::applicationName()).arg(QApplication::applicationVersion());
         }
-        componentDetails_s(QString name, ACN::OTP::cid_t CID) :
+        componentDetails_s(QString name, OTP::cid_t CID) :
             Name(name),
             CID(CID) {}
         QString Name;
-        ACN::OTP::cid_t CID;
+        OTP::cid_t CID;
     } componentDetails_t;
     void setComponentSettings(QString settingsGroup, componentDetails_t details);
     componentDetails_t getComponentSettings(QString settingsGroup);
@@ -55,8 +55,8 @@ public:
     void setSystemRequestInterval(uint seconds);
     uint getSystemRequestInterval();
 
-    void setSourceResolution(ACN::OTP::Consumer::multipleProducerResolution_e resolution);
-    ACN::OTP::Consumer::multipleProducerResolution_e getSourceResolution();
+    void setSourceResolution(OTP::Consumer::multipleProducerResolution_e resolution);
+    OTP::Consumer::multipleProducerResolution_e getSourceResolution();
 
 signals:
     void newNetworkInterface(QNetworkInterface);

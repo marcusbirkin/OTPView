@@ -33,10 +33,10 @@ class GroupSelectionDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit GroupSelectionDialog(QList<ACN::OTP::group_t> usedGroups, QWidget *parent = nullptr);
+    explicit GroupSelectionDialog(QList<OTP::group_t> usedGroups, QWidget *parent = nullptr);
     ~GroupSelectionDialog();
 
-    ACN::OTP::group_t getGroup();
+    OTP::group_t getGroup();
 
 private slots:
 

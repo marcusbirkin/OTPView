@@ -20,11 +20,11 @@
 #include <QLineEdit>
 #include <regex>
 
-using namespace ACN::OTP::MODULES::STANDARD;
+using namespace OTP::MODULES::STANDARD;
 
 SpacialSpinBox::SpacialSpinBox(
-        std::shared_ptr<class ACN::OTP::Producer> otpProducer,
-        ACN::OTP::axis_t axis,
+        std::shared_ptr<class OTP::Producer> otpProducer,
+        OTP::axis_t axis,
         VALUES::moduleValue_t moduleValue,
         QWidget *parent) : QAbstractSpinBox(parent),
     otpProducer(otpProducer),
@@ -61,42 +61,42 @@ void SpacialSpinBox::setValue(value_t val)
             case VALUES::POSITION:
             {
                 auto position = otpProducer->getProducerPosition(address, axis);
-                position.timestamp = static_cast<ACN::OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
+                position.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
                 position.value = m_value;
                 otpProducer->setProducerPosition(address, axis, position); break;
             }
             case VALUES::POSITION_VELOCITY:
             {
                 auto positionVel = otpProducer->getProducerPositionVelocity(address, axis);
-                positionVel.timestamp = static_cast<ACN::OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
+                positionVel.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
                 positionVel.value = m_value;
                 otpProducer->setProducerPositionVelocity(address, axis, positionVel); break;
             }
             case VALUES::POSITION_ACCELERATION:
             {
                 auto positionAccel = otpProducer->getProducerPositionAcceleration(address, axis);
-                positionAccel.timestamp = static_cast<ACN::OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
+                positionAccel.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
                 positionAccel.value = m_value;
                 otpProducer->setProducerPositionAcceleration(address, axis, positionAccel); break;
             }
             case VALUES::ROTATION:
             {
                 auto rotation = otpProducer->getProducerRotation(address, axis);
-                rotation.timestamp = static_cast<ACN::OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
+                rotation.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
                 rotation.value = m_value;
                 otpProducer->setProducerRotation(address, axis, rotation); break;
             }
             case VALUES::ROTATION_VELOCITY:
             {
                 auto rotationVel = otpProducer->getProducerRotationVelocity(address, axis);
-                rotationVel.timestamp = static_cast<ACN::OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
+                rotationVel.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
                 rotationVel.value = m_value;
                 otpProducer->setProducerRotationVelocity(address, axis, rotationVel); break;
             }
             case VALUES::ROTATION_ACCELERATION:
             {
                 auto rotationAccel = otpProducer->getProducerRotationAcceleration(address, axis);
-                rotationAccel.timestamp = static_cast<ACN::OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
+                rotationAccel.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
                 rotationAccel.value = m_value;
                 otpProducer->setProducerRotationAcceleration(address, axis, rotationAccel); break;
             }
@@ -104,7 +104,7 @@ void SpacialSpinBox::setValue(value_t val)
     }
 }
 
-void SpacialSpinBox::setAddress(ACN::OTP::address_t value)
+void SpacialSpinBox::setAddress(OTP::address_t value)
 {
     address = value;
     switch (moduleValue) {

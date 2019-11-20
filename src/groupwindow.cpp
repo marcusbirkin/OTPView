@@ -23,12 +23,12 @@
 #include "widgets/spacialspinbox.h"
 #include "models/pointstablemodel.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
 GroupWindow::GroupWindow(
-        std::shared_ptr<class ACN::OTP::Producer> otpProducer,
-        ACN::OTP::system_t system,
-        ACN::OTP::group_t group,
+        std::shared_ptr<class OTP::Producer> otpProducer,
+        OTP::system_t system,
+        OTP::group_t group,
         QWidget *parent) :
     QWidget(parent),
     ui(new Ui::GroupWindow),
@@ -105,7 +105,7 @@ GroupWindow::~GroupWindow()
     delete ui;
 }
 
-void GroupWindow::setSystem(ACN::OTP::system_t newSystem)
+void GroupWindow::setSystem(OTP::system_t newSystem)
 {
     auto pointsList = otpProducer->getProducerPoints(system, group);
     otpProducer->removeProducerGroup(system, group);

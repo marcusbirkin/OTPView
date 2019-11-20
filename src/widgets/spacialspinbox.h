@@ -30,9 +30,9 @@ public:
     typedef qint32 value_t;
 
     SpacialSpinBox(
-            std::shared_ptr<class ACN::OTP::Producer> otpProducer,
-            ACN::OTP::axis_t axis,
-            ACN::OTP::MODULES::STANDARD::VALUES::moduleValue_t moduleValue,
+            std::shared_ptr<class OTP::Producer> otpProducer,
+            OTP::axis_t axis,
+            OTP::MODULES::STANDARD::VALUES::moduleValue_t moduleValue,
             QWidget* parent = nullptr);
 
     value_t value() const { return m_value; }
@@ -49,7 +49,7 @@ public:
         setMaximum(max);
     }
 
-    void setRange(ACN::OTP::range_t range)
+    void setRange(OTP::range_t range)
     {
         setRange(range.getMin(), range.getMax());
     }
@@ -57,7 +57,7 @@ public:
 
 public slots:
     void setValue(value_t val);
-    void setAddress(ACN::OTP::address_t);
+    void setAddress(OTP::address_t);
 
 signals:
     void valueChanged(value_t value);
@@ -78,10 +78,10 @@ private slots:
         void processInput();
 
 private:
-    std::shared_ptr<class ACN::OTP::Producer> otpProducer;
-    ACN::OTP::address_t address;
-    ACN::OTP::axis_t axis;
-    ACN::OTP::MODULES::STANDARD::VALUES::moduleValue_t moduleValue;
+    std::shared_ptr<class OTP::Producer> otpProducer;
+    OTP::address_t address;
+    OTP::axis_t axis;
+    OTP::MODULES::STANDARD::VALUES::moduleValue_t moduleValue;
 
     std::pair<value_t,value_t> range = {std::numeric_limits<value_t>::min(),std::numeric_limits<value_t>::max()};
     value_t m_value = 0;

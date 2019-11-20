@@ -19,9 +19,9 @@
 #include "systemselectiondialog.h"
 #include "ui_systemselectiondialog.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
-SystemSelectionDialog::SystemSelectionDialog(QList<ACN::OTP::system_t> usedSystems, QWidget *parent) :
+SystemSelectionDialog::SystemSelectionDialog(QList<OTP::system_t> usedSystems, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SystemSelectionDialog)
 {

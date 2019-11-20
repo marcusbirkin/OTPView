@@ -19,9 +19,9 @@
 #include "groupselectiondialog.h"
 #include "ui_groupselectiondialog.h"
 
-using namespace ACN::OTP;
+using namespace OTP;
 
-GroupSelectionDialog::GroupSelectionDialog(QList<ACN::OTP::group_t> usedGroups, QWidget *parent) :
+GroupSelectionDialog::GroupSelectionDialog(QList<OTP::group_t> usedGroups, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::GroupSelectionDialog)
 {

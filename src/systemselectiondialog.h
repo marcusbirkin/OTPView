@@ -33,10 +33,10 @@ class SystemSelectionDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SystemSelectionDialog(QList<ACN::OTP::system_t> usedSystems, QWidget *parent = nullptr);
+    explicit SystemSelectionDialog(QList<OTP::system_t> usedSystems, QWidget *parent = nullptr);
     ~SystemSelectionDialog();
 
-    ACN::OTP::system_t getSystem();
+    OTP::system_t getSystem();
 
 private slots:
 
