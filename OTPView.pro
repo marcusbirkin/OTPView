@@ -27,6 +27,10 @@ CONFIG += c++17
 include($$PWD/version.pri)
 include($$PWD/libs/OTPLib/OTPLib.pri)
 
+RC_FILE = res/OTPView.rc
+
+RESOURCES += res/OTPView.qrc
+
 INCLUDEPATH += src
 
 SOURCES += \
