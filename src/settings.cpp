@@ -107,19 +107,3 @@ uint Settings::getSystemRequestInterval()
     settings.beginGroup(S_GENERAL);
     return settings.value(S_GENERAL_SYSTEMREQUESTINTERVAL, 3).toUInt();
 }
-
-void Settings::setSourceResolution(OTP::Consumer::multipleProducerResolution_e resolution)
-{
-    QSettings settings;
-    settings.beginGroup(S_GENERAL);
-    settings.setValue(S_GENERAL_SOURCERESOLUTION, resolution);
-    settings.sync();
-}
-OTP::Consumer::multipleProducerResolution_e Settings::getSourceResolution()
-{
-    using namespace OTP;
-    QSettings settings;
-    settings.beginGroup(S_GENERAL);
-    auto ret = settings.value(S_GENERAL_SOURCERESOLUTION, Consumer::Newest).toInt();
-    return static_cast<Consumer::multipleProducerResolution_e>(ret);
-}

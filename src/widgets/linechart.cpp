@@ -221,7 +221,7 @@ void LineChart::redraw()
         }
     }
     auto headRoomPercent = 10;
-    if (yMin == 0 && yMax == 0)
+    if (qFuzzyIsNull(yMin) && qFuzzyIsNull(yMax))
     {
         axisY->setRange(-0.1, 0.1);
     } else {
@@ -256,8 +256,7 @@ void LineChart::updatedPosition(cid_t cid, address_t updatedAddress, axis_t upda
 
     auto pos = this->otpConsumer->getPosition(
                 this->address,
-                updatedAxis,
-                Settings::getInstance().getSourceResolution());
+                updatedAxis);
     qreal y = pos.value;
     if (pos.scale == MODULES::STANDARD::PositionModule_t::scale_e::um) y = y / 1000; // to millimeters
     if (pos.scale == MODULES::STANDARD::PositionModule_t::scale_e::mm) y = y / 1000; // to meters
@@ -275,8 +274,7 @@ void LineChart::updatedPositionVelocity(cid_t cid, address_t updatedAddress, axi
 
     auto pos = this->otpConsumer->getPositionAcceleration(
                 this->address,
-                updatedAxis,
-                Settings::getInstance().getSourceResolution());
+                updatedAxis);
     qreal y = pos.value;
     y = y / 1000; // to meters
 
@@ -293,8 +291,7 @@ void LineChart::updatedPositionAcceleration(cid_t cid, address_t updatedAddress,
 
     auto pos = this->otpConsumer->getPositionVelocity(
                 this->address,
-                updatedAxis,
-                Settings::getInstance().getSourceResolution());
+                updatedAxis);
     qreal y = pos.value;
     y = y / 1000; // to meters
 
@@ -311,8 +308,7 @@ void LineChart::updatedRotation(cid_t cid, address_t updatedAddress, axis_t upda
 
     auto pos = this->otpConsumer->getRotation(
                 this->address,
-                updatedAxis,
-                Settings::getInstance().getSourceResolution());
+                updatedAxis);
     auto y = pos.value;
 
     series->append(x,y);
@@ -328,8 +324,7 @@ void LineChart::updatedRotationVelocity(cid_t cid, address_t updatedAddress, axi
 
     auto pos = this->otpConsumer->getRotationVelocity(
                 this->address,
-                updatedAxis,
-                Settings::getInstance().getSourceResolution());
+                updatedAxis);
     auto y = pos.value;
 
     series->append(x,y);
@@ -345,8 +340,7 @@ void LineChart::updatedRotationAcceleration(cid_t cid, address_t updatedAddress,
 
     auto pos = this->otpConsumer->getRotationAcceleration(
                 this->address,
-                updatedAxis,
-                Settings::getInstance().getSourceResolution());
+                updatedAxis);
     auto y = pos.value;
 
     series->append(x,y);

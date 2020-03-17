@@ -51,6 +51,18 @@ private slots:
 
     void on_leName_textChanged(const QString &arg1);
 
+    void on_sbParent_valueChanged();
+
+    void on_sbParentSystem_valueChanged(int arg1);
+
+    void on_sbParentGroup_valueChanged(int arg1);
+
+    void on_sbParentPoint_valueChanged(int arg1);
+
+    void on_cbParentRelative_stateChanged(int arg1);
+
+    void on_cbParentDisable_stateChanged(int arg1);
+
 private:
     Ui::GroupWindow *ui;
 
@@ -59,6 +71,14 @@ private:
     OTP::group_t group;
 
     QStringList Axes {QStringLiteral("X"),QStringLiteral("Y"),QStringLiteral("Z")};
+
+    enum ScaleHeaders_e
+    {
+        Scale
+    };
+    QStringList ScaleHeaders = {
+        tr("Scale")
+    };
 
     enum PointsDetailsHeaders_e
     {

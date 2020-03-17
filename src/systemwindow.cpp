@@ -59,8 +59,8 @@ SystemWindow::SystemWindow(
     ui->tabWidget->setMovable(true);
     // - Remove close button from first tab
     QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
-    tabBar->setTabButton(0, QTabBar::RightSide, 0);
-    tabBar->setTabButton(0, QTabBar::LeftSide, 0);
+    tabBar->setTabButton(0, QTabBar::RightSide, nullptr);
+    tabBar->setTabButton(0, QTabBar::LeftSide, nullptr);
 }
 
 SystemWindow::~SystemWindow()

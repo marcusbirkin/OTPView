@@ -45,6 +45,7 @@ void SystemSpinBox::setValue(system_t val)
         lineEdit()->setText(textFromValue(val));
         m_value = val;
 
+        emit valueChanged(static_cast<int>(m_value));
         emit valueChanged(m_value);
         emit valueChanged(oldValue, m_value);
     }

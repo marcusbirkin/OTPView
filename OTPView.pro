@@ -51,7 +51,9 @@ SOURCES += \
     src/widgets/systemspinbox.cpp \
     src/widgets/groupspinbox.cpp \
     src/widgets/pointspinbox.cpp \
-    src/widgets/spacialspinbox.cpp
+    src/widgets/spacialspinbox.cpp \
+    src/widgets/scalespinbox.cpp \
+    src/widgets/priorityspinbox.cpp
 
 HEADERS += \
     src/mainwindow.h \
@@ -70,7 +72,9 @@ HEADERS += \
     src/widgets/systemspinbox.h \
     src/widgets/groupspinbox.h \
     src/widgets/pointspinbox.h \
-    src/widgets/spacialspinbox.h
+    src/widgets/spacialspinbox.h \
+    src/widgets/scalespinbox.h \
+    src/widgets/priorityspinbox.h
 
 FORMS += \
     src/mainwindow.ui \

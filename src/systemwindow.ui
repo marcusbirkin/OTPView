@@ -10,6 +10,10 @@
     <height>391</height>
    </rect>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../res/OTPView.qrc">
+    <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
@@ -64,6 +68,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../res/OTPView.qrc"/>
+ </resources>
  <connections/>
 </ui>

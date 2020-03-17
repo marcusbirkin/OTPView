@@ -31,8 +31,8 @@ PointsTableModel::PointsTableModel(
     system(system),
     group(group)
 {
-    connect(otpProducer.get(), &Producer::newPoint, [this]() { emit layoutChanged(); });
-    connect(otpProducer.get(), &Producer::removedPoint, [this]() { emit layoutChanged(); });
+    connect(otpProducer.get(), &Producer::newPoint, this, [=]() { emit layoutChanged(); });
+    connect(otpProducer.get(), &Producer::removedPoint, this, [=]() { emit layoutChanged(); });
 }
 
 OTP::address_t PointsTableModel::getAddress(const QModelIndex &index) const

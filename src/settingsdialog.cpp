@@ -39,9 +39,6 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
 
     // System Request Interval
     ui->sbSystemRequestInterval->setValue(static_cast<int>(Settings::getInstance().getSystemRequestInterval()));
-
-    // Multiple Source Resolution
-    populateResolutionList();
 }
 
 SettingsDialog::~SettingsDialog()
@@ -60,10 +57,6 @@ void SettingsDialog::on_buttonBox_accepted()
 
     instance.setSystemRequestInterval(
                 static_cast<uint>(ui->sbSystemRequestInterval->value()));
-
-    instance.setSourceResolution(
-                static_cast<OTP::Consumer::multipleProducerResolution_e>(
-                    ui->cbResolution->currentData(Qt::UserRole).toInt()));
 
     this->close();
 }
@@ -132,22 +125,6 @@ void SettingsDialog::populateProtocolList()
        if (static_cast<QAbstractSocket::NetworkLayerProtocol>(ui->cbProtocol->itemData(idx).toInt())
                == Settings::getInstance().getNetworkTransport())
            ui->cbProtocol->setCurrentIndex(idx);
-    }
-}
-
-void SettingsDialog::populateResolutionList()
-{
-    ui->cbResolution->addItem("Newest", OTP::Consumer::multipleProducerResolution_e::Newest);
-    ui->cbResolution->addItem("Largest", OTP::Consumer::multipleProducerResolution_e::Largest);
-    ui->cbResolution->addItem("Smallest", OTP::Consumer::multipleProducerResolution_e::Smallest);
-
-    for (int idx = 0; idx < ui->cbResolution->count(); idx++)
-    {
-        auto idxData = static_cast<OTP::Consumer::multipleProducerResolution_e>(
-                    ui->cbResolution->itemData(idx).toInt());
-        auto savedData = Settings::getInstance().getSourceResolution();
-        if (idxData == savedData)
-            ui->cbResolution->setCurrentIndex(idx);
     }
 }
 

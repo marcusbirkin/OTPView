@@ -1,7 +1,7 @@
 /*
     OTPView
     A QT Frontend for E1.59  (Entertainment  Technology  Object  Transform  Protocol  (OTP))
-    Copyright (C) 2019  Marcus Birkin
+    Copyright (C) 2020  Marcus Birkin
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
@@ -16,32 +16,46 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef SPACIALSPINBOX_H
-#define SPACIALSPINBOX_H
+#ifndef SCALESPINBOX_H
+#define SCALESPINBOX_H
 
 #include <QAbstractSpinBox>
+#include <QLineEdit>
+#include <QList>
 #include "libs/OTPLib/otp.hpp"
-#include "libs/OTPLib/network/modules/modules.hpp"
+#include "libs/OTPLib/network/modules/modules_const.hpp"
 
-class SpacialSpinBox : public QAbstractSpinBox
+using namespace OTP::MODULES::STANDARD;
+class ScaleSpinBox : public QAbstractSpinBox
 {
     Q_OBJECT
 public:
-    typedef qint32 value_t;
+    typedef ScaleModule_t::scale_t value_t;
 
-    SpacialSpinBox(
+    ScaleSpinBox(
             std::shared_ptr<class OTP::Producer> otpProducer,
             OTP::axis_t axis,
-            OTP::MODULES::STANDARD::VALUES::moduleValue_t moduleValue,
             QWidget* parent = nullptr);
 
     value_t value() const { return m_value; }
 
     value_t minimum() const { return range.first; }
-    void setMinimum(value_t min) { range.first = min; }
+    void setMinimum(value_t min) {
+        range.first = std::clamp(
+                    min,
+                    static_cast<value_t>(VALUES::RANGES::getRange(VALUES::SCALE).getMin()),
+                    static_cast<value_t>(VALUES::RANGES::getRange(VALUES::SCALE).getMax())
+                    );
+    }
 
     value_t maximum() const { return range.second; }
-    void setMaximum(value_t max) {  range.second = max; }
+    void setMaximum(value_t max) {
+        range.second = std::clamp(
+                    max,
+                    static_cast<value_t>(VALUES::RANGES::getRange(VALUES::SCALE).getMin()),
+                    static_cast<value_t>(VALUES::RANGES::getRange(VALUES::SCALE).getMax())
+                    );
+    }
 
     void setRange(value_t min, value_t max)
     {
@@ -54,13 +68,13 @@ public:
         setRange(range.getMin(), range.getMax());
     }
 
-
 public slots:
     void setValue(value_t val);
     void setAddress(OTP::address_t);
 
 signals:
     void valueChanged(value_t value);
+    void valueChanged(value_t oldValue, value_t newValue);
 
 protected:
     void stepBy(int steps);
@@ -72,7 +86,7 @@ protected:
     value_t valueFromText(const QString &text, bool *ok) const;
     QString textFromValue(value_t val) const;
 
-    QAbstractSpinBox::StepEnabled stepEnabled() const;
+    QAbstractSpinBox::StepEnabled stepEnabled() const {return StepUpEnabled | StepDownEnabled; }
 
 private slots:
     void processInput();
@@ -81,10 +95,9 @@ private:
     std::shared_ptr<class OTP::Producer> otpProducer;
     OTP::address_t address;
     OTP::axis_t axis;
-    OTP::MODULES::STANDARD::VALUES::moduleValue_t moduleValue;
 
     std::pair<value_t,value_t> range = {std::numeric_limits<value_t>::min(),std::numeric_limits<value_t>::max()};
-    value_t m_value = 0;
+    value_t m_value = 1;
 };
 
-#endif // SPACIALSPINBOX_H
+#endif // SCALESPINBOX_H

@@ -22,6 +22,11 @@
 #include "pointselectiondialog.h"
 #include "widgets/spacialspinbox.h"
 #include "models/pointstablemodel.h"
+#include "widgets/systemspinbox.h"
+#include "widgets/groupspinbox.h"
+#include "widgets/pointspinbox.h"
+#include "widgets/scalespinbox.h"
+#include "widgets/priorityspinbox.h"
 
 using namespace OTP;
 
@@ -58,6 +63,26 @@ GroupWindow::GroupWindow(
 
     // - Name
     ui->leName->setMaxLength(name_t::maxSize());
+
+    // - Priority
+    auto sbPriority = new PrioritySpinBox(otpProducer, this);
+    ui->gbPriority->layout()->addWidget(sbPriority);
+
+    // - Parent
+    ui->cbParentDisable->setChecked(true);
+
+    // - Scale
+    ui->tableScale->setColumnCount(ScaleHeaders.count());
+    ui->tableScale->setHorizontalHeaderLabels(ScaleHeaders);
+    ui->tableScale->setRowCount(Axes.count());
+    ui->tableScale->setVerticalHeaderLabels(Axes);
+    ui->tableScale->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableScale->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    for (auto axis = axis_t::first; axis < axis_t::count; axis++)
+    {
+        auto scaleWidget = new ScaleSpinBox(otpProducer, axis, ui->tableScale);
+        ui->tableScale->setCellWidget(axis, ScaleHeaders_e::Scale, scaleWidget);
+    }
 
     // - Position
     ui->tablePointsPosition->setColumnCount(PointsDetailsHeaders.count());
@@ -114,7 +139,7 @@ void GroupWindow::setSystem(OTP::system_t newSystem)
     otpProducer->addProducerSystem(newSystem);
     otpProducer->addProducerGroup(newSystem, group);
     for (auto point : pointsList)
-        otpProducer->addProducerPoint(newSystem, group, point);
+        otpProducer->addProducerPoint(newSystem, group, point, priority_t());
 
     qobject_cast<PointsTableModel*>(ui->tablePoints->model())->setSystem(newSystem);
 }
@@ -137,16 +162,20 @@ void GroupWindow::on_pbAddPoint_clicked()
     if (dialog->exec() == QDialog::Rejected)
         return;
 
-    otpProducer->addProducerPoint(system, group, dialog->getPoint());
+    otpProducer->addProducerPoint(system, group, dialog->getPoint(), priority_t());
     otpProducer->setProducerPointName(
                 address_t{system, group, dialog->getPoint()},
                 QString("Point %1/%2/%3").arg(system).arg(group).arg(dialog->getPoint()));
+
+    on_tablePoints_itemSelectionChanged();
 }
 
 void GroupWindow::on_pbRemovePoint_clicked()
 {
     for (auto address : getSelectedAddress())
         otpProducer->removeProducerPoint(address);
+
+    on_tablePoints_itemSelectionChanged();
 }
 
 void GroupWindow::on_tablePoints_itemSelectionChanged()
@@ -161,8 +190,28 @@ void GroupWindow::on_tablePoints_itemSelectionChanged()
     // - Name
     ui->leName->setText(otpProducer->getProducerPointName(address));
 
+    // - Priority
+    auto priorityWidget = static_cast<PrioritySpinBox*>(ui->gbPriority->layout()->itemAt(0)->widget());
+    if (priorityWidget)
+        priorityWidget->setAddress(address);
+
+    // - Parent
+    auto parent = otpProducer->getProducerParent(address);
+    ui->cbParentDisable->setChecked(parent.value == address);
+    ui->sbParentSystem->setValue(parent.value.system);
+    ui->sbParentGroup->setValue(parent.value.group);
+    ui->sbParentPoint->setValue(parent.value.point);
+    ui->cbParentRelative->setChecked(parent.relative);
+
     for (auto axis = axis_t::first; axis < axis_t::count; axis++)
     {
+        // - Scale
+        {
+            auto scaleWidget = static_cast<ScaleSpinBox*>(ui->tableScale->cellWidget(axis, ScaleHeaders_e::Scale));
+            if (scaleWidget)
+                scaleWidget->setAddress(address);
+        }
+
         // - Position
         {
             auto valueWidget = static_cast<SpacialSpinBox*>(ui->tablePointsPosition->cellWidget(axis, PointsDetailsHeaders_e::Value));
@@ -199,4 +248,60 @@ void GroupWindow::on_leName_textChanged(const QString &arg1)
 {
     if (getSelectedAddress().count() != 1) return;
     otpProducer->setProducerPointName(getSelectedAddress().first(), arg1);
+}
+
+void GroupWindow::on_sbParent_valueChanged()
+{
+    if (getSelectedAddress().count() != 1) return;
+    auto parent = otpProducer->getProducerParent(getSelectedAddress().first());
+    parent.timestamp = ui->cbParentDisable->isChecked() ? 0 :
+            static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    if (ui->cbParentDisable->isChecked()) {
+        parent.value = getSelectedAddress().first();
+        parent.relative = false;
+    } else {
+        parent.value = {ui->sbParentSystem->value(), ui->sbParentGroup->value(), ui->sbParentPoint->value()};
+        parent.relative = ui->cbParentRelative->isChecked();
+    }
+
+    otpProducer->setProducerParent(getSelectedAddress().first(), parent);
+}
+
+void GroupWindow::on_sbParentSystem_valueChanged(int arg1)
+{
+    Q_UNUSED(arg1)
+    on_sbParent_valueChanged();
+}
+
+void GroupWindow::on_sbParentGroup_valueChanged(int arg1)
+{
+    Q_UNUSED(arg1)
+    on_sbParent_valueChanged();
+}
+
+void GroupWindow::on_sbParentPoint_valueChanged(int arg1)
+{
+    Q_UNUSED(arg1)
+    on_sbParent_valueChanged();
+}
+
+void GroupWindow::on_cbParentRelative_stateChanged(int arg1)
+{
+    Q_UNUSED(arg1)
+    on_sbParent_valueChanged();
+}
+
+void GroupWindow::on_cbParentDisable_stateChanged(int arg1)
+{
+    // Disable all widgets in Parent groupbox, except the disable checkbox!
+    for (int ln = 0; ln < ui->gbParent->layout()->count(); ln++) {
+        auto layout = ui->gbParent->layout()->itemAt(ln)->layout();
+        for (int wn = 0; wn < layout->count(); wn++) {
+            auto widget = layout->itemAt(wn)->widget();
+            if (widget && (widget != ui->cbParentDisable))
+                widget->setEnabled(!static_cast<bool>(arg1));
+        }
+    }
+
+    on_sbParent_valueChanged();
 }

@@ -41,7 +41,8 @@ public:
         SystemPointDetails_Frist,
         SystemPointDetailsNameItem = SystemPointDetails_Frist,
         SystemPointDetailsLastSeenItem,
-        SystemPointDetails_Last = SystemPointDetailsLastSeenItem,
+        SystemPointDetailsParentItem,
+        SystemPointDetails_Last = SystemPointDetailsParentItem,
 
         // Point Position
         SystemPointPositionItem,
@@ -51,14 +52,16 @@ public:
         SystemPointPositionAccelItem,
         SystemPointPosition_Last = SystemPointPositionAccelItem,
 
-
         // Point Rotation
         SystemPointRotationItem,
         SystemPointRotation_First,
-        SystemPointRotationValueItem  = SystemPointRotation_First,
+        SystemPointRotationValueItem = SystemPointRotation_First,
         SystemPointRotationVelcocityItem,
         SystemPointRotationAccelItem,
         SystemPointRotation_Last = SystemPointRotationAccelItem,
+
+        // Point Scale
+        SystemPointScaleItem,
 
         // Axis
         SystemPointAxis_First,
@@ -70,8 +73,10 @@ public:
         // Axis details
         SystemPointAxisDetails_First,
         SystemPointAxisDetails_Source = SystemPointAxisDetails_First,
+        SystemPointAxisDetails_Priority,
         SystemPointAxisDetails_Timestamp,
-        SystemPointAxisDetails_Last = SystemPointAxisDetails_Timestamp,
+        SystemPointAxisDetails_ParentRelative,
+        SystemPointAxisDetails_Last = SystemPointAxisDetails_ParentRelative,
     } itemType_t;
 
     explicit SystemItem(std::shared_ptr<class OTP::Consumer> otpConsumer,
@@ -152,6 +157,7 @@ private slots:
     void newPointDetails(SystemItem *parent);
     void newPointPosition(SystemItem *parent);
     void newPointRotation(SystemItem *parent);
+    void newPointScale(SystemItem *parent);
 
 private:
     QModelIndex index(OTP::address_t, SystemItem::itemType_t) const;

@@ -49,6 +49,7 @@ public slots:
     void setValue(OTP::point_t val);
 
 signals:
+    void valueChanged(int value);
     void valueChanged(OTP::point_t value);
     void valueChanged(OTP::point_t oldValue, OTP::point_t newValue);
 

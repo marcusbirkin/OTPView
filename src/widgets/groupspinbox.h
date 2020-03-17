@@ -49,6 +49,7 @@ public slots:
     void setValue(OTP::group_t val);
 
 signals:
+    void valueChanged(int value);
     void valueChanged(OTP::group_t value);
     void valueChanged(OTP::group_t oldValue, OTP::group_t newValue);
 

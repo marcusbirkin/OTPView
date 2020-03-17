@@ -55,9 +55,6 @@ public:
     void setSystemRequestInterval(uint seconds);
     uint getSystemRequestInterval();
 
-    void setSourceResolution(OTP::Consumer::multipleProducerResolution_e resolution);
-    OTP::Consumer::multipleProducerResolution_e getSourceResolution();
-
 signals:
     void newNetworkInterface(QNetworkInterface);
     void newNetworkTransport(QAbstractSocket::NetworkLayerProtocol);

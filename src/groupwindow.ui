@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>480</width>
-    <height>341</height>
+    <height>387</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,6 +24,10 @@
   </property>
   <property name="windowTitle">
    <string>Form</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../res/OTPView.qrc">
+    <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -44,6 +48,18 @@
       <string>Points</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,2">
         <item>
@@ -130,36 +146,221 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0">
+            <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,1,1">
+             <property name="spacing">
+              <number>6</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <item>
-              <widget class="QGroupBox" name="gbName">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="title">
-                <string>Name</string>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_3">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QLineEdit" name="leName"/>
-                </item>
-               </layout>
-              </widget>
+              <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,0">
+               <item>
+                <widget class="QGroupBox" name="gbName">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string>Name</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_3">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>1</number>
+                  </property>
+                  <item>
+                   <widget class="QLineEdit" name="leName"/>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="gbPriority">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string>Priority</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_8">
+                  <property name="leftMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>1</number>
+                  </property>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,0">
+               <item>
+                <widget class="QGroupBox" name="gbParent">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string>Parent</string>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>1</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>1</number>
+                  </property>
+                  <item>
+                   <layout class="QHBoxLayout" name="hlParentAddress" stretch="1,0,1,0,1">
+                    <item>
+                     <widget class="SystemSpinBox" name="sbParentSystem"/>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_2">
+                      <property name="text">
+                       <string>/</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="GroupSpinBox" name="sbParentGroup"/>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label">
+                      <property name="text">
+                       <string>/</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="PointSpinBox" name="sbParentPoint"/>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="hlParentRelative" stretch="0,1,0,2">
+                    <item>
+                     <widget class="QCheckBox" name="cbParentDisable">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="text">
+                       <string>Disable</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="cbParentRelative">
+                      <property name="text">
+                       <string>Relative</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QTableWidget" name="tableScale">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>93</height>
+                  </size>
+                 </property>
+                 <property name="sizeAdjustPolicy">
+                  <enum>QAbstractScrollArea::AdjustToContents</enum>
+                 </property>
+                 <property name="rowCount">
+                  <number>3</number>
+                 </property>
+                 <row/>
+                 <row/>
+                 <row/>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item>
               <widget class="QGroupBox" name="gbPosition">
@@ -174,22 +375,40 @@
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_5">
                 <property name="leftMargin">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="topMargin">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="rightMargin">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <item>
                  <widget class="QTableWidget" name="tablePointsPosition">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>93</height>
+                   </size>
+                  </property>
                   <property name="sizeAdjustPolicy">
                    <enum>QAbstractScrollArea::AdjustToContents</enum>
                   </property>
+                  <property name="rowCount">
+                   <number>3</number>
+                  </property>
+                  <row/>
+                  <row/>
+                  <row/>
                  </widget>
                 </item>
                </layout>
@@ -208,22 +427,40 @@
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_6">
                 <property name="leftMargin">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="topMargin">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="rightMargin">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="bottomMargin">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <item>
                  <widget class="QTableWidget" name="tablePointsRotation">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>93</height>
+                   </size>
+                  </property>
                   <property name="sizeAdjustPolicy">
                    <enum>QAbstractScrollArea::AdjustToContents</enum>
                   </property>
+                  <property name="rowCount">
+                   <number>3</number>
+                  </property>
+                  <row/>
+                  <row/>
+                  <row/>
                  </widget>
                 </item>
                </layout>
@@ -241,6 +478,25 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>SystemSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>widgets/systemspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>GroupSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>widgets/groupspinbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PointSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>widgets/pointspinbox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../res/OTPView.qrc"/>
+ </resources>
  <connections/>
 </ui>

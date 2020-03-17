@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent) :
                                "<p><h1>%1</h1>"
                                "<h2>Version: %2</h2>"
                                "<h3>A QT Frontend for E1.59 (Entertainment Technology Object Transform Protocol (OTP))</h3>"
-                               "<h4>Marcus Birkin 2019</h4>"
+                               "<h4>Marcus Birkin 2019 - 2020</h4>"
                                "<h4><a href=\"https://github.com/marcusbirkin/OTPView\">https://github.com/marcusbirkin/OTPView</a></h4></p>")
                            .arg(QApplication::applicationName())
                            .arg(QApplication::applicationVersion())
