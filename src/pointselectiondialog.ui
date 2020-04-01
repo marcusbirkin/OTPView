@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>New Group</string>
+   <string>New Point</string>
   </property>
   <property name="modal">
    <bool>true</bool>
