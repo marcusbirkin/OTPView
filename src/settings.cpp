@@ -107,7 +107,7 @@ std::chrono::seconds Settings::getSystemRequestInterval()
     QSettings settings;
     settings.beginGroup(S_GENERAL);
     return std::chrono::seconds(
-            settings.value(S_GENERAL_SYSTEMREQUESTINTERVAL, std::chrono::seconds(3).count()).toLongLong());
+            settings.value(S_GENERAL_SYSTEMREQUESTINTERVAL, std::chrono::seconds(10).count()).toLongLong());
 }
 
 void Settings::setTransformMessageRate(std::chrono::milliseconds interval)
