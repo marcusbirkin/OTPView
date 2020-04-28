@@ -18,6 +18,8 @@
 */
 #include "systemmodel.h"
 #include "settings.h"
+#include <QFont>
+#include <QColor>
 
 using namespace OTP;
 

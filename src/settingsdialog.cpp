@@ -38,7 +38,11 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     populateInterfaceList();
 
     // System Request Interval
-    ui->sbSystemRequestInterval->setValue(static_cast<int>(Settings::getInstance().getSystemRequestInterval()));
+    ui->sbSystemRequestInterval->setValue(static_cast<int>(Settings::getInstance().getSystemRequestInterval().count()));
+
+    // Transform message interval
+    ui->sbTransformTXRate->setRange(OTP::OTP_TRANSFORM_TIMING_MIN.count(), OTP::OTP_TRANSFORM_TIMING_MAX.count());
+    ui->sbTransformTXRate->setValue(static_cast<int>(Settings::getInstance().getTransformMessageRate().count()));
 }
 
 SettingsDialog::~SettingsDialog()
@@ -56,7 +60,10 @@ void SettingsDialog::on_buttonBox_accepted()
                 static_cast<QAbstractSocket::NetworkLayerProtocol>(ui->cbProtocol->itemData(ui->cbProtocol->currentIndex()).toInt()));
 
     instance.setSystemRequestInterval(
-                static_cast<uint>(ui->sbSystemRequestInterval->value()));
+                std::chrono::seconds(ui->sbSystemRequestInterval->value()));
+
+    instance.setTransformMessageRate(
+                std::chrono::milliseconds(ui->sbTransformTXRate->value()));
 
     this->close();
 }

@@ -52,13 +52,17 @@ public:
     void setComponentSettings(QString settingsGroup, componentDetails_t details);
     componentDetails_t getComponentSettings(QString settingsGroup);
 
-    void setSystemRequestInterval(uint seconds);
-    uint getSystemRequestInterval();
+    void setSystemRequestInterval(std::chrono::seconds interval);
+    std::chrono::seconds getSystemRequestInterval();
+
+    void setTransformMessageRate(std::chrono::milliseconds interval);
+    std::chrono::milliseconds getTransformMessageRate();
 
 signals:
     void newNetworkInterface(QNetworkInterface);
     void newNetworkTransport(QAbstractSocket::NetworkLayerProtocol);
-    void newSystemRequestInterval(uint);
+    void newSystemRequestInterval(std::chrono::seconds);
+    void newTransformMessageRate(std::chrono::milliseconds);
 
 private:
     Settings();

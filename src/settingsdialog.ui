@@ -103,7 +103,20 @@
       </item>
       <item>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="1" column="0">
+        <item row="1" column="3">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="1">
          <widget class="QGroupBox" name="gbSystemUpdate">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -128,8 +141,27 @@
           </layout>
          </widget>
         </item>
-        <item row="1" column="1">
-         <spacer name="horizontalSpacer">
+        <item row="1" column="2">
+         <widget class="QGroupBox" name="gbTransformTXRate">
+          <property name="title">
+           <string>Transform Message Interval</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QSpinBox" name="sbTransformTXRate">
+             <property name="suffix">
+              <string> Milliseconds</string>
+             </property>
+             <property name="maximum">
+              <number>60</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>

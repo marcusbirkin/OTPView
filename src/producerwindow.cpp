@@ -39,6 +39,7 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
                           Settings::getInstance().getNetworkTransport(),
                           Settings::getInstance().getComponentSettings(componentSettingsGroup).Name,
                           Settings::getInstance().getComponentSettings(componentSettingsGroup).CID,
+                          Settings::getInstance().getTransformMessageRate(),
                           this));
 
     // OTP Producer Interface
@@ -89,6 +90,11 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
             otpProducer->removeProducerSystem(oldValue);
         });
 
+    // OTP Producer Transform Message Rate
+    connect(&Settings::getInstance(), &Settings::newTransformMessageRate,
+            [this](std::chrono::milliseconds value) {
+                otpProducer->setProducerTransformMsgRate(value);
+            });
 }
 
 ProducerWindow::~ProducerWindow()

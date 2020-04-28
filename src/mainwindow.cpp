@@ -133,10 +133,10 @@ MainWindow::MainWindow(QWidget *parent) :
         [this]() {
            otpConsumer->UpdateOTPMap();
         });
-    timer->start(static_cast<int>(Settings::getInstance().getSystemRequestInterval()) * 1000);
+    timer->start(Settings::getInstance().getSystemRequestInterval());
     connect(&Settings::getInstance(), &Settings::newSystemRequestInterval,
-            [timer](uint value) {
-                timer->setInterval(static_cast<int>(value) * 1000);
+            [timer](std::chrono::seconds value) {
+                timer->setInterval(value);
             });
     otpConsumer->UpdateOTPMap();
 }

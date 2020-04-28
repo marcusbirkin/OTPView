@@ -24,6 +24,7 @@
 static const QString S_GENERAL("GENERAL");
 static const QString S_GENERAL_SYSTEMREQUESTINTERVAL("SYSTEMREQUESTINTERVAL");
 static const QString S_GENERAL_SOURCERESOLUTION("RESOLUTION");
+static const QString S_GENERAL_TRANSFORM_RATE("TRANSFORMRATE");
 
 static const QString S_NETWORK("NETWORK");
 static const QString S_NETWORK_HARDWAREADDRESS("HARDWAREADDRESS");
@@ -92,18 +93,37 @@ Settings::componentDetails_t Settings::getComponentSettings(QString settingsGrou
     return details;
 }
 
-void Settings::setSystemRequestInterval(uint seconds)
+void Settings::setSystemRequestInterval(std::chrono::seconds interval)
 {
     QSettings settings;
     settings.beginGroup(S_GENERAL);
-    settings.setValue(S_GENERAL_SYSTEMREQUESTINTERVAL, seconds);
+    settings.setValue(S_GENERAL_SYSTEMREQUESTINTERVAL, interval.count());
     settings.sync();
 
-    emit newSystemRequestInterval(seconds);
+    emit newSystemRequestInterval(interval);
 }
-uint Settings::getSystemRequestInterval()
+std::chrono::seconds Settings::getSystemRequestInterval()
 {
     QSettings settings;
     settings.beginGroup(S_GENERAL);
-    return settings.value(S_GENERAL_SYSTEMREQUESTINTERVAL, 3).toUInt();
+    return std::chrono::seconds(
+            settings.value(S_GENERAL_SYSTEMREQUESTINTERVAL, std::chrono::seconds(3).count()).toLongLong());
+}
+
+void Settings::setTransformMessageRate(std::chrono::milliseconds interval)
+{
+    QSettings settings;
+    settings.beginGroup(S_GENERAL);
+    settings.setValue(S_GENERAL_TRANSFORM_RATE, interval.count());
+    settings.sync();
+
+    emit newTransformMessageRate(interval);
+}
+
+std::chrono::milliseconds Settings::getTransformMessageRate()
+{
+    QSettings settings;
+    settings.beginGroup(S_GENERAL);
+    return std::chrono::milliseconds(
+                settings.value(S_GENERAL_TRANSFORM_RATE, OTP::OTP_TRANSFORM_TIMING_MAX.count()).toLongLong());
 }
