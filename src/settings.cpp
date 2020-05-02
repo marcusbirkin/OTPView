@@ -97,7 +97,7 @@ void Settings::setSystemRequestInterval(std::chrono::seconds interval)
 {
     QSettings settings;
     settings.beginGroup(S_GENERAL);
-    settings.setValue(S_GENERAL_SYSTEMREQUESTINTERVAL, interval.count());
+    settings.setValue(S_GENERAL_SYSTEMREQUESTINTERVAL, static_cast<qlonglong>(interval.count()));
     settings.sync();
 
     emit newSystemRequestInterval(interval);
@@ -107,14 +107,14 @@ std::chrono::seconds Settings::getSystemRequestInterval()
     QSettings settings;
     settings.beginGroup(S_GENERAL);
     return std::chrono::seconds(
-            settings.value(S_GENERAL_SYSTEMREQUESTINTERVAL, std::chrono::seconds(10).count()).toLongLong());
+            settings.value(S_GENERAL_SYSTEMREQUESTINTERVAL, static_cast<qlonglong>(std::chrono::seconds(10).count())).toLongLong());
 }
 
 void Settings::setTransformMessageRate(std::chrono::milliseconds interval)
 {
     QSettings settings;
     settings.beginGroup(S_GENERAL);
-    settings.setValue(S_GENERAL_TRANSFORM_RATE, interval.count());
+    settings.setValue(S_GENERAL_TRANSFORM_RATE, static_cast<qlonglong>(interval.count()));
     settings.sync();
 
     emit newTransformMessageRate(interval);
@@ -125,5 +125,5 @@ std::chrono::milliseconds Settings::getTransformMessageRate()
     QSettings settings;
     settings.beginGroup(S_GENERAL);
     return std::chrono::milliseconds(
-                settings.value(S_GENERAL_TRANSFORM_RATE, OTP::OTP_TRANSFORM_TIMING_MAX.count()).toLongLong());
+                settings.value(S_GENERAL_TRANSFORM_RATE, static_cast<qlonglong>(OTP::OTP_TRANSFORM_TIMING_MAX.count())).toLongLong());
 }
