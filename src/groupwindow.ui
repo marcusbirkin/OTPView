@@ -240,7 +240,7 @@
                   </sizepolicy>
                  </property>
                  <property name="title">
-                  <string>Parent</string>
+                  <string>Reference Frame</string>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0">
                   <property name="spacing">
@@ -286,7 +286,7 @@
                    </layout>
                   </item>
                   <item>
-                   <layout class="QHBoxLayout" name="hlParentRelative" stretch="0,1,0,2">
+                   <layout class="QHBoxLayout" name="hlParentRelative" stretch="0,1">
                     <item>
                      <widget class="QCheckBox" name="cbParentDisable">
                       <property name="enabled">
@@ -299,26 +299,6 @@
                     </item>
                     <item>
                      <spacer name="horizontalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item>
-                     <widget class="QCheckBox" name="cbParentRelative">
-                      <property name="text">
-                       <string>Relative</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="horizontalSpacer">
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
                       </property>
