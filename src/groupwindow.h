@@ -59,8 +59,6 @@ private slots:
 
     void on_sbParentPoint_valueChanged(int arg1);
 
-    void on_cbParentRelative_stateChanged(int arg1);
-
     void on_cbParentDisable_stateChanged(int arg1);
 
 private:

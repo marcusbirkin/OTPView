@@ -179,8 +179,9 @@ QString SystemItem::getDataPositionRotationString() const
                             .arg(rotationAccel.unit);
 
                 case SystemPointScaleItem:
-                    return QString("%1")
-                        .arg(scale.value);
+                    return QString("%1 (%2)")
+                            .arg(scale.value)
+                            .arg(scale);
 
                 default: return QString("???");
             }
@@ -262,12 +263,12 @@ QVariant SystemItem::data(int column, int roll) const
                 if (roll == Qt::BackgroundRole) return QColor(Qt::red);
             }
             return QVariant();
-        case SystemPointDetailsParentItem:
+        case SystemPointDetailsReferenceFrameItem:
             if (roll == Qt::DisplayRole)
                 switch (column)
                 {
-                    case columnFirst: return QString("Parent");
-                    case columnDetails: return otpConsumer->getParent(getAddress()).value.toString();
+                    case columnFirst: return QString("Reference Frame");
+                    case columnDetails: return otpConsumer->getReferenceFrame(getAddress()).value.toString();
                     default: return QString("???");
                 }
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
@@ -357,21 +358,6 @@ QVariant SystemItem::data(int column, int roll) const
                     case columnDetails: return getDataPositionRotationString();
                     default: return QString("???");
                 }
-            return QVariant();
-
-        case SystemPointAxisDetails_ParentRelative:
-            if (roll == Qt::DisplayRole)
-                switch (column)
-                {
-                    case columnFirst: return QString("Relative to parent");
-                    case columnDetails:
-                        return otpConsumer->getParent(getAddress()).relative;
-                    default: return QString("???");
-                }
-            if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
-            {
-                if (roll == Qt::FontRole) return italic();
-            }
             return QVariant();
         }
 
@@ -764,16 +750,14 @@ void SystemModel::newPointScale(SystemItem *parent)
     for (int axisType = SystemItem::SystemPointAxis_First; axisType <= SystemItem::SystemPointAxis_Last; axisType++)
     {
         auto AxisItem =
-                new SystemItem(this->otpConsumer,  parent->getAddress(), static_cast<SystemItem::itemType_t>(axisType), pointScaleItem);
+                new SystemItem(this->otpConsumer, parent->getAddress(), static_cast<SystemItem::itemType_t>(axisType), pointScaleItem);
         pointScaleItem->insertChild(static_cast<SystemItem::key_t>(axisType), AxisItem);
 
         // Axis Details
         for (int axisType = SystemItem::SystemPointAxisDetails_First; axisType <= SystemItem::SystemPointAxisDetails_Last; axisType++)
         {
-            if (axisType == SystemItem::SystemPointAxisDetails_ParentRelative)
-                continue; // Relative not appropriate here
             auto AxisDetailItem =
-                    new SystemItem(this->otpConsumer,  parent->getAddress(), static_cast<SystemItem::itemType_t>(axisType), AxisItem);
+                    new SystemItem(this->otpConsumer, parent->getAddress(), static_cast<SystemItem::itemType_t>(axisType), AxisItem);
             AxisItem->insertChild(static_cast<SystemItem::key_t>(axisType), AxisDetailItem);
         }
     }

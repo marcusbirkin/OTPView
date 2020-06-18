@@ -29,7 +29,7 @@ ScaleSpinBox::ScaleSpinBox(
 {
     setRange(VALUES::RANGES::getRange(VALUES::SCALE));
 
-    lineEdit()->setText(textFromValue(m_value));
+    setValue(m_value);
 
     connect(this->lineEdit(), SIGNAL(editingFinished()), this, SLOT(processInput()));
     connect(this->lineEdit(), SIGNAL(returnPressed()), this, SLOT(processInput()));
@@ -48,19 +48,20 @@ void ScaleSpinBox::processInput()
 void ScaleSpinBox::setValue(value_t val)
 {
     auto oldValue = m_value;
-    if (m_value != val) {
-        lineEdit()->setText(textFromValue(val));
-        m_value = val;
+    m_value = val;
 
-        if (!address.isValid()) return;
-        emit valueChanged(m_value);
+    lineEdit()->setText(textFromValue(val));
+
+
+    if (!address.isValid()) return;
+    emit valueChanged(m_value);
+    if (m_value != val)
         emit valueChanged(oldValue, m_value);
 
-        auto scale = otpProducer->getProducerScale(address, axis);
-        scale.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
-        scale.value = m_value;
-        otpProducer->setProducerScale(address, axis, scale);
-    }
+    auto scale = otpProducer->getProducerScale(address, axis);
+    scale.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    scale.value = m_value;
+    otpProducer->setProducerScale(address, axis, scale);
 }
 
 void ScaleSpinBox::setAddress(OTP::address_t value)
@@ -113,12 +114,13 @@ ScaleSpinBox::value_t ScaleSpinBox::valueFromText(const QString &text) const
 
 ScaleSpinBox::value_t ScaleSpinBox::valueFromText(const QString &text, bool *ok) const
 {
-    auto temp = text.split(" ").first();
-    *ok = !temp.isEmpty();
-    return temp.toInt();
+    auto temp = text;
+    return ScaleModule_t::fromPercent(temp.remove(suffix).toFloat(ok));
 }
 
 QString ScaleSpinBox::textFromValue(value_t val) const
 {
-    return QString::number(val);
+    return QString("%1 %2")
+            .arg(ScaleModule_t::toPercentString(val))
+            .arg(suffix);
 }

@@ -41,8 +41,8 @@ public:
         SystemPointDetails_Frist,
         SystemPointDetailsNameItem = SystemPointDetails_Frist,
         SystemPointDetailsLastSeenItem,
-        SystemPointDetailsParentItem,
-        SystemPointDetails_Last = SystemPointDetailsParentItem,
+        SystemPointDetailsReferenceFrameItem,
+        SystemPointDetails_Last = SystemPointDetailsReferenceFrameItem,
 
         // Point Position
         SystemPointPositionItem,
@@ -75,8 +75,7 @@ public:
         SystemPointAxisDetails_Source = SystemPointAxisDetails_First,
         SystemPointAxisDetails_Priority,
         SystemPointAxisDetails_Timestamp,
-        SystemPointAxisDetails_ParentRelative,
-        SystemPointAxisDetails_Last = SystemPointAxisDetails_ParentRelative,
+        SystemPointAxisDetails_Last = SystemPointAxisDetails_Timestamp,
     } itemType_t;
 
     explicit SystemItem(std::shared_ptr<class OTP::Consumer> otpConsumer,

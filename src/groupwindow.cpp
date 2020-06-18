@@ -195,13 +195,12 @@ void GroupWindow::on_tablePoints_itemSelectionChanged()
     if (priorityWidget)
         priorityWidget->setAddress(address);
 
-    // - Parent
-    auto parent = otpProducer->getProducerParent(address);
+    // - Reference Frame
+    auto parent = otpProducer->getProducerReferenceFrame(address);
     ui->cbParentDisable->setChecked(parent.value == address);
     ui->sbParentSystem->setValue(parent.value.system);
     ui->sbParentGroup->setValue(parent.value.group);
     ui->sbParentPoint->setValue(parent.value.point);
-    ui->cbParentRelative->setChecked(parent.relative);
 
     for (auto axis = axis_t::first; axis < axis_t::count; axis++)
     {
@@ -253,18 +252,16 @@ void GroupWindow::on_leName_textChanged(const QString &arg1)
 void GroupWindow::on_sbParent_valueChanged()
 {
     if (getSelectedAddress().count() != 1) return;
-    auto parent = otpProducer->getProducerParent(getSelectedAddress().first());
-    parent.timestamp = ui->cbParentDisable->isChecked() ? 0 :
+    auto referenceFrame = otpProducer->getProducerReferenceFrame(getSelectedAddress().first());
+    referenceFrame.timestamp = ui->cbParentDisable->isChecked() ? 0 :
             static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
     if (ui->cbParentDisable->isChecked()) {
-        parent.value = getSelectedAddress().first();
-        parent.relative = false;
+        referenceFrame.value = getSelectedAddress().first();
     } else {
-        parent.value = {ui->sbParentSystem->value(), ui->sbParentGroup->value(), ui->sbParentPoint->value()};
-        parent.relative = ui->cbParentRelative->isChecked();
+        referenceFrame.value = {ui->sbParentSystem->value(), ui->sbParentGroup->value(), ui->sbParentPoint->value()};
     }
 
-    otpProducer->setProducerParent(getSelectedAddress().first(), parent);
+    otpProducer->setProducerReferenceFrame(getSelectedAddress().first(), referenceFrame);
 }
 
 void GroupWindow::on_sbParentSystem_valueChanged(int arg1)
@@ -280,12 +277,6 @@ void GroupWindow::on_sbParentGroup_valueChanged(int arg1)
 }
 
 void GroupWindow::on_sbParentPoint_valueChanged(int arg1)
-{
-    Q_UNUSED(arg1)
-    on_sbParent_valueChanged();
-}
-
-void GroupWindow::on_cbParentRelative_stateChanged(int arg1)
 {
     Q_UNUSED(arg1)
     on_sbParent_valueChanged();
