@@ -97,7 +97,8 @@ private:
     OTP::axis_t axis;
 
     std::pair<value_t,value_t> range = {std::numeric_limits<value_t>::min(),std::numeric_limits<value_t>::max()};
-    value_t m_value = 1;
+    value_t m_value = ScaleModule_t::fromPercent(100);
+    QString suffix = "%";
 };
 
 #endif // SCALESPINBOX_H

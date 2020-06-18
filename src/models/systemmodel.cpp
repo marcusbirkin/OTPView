@@ -179,8 +179,9 @@ QString SystemItem::getDataPositionRotationString() const
                             .arg(rotationAccel.unit);
 
                 case SystemPointScaleItem:
-                    return QString("%1")
-                        .arg(scale.value);
+                    return QString("%1 (%2)")
+                            .arg(scale.value)
+                            .arg(scale);
 
                 default: return QString("???");
             }
