@@ -99,6 +99,12 @@ void SpacialSpinBox::setValue(value_t val)
             rotationAccel.value = m_value;
             otpProducer->setProducerRotationAcceleration(address, axis, rotationAccel); break;
         }
+        case VALUES::SCALE:
+            Q_ASSERT(moduleValue != VALUES::SCALE); // Invalid module for this class
+            break;
+        case VALUES::REFERENCE_FRAME:
+           Q_ASSERT(moduleValue != VALUES::REFERENCE_FRAME); // Invalid module for this class
+            break;
     }
 }
 
@@ -118,6 +124,12 @@ void SpacialSpinBox::setAddress(OTP::address_t value)
             setValue(otpProducer->getProducerRotationVelocity(address, axis).value); break;
         case VALUES::ROTATION_ACCELERATION:
             setValue(otpProducer->getProducerRotationAcceleration(address, axis).value); break;
+        case VALUES::SCALE:
+            Q_ASSERT(moduleValue != VALUES::SCALE); // Invalid module for this class
+            break;
+        case VALUES::REFERENCE_FRAME:
+           Q_ASSERT(moduleValue != VALUES::REFERENCE_FRAME);// Invalid module for this class
+            break;
     }
 }
 
