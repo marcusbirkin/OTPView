@@ -48,7 +48,11 @@ LineChart::LineChart(std::shared_ptr<class OTP::Consumer> otpConsumer,
     this->layout()->addItem(buttonLayoutPosition);
     this->layout()->addItem(buttonLayoutRotation);
     buttonGroup->setExclusive(true);
+    #if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+    connect(buttonGroup, &QButtonGroup::idToggled, this, &LineChart::buttonToggled);
+    #else
     connect(buttonGroup, qOverload<int, bool>(&QButtonGroup::buttonToggled), this, &LineChart::buttonToggled);
+    #endif
 
     setupLineSeries(POSITION, "Position", *buttonLayoutPosition);
     setupLineSeries(POSITION_VELOCITY, "Position Velocity", *buttonLayoutPosition);
@@ -172,8 +176,7 @@ void LineChart::buttonToggled(int type, bool checked)
 
     // Lineseries
     for (auto axis = axis_t::first; axis < axis_t::count; ++axis)
-        for (auto series : lineSeries[axis].values(static_cast<moduleValue_t>(type)))
-            series->setVisible(checked);
+        lineSeries[axis].value(static_cast<moduleValue_t>(type))->setVisible(checked);
 }
 
 void LineChart::redraw()
