@@ -73,6 +73,9 @@ ComponentsItem::ComponentsItem(
             {
                 if (cid == this->CID)
                 {
+                    if (this->otpConsumer->getComponent(cid).getType() == component_s::consumer)
+                        return; // Consumers don't send system lists
+
                     this->childItems.append(
                                 new ComponentsItem(this->otpConsumer, this->CID, ComponentSystemListItem, this));
                     emit layoutChanged();
@@ -82,8 +85,10 @@ ComponentsItem::ComponentsItem(
             {
                 if (cid == CID)
                 {
-                    this->childItems.resize(childItems.size() - 1);
-                    emit layoutChanged();
+                    if (childItems.size()) {
+                        this->childItems.resize(childItems.size() - 1);
+                        emit layoutChanged();
+                    }
                 }
             });
         } break;
@@ -125,7 +130,10 @@ QVariant ComponentsItem::data(int column) const
             return QString("Type: %1").arg(
                         otpConsumer->getComponent(CID).getType() == component_s::consumer ? QString("Consumer") : QString("Producer"));
         case ComponentSystemList:
-            return QString("Systems%1").arg(otpConsumer->getSystems(CID).isEmpty() ? ": None" : "");
+            if (otpConsumer->getComponent(CID).getType() == component_s::consumer)
+                return "Systems: N/A";
+            else
+                return QString("Systems%1").arg(otpConsumer->getSystems(CID).isEmpty() ? ": None" : "");
         case ComponentSystemListItem:
             return QString::number(otpConsumer->getSystems(CID).value(row()));
         default:
