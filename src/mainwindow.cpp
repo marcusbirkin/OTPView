@@ -174,14 +174,14 @@ void MainWindow::updateStatusBar()
                 (otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
         {
             auto status = otpConsumer->getConsumerNetworkinterfaceState(QAbstractSocket::IPv4Protocol);
-            message.append(QString(" IPv4 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
+            message.append(QString(" OTP-4 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
         }
 
         if ((otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::IPv6Protocol) ||
                 (otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
         {
             auto status = otpConsumer->getConsumerNetworkinterfaceState(QAbstractSocket::IPv6Protocol);
-            message.append(QString(" IPv6 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
+            message.append(QString(" OTP-6 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
         }
     }
 

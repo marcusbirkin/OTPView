@@ -123,9 +123,9 @@ void SettingsDialog::populateInterfaceList()
 void SettingsDialog::populateProtocolList()
 {
     ui->cbProtocol->clear();
-    ui->cbProtocol->addItem("IPv4", QAbstractSocket::IPv4Protocol);
-    ui->cbProtocol->addItem("IPv6", QAbstractSocket::IPv6Protocol);
-    ui->cbProtocol->addItem("IPv4 & IPv6", QAbstractSocket::AnyIPProtocol);
+    ui->cbProtocol->addItem("OTP-4", QAbstractSocket::IPv4Protocol);
+    ui->cbProtocol->addItem("OTP-6", QAbstractSocket::IPv6Protocol);
+    ui->cbProtocol->addItem("OTP-4/6", QAbstractSocket::AnyIPProtocol);
 
     for (int idx = 0; idx < ui->cbProtocol->count(); idx++)
     {
