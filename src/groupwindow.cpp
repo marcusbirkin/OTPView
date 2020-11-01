@@ -55,6 +55,12 @@ GroupWindow::GroupWindow(
     ui->tablePoints->verticalHeader()->hide();
     ui->tablePoints->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tablePoints->horizontalHeader()->setStretchLastSection(true);
+    connect(ui->tablePoints->model(), &QAbstractItemModel::rowsInserted, this, [=](const QModelIndex, int start, int end)
+    {
+        // Automatically select newly inserted row
+        if (start == end)
+            ui->tablePoints->selectRow(start);
+    });
 
     // Producer Points Details
     on_tablePoints_itemSelectionChanged();
@@ -63,6 +69,11 @@ GroupWindow::GroupWindow(
 
     // - Name
     ui->leName->setMaxLength(name_t::maxSize());
+    connect(otpProducer.get(), &Producer::updatedProducerPointName, this, [=](address_t address) {
+        if (this->getSelectedAddress().contains(address)) {
+            this->on_tablePoints_itemSelectionChanged();
+        }
+    });
 
     // - Priority
     auto sbPriority = new PrioritySpinBox(otpProducer, this);
@@ -70,6 +81,11 @@ GroupWindow::GroupWindow(
 
     // - Parent
     ui->cbParentDisable->setChecked(true);
+    connect(otpProducer.get(), &Producer::updatedReferenceFrame, this, [=](address_t address) {
+        if (this->getSelectedAddress().contains(address)) {
+            this->on_tablePoints_itemSelectionChanged();
+        }
+    });
 
     // - Scale
     ui->tableScale->setColumnCount(ScaleHeaders.count());
@@ -166,8 +182,6 @@ void GroupWindow::on_pbAddPoint_clicked()
     otpProducer->setProducerPointName(
                 address_t{system, group, dialog->getPoint()},
                 QString("Point %1/%2/%3").arg(system).arg(group).arg(dialog->getPoint()));
-
-    on_tablePoints_itemSelectionChanged();
 }
 
 void GroupWindow::on_pbRemovePoint_clicked()

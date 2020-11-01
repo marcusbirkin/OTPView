@@ -31,7 +31,14 @@ PointsTableModel::PointsTableModel(
     system(system),
     group(group)
 {
-    connect(otpProducer.get(), &Producer::newPoint, this, [=]() { emit layoutChanged(); });
+    connect(otpProducer.get(), &Producer::newPoint, this, [=](cid_t, system_t system, group_t group, point_t point)
+    {
+        if (system == this->system && group == this->group) {
+            auto row = otpProducer->getProducerPoints(system, group).indexOf(point);
+            beginInsertRows(QModelIndex(), row, row);
+            endInsertRows();
+        }
+    });
     connect(otpProducer.get(), &Producer::removedPoint, this, [=]() { emit layoutChanged(); });
 }
 

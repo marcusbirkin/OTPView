@@ -33,6 +33,13 @@ ScaleSpinBox::ScaleSpinBox(
 
     connect(this->lineEdit(), SIGNAL(editingFinished()), this, SLOT(processInput()));
     connect(this->lineEdit(), SIGNAL(returnPressed()), this, SLOT(processInput()));
+
+    connect(otpProducer.get(), &Producer::updatedScale, this, [=](address_t address, axis_t axis) {
+        if (this->address.isValid() && this->address == address) {
+            m_value = otpProducer.get()->getProducerScale(address, axis).value;
+            lineEdit()->setText(textFromValue(m_value));
+        }
+    });
 }
 
 void ScaleSpinBox::processInput()

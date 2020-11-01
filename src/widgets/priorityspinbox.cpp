@@ -31,6 +31,13 @@ PrioritySpinBox::PrioritySpinBox(
 
     connect(this->lineEdit(), SIGNAL(editingFinished()), this, SLOT(processInput()));
     connect(this->lineEdit(), SIGNAL(returnPressed()), this, SLOT(processInput()));
+
+    connect(otpProducer.get(), &Producer::updatedProducerPointPriority, this, [=](address_t address) {
+        if (this->address.isValid() && this->address == address) {
+            m_value = otpProducer.get()->getProducerPointPriority(address);
+            lineEdit()->setText(textFromValue(m_value));
+        }
+    });
 }
 
 void PrioritySpinBox::processInput()
