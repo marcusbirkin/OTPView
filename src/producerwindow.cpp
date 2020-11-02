@@ -21,6 +21,7 @@
 #include "settings.h"
 #include "groupselectiondialog.h"
 #include <QMdiSubWindow>
+#include <QSettings>
 
 using namespace OTP;
 
@@ -100,6 +101,21 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
 ProducerWindow::~ProducerWindow()
 {
     delete ui;
+}
+
+void ProducerWindow::showEvent(QShowEvent *event) {
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    restoreGeometry(settings.value("ProducerWindow/geometry").toByteArray());
+    restoreState(settings.value("ProducerWindow/state").toByteArray());
+    QMainWindow::showEvent(event);
+}
+
+void ProducerWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    settings.setValue("ProducerWindow/geometry", saveGeometry());
+    settings.setValue("ProducerWindow/state", saveState());
+    QMainWindow::closeEvent(event);
 }
 
 void ProducerWindow::updateStatusBar()

@@ -40,6 +40,8 @@ public:
     ~MainWindow();
 
 private slots:
+    void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
     void on_actionSettings_triggered();
     void on_actionNew_Producer_triggered();
     void on_actionNew_Consumer_triggered();

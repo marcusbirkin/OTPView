@@ -27,6 +27,8 @@
 #include "widgets/pointspinbox.h"
 #include "widgets/scalespinbox.h"
 #include "widgets/priorityspinbox.h"
+#include <QSettings>
+#include <cstring>
 
 using namespace OTP;
 
@@ -144,6 +146,45 @@ GroupWindow::~GroupWindow()
 {
     otpProducer->removeProducerGroup(system, group);
     delete ui;
+}
+
+QObjectList findSpliters(const QObjectList &objList) {
+    QObjectList ret;
+    for (auto child : objList) {
+        if (std::strcmp(child->metaObject()->className(), "QSplitter") == 0)
+            ret.append(child);
+        ret.append(findSpliters(child->children()));
+    }
+
+    return ret;
+}
+
+void GroupWindow::showEvent(QShowEvent *event) {
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    parentWidget()->restoreGeometry(settings.value("GroupWindow/geometry").toByteArray());
+    // Restore all splitter sizes
+    for (auto obj : findSpliters(this->ui->gbPoints->children())) {
+        auto splitter = qobject_cast<QSplitter*>(obj);
+        splitter->setSizes(
+            settings.value(
+                QString("GroupWindow/spliter_%1").arg(splitter->objectName()))
+            .value<QList<int>>());
+    }
+    QWidget::showEvent(event);
+}
+
+void GroupWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    settings.setValue("GroupWindow/geometry", parentWidget()->saveGeometry());
+    // Save all splitter sizes
+    for (const auto obj : findSpliters(this->ui->gbPoints->children())) {
+        auto splitter = qobject_cast<const QSplitter*>(obj);
+        settings.setValue(
+            QString("GroupWindow/spliter_%1").arg(splitter->objectName()),
+            QVariant::fromValue(splitter->sizes()));
+    }
+    QWidget::closeEvent(event);
 }
 
 void GroupWindow::setSystem(OTP::system_t newSystem)

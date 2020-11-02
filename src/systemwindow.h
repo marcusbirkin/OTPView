@@ -41,6 +41,8 @@ public:
     OTP::system_t getSystem() const { return system; }
 
 private slots:
+    void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
     void on_tabWidget_tabCloseRequested(int index);
 
 private:

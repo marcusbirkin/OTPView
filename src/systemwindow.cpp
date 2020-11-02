@@ -20,6 +20,7 @@
 #include "ui_systemwindow.h"
 #include "models/systemmodel.h"
 #include "widgets/linechart.h"
+#include <QSettings>
 
 using namespace OTP;
 
@@ -69,6 +70,18 @@ SystemWindow::~SystemWindow()
     delete ui;
 }
 
+void SystemWindow::showEvent(QShowEvent *event) {
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    parentWidget()->restoreGeometry(settings.value(QString("SystemWindow_%1/geometry").arg(system)).toByteArray());
+    QWidget::showEvent(event);
+}
+
+void SystemWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    settings.setValue(QString("SystemWindow_%1/geometry").arg(system), parentWidget()->saveGeometry());
+    QWidget::closeEvent(event);
+}
 
 void SystemWindow::on_tabWidget_tabCloseRequested(int index)
 {

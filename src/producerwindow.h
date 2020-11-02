@@ -37,6 +37,8 @@ public:
     ~ProducerWindow();
 
 private slots:
+    void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
     void on_actionNew_Group_triggered();
 
 private:

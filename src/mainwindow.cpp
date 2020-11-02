@@ -23,6 +23,7 @@
 #include <QMessageBox>
 #include <QTimer>
 #include <QMdiSubWindow>
+#include <QSettings>
 #include "systemselectiondialog.h"
 #include "models/componentsmodel.h"
 
@@ -145,6 +146,21 @@ MainWindow::~MainWindow()
 {
     otpConsumer.get()->disconnect();
     delete ui;
+}
+
+void MainWindow::showEvent(QShowEvent *event) {
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    restoreGeometry(settings.value("MainWindow/geometry").toByteArray());
+    restoreState(settings.value("MainWindow/state").toByteArray());
+    QMainWindow::showEvent(event);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QSettings settings(QApplication::organizationName(), QApplication::applicationName());
+    settings.setValue("MainWindow/geometry", saveGeometry());
+    settings.setValue("MainWindow/state", saveState());
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::on_tvComponents_doubleClicked(const QModelIndex &index)

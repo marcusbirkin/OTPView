@@ -44,6 +44,9 @@ public slots:
     void setSystem(OTP::system_t newSystem);
 
 private slots:
+    void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
+
     void on_pbAddPoint_clicked();
     void on_pbRemovePoint_clicked();
 
