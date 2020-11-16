@@ -40,7 +40,7 @@ SystemWindow::SystemWindow(
                 .arg(system));
 
     // Create system
-    otpConsumer->addConsumerSystem(system);
+    otpConsumer->addLocalSystem(system);
 
     // Tree
     ui->tvDetails->setModel(new SystemModel(otpConsumer, system, this));
@@ -66,7 +66,7 @@ SystemWindow::SystemWindow(
 
 SystemWindow::~SystemWindow()
 {
-    otpConsumer->removeConsumerSystem(system);
+    otpConsumer->removeLocalSystem(system);
     delete ui;
 }
 

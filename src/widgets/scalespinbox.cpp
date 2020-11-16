@@ -36,7 +36,7 @@ ScaleSpinBox::ScaleSpinBox(
 
     connect(otpProducer.get(), &Producer::updatedScale, this, [=](address_t address, axis_t axis) {
         if (this->address.isValid() && this->address == address) {
-            m_value = otpProducer.get()->getProducerScale(address, axis).value;
+            m_value = otpProducer.get()->getLocalScale(address, axis).value;
             lineEdit()->setText(textFromValue(m_value));
         }
     });
@@ -65,16 +65,16 @@ void ScaleSpinBox::setValue(value_t val)
     if (m_value != val)
         emit valueChanged(oldValue, m_value);
 
-    auto scale = otpProducer->getProducerScale(address, axis);
+    auto scale = otpProducer->getLocalScale(address, axis);
     scale.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
     scale.value = m_value;
-    otpProducer->setProducerScale(address, axis, scale);
+    otpProducer->setLocalScale(address, axis, scale);
 }
 
 void ScaleSpinBox::setAddress(OTP::address_t value)
 {
     address = value;
-    setValue(otpProducer->getProducerScale(address, axis).value);
+    setValue(otpProducer->getLocalScale(address, axis).value);
 }
 
 void ScaleSpinBox::stepBy(int steps)

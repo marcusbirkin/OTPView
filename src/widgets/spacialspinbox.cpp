@@ -59,45 +59,45 @@ void SpacialSpinBox::setValue(value_t val)
     switch (moduleValue) {
         case VALUES::POSITION:
         {
-            auto position = otpProducer->getProducerPosition(address, axis);
+            auto position = otpProducer->getLocalPosition(address, axis);
             position.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
             position.value = m_value;
-            otpProducer->setProducerPosition(address, axis, position); break;
+            otpProducer->setLocalPosition(address, axis, position); break;
         }
         case VALUES::POSITION_VELOCITY:
         {
-            auto positionVel = otpProducer->getProducerPositionVelocity(address, axis);
+            auto positionVel = otpProducer->getLocalPositionVelocity(address, axis);
             positionVel.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
             positionVel.value = m_value;
-            otpProducer->setProducerPositionVelocity(address, axis, positionVel); break;
+            otpProducer->setLocalPositionVelocity(address, axis, positionVel); break;
         }
         case VALUES::POSITION_ACCELERATION:
         {
-            auto positionAccel = otpProducer->getProducerPositionAcceleration(address, axis);
+            auto positionAccel = otpProducer->getLocalPositionAcceleration(address, axis);
             positionAccel.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
             positionAccel.value = m_value;
-            otpProducer->setProducerPositionAcceleration(address, axis, positionAccel); break;
+            otpProducer->setLocalPositionAcceleration(address, axis, positionAccel); break;
         }
         case VALUES::ROTATION:
         {
-            auto rotation = otpProducer->getProducerRotation(address, axis);
+            auto rotation = otpProducer->getLocalRotation(address, axis);
             rotation.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
             rotation.value = m_value;
-            otpProducer->setProducerRotation(address, axis, rotation); break;
+            otpProducer->setLocalRotation(address, axis, rotation); break;
         }
         case VALUES::ROTATION_VELOCITY:
         {
-            auto rotationVel = otpProducer->getProducerRotationVelocity(address, axis);
+            auto rotationVel = otpProducer->getLocalRotationVelocity(address, axis);
             rotationVel.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
             rotationVel.value = m_value;
-            otpProducer->setProducerRotationVelocity(address, axis, rotationVel); break;
+            otpProducer->setLocalRotationVelocity(address, axis, rotationVel); break;
         }
         case VALUES::ROTATION_ACCELERATION:
         {
-            auto rotationAccel = otpProducer->getProducerRotationAcceleration(address, axis);
+            auto rotationAccel = otpProducer->getLocalRotationAcceleration(address, axis);
             rotationAccel.timestamp = static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
             rotationAccel.value = m_value;
-            otpProducer->setProducerRotationAcceleration(address, axis, rotationAccel); break;
+            otpProducer->setLocalRotationAcceleration(address, axis, rotationAccel); break;
         }
         case VALUES::SCALE:
             Q_ASSERT(moduleValue != VALUES::SCALE); // Invalid module for this class
@@ -113,17 +113,17 @@ void SpacialSpinBox::setAddress(OTP::address_t value)
     address = value;
     switch (moduleValue) {
         case VALUES::POSITION:
-            setValue(otpProducer->getProducerPosition(address, axis).value); break;
+            setValue(otpProducer->getLocalPosition(address, axis).value); break;
         case VALUES::POSITION_VELOCITY:
-            setValue(otpProducer->getProducerPositionVelocity(address, axis).value); break;
+            setValue(otpProducer->getLocalPositionVelocity(address, axis).value); break;
         case VALUES::POSITION_ACCELERATION:
-            setValue(otpProducer->getProducerPositionAcceleration(address, axis).value); break;
+            setValue(otpProducer->getLocalPositionAcceleration(address, axis).value); break;
         case VALUES::ROTATION:
-            setValue(otpProducer->getProducerRotation(address, axis).value); break;
+            setValue(otpProducer->getLocalRotation(address, axis).value); break;
         case VALUES::ROTATION_VELOCITY:
-            setValue(otpProducer->getProducerRotationVelocity(address, axis).value); break;
+            setValue(otpProducer->getLocalRotationVelocity(address, axis).value); break;
         case VALUES::ROTATION_ACCELERATION:
-            setValue(otpProducer->getProducerRotationAcceleration(address, axis).value); break;
+            setValue(otpProducer->getLocalRotationAcceleration(address, axis).value); break;
         case VALUES::SCALE:
             Q_ASSERT(moduleValue != VALUES::SCALE); // Invalid module for this class
             break;
@@ -180,7 +180,7 @@ QString SpacialSpinBox::textFromValue(value_t val) const
         case VALUES::POSITION:
             return QString("%1 %2").arg(QString::number(val)).arg(
                         otpProducer->getUnitString(
-                            otpProducer->getProducerPosition(address, axis).scale,
+                            otpProducer->getLocalPosition(address, axis).scale,
                             moduleValue));
         default:
             return QString("%1 %2").arg(QString::number(val)).arg(

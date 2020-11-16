@@ -50,7 +50,7 @@ GroupWindow::GroupWindow(
                 .arg(group));
 
     // Create group
-    otpProducer->addProducerGroup(system, group);
+    otpProducer->addLocalGroup(system, group);
 
     // Points
     ui->tablePoints->setModel(new PointsTableModel(otpProducer, system, group, this));
@@ -71,7 +71,7 @@ GroupWindow::GroupWindow(
 
     // - Name
     ui->leName->setMaxLength(name_t::maxSize());
-    connect(otpProducer.get(), &Producer::updatedProducerPointName, this, [=](address_t address) {
+    connect(otpProducer.get(), &Producer::updatedLocalPointName, this, [=](address_t address) {
         if (this->getSelectedAddress().contains(address)) {
             this->on_tablePoints_itemSelectionChanged();
         }
@@ -144,7 +144,7 @@ GroupWindow::GroupWindow(
 
 GroupWindow::~GroupWindow()
 {
-    otpProducer->removeProducerGroup(system, group);
+    otpProducer->removeLocalGroup(system, group);
     delete ui;
 }
 
@@ -189,14 +189,14 @@ void GroupWindow::closeEvent(QCloseEvent *event)
 
 void GroupWindow::setSystem(OTP::system_t newSystem)
 {
-    auto pointsList = otpProducer->getProducerPoints(system, group);
-    otpProducer->removeProducerGroup(system, group);
+    auto pointsList = otpProducer->getLocalPoints(system, group);
+    otpProducer->removeLocalGroup(system, group);
 
     system = newSystem;
-    otpProducer->addProducerSystem(newSystem);
-    otpProducer->addProducerGroup(newSystem, group);
+    otpProducer->addLocalSystem(newSystem);
+    otpProducer->addLocalGroup(newSystem, group);
     for (auto point : pointsList)
-        otpProducer->addProducerPoint(newSystem, group, point, priority_t());
+        otpProducer->addLocalPoint(newSystem, group, point, priority_t());
 
     qobject_cast<PointsTableModel*>(ui->tablePoints->model())->setSystem(newSystem);
 }
@@ -215,12 +215,12 @@ QList<address_t> GroupWindow::getSelectedAddress()
 
 void GroupWindow::on_pbAddPoint_clicked()
 {
-    auto dialog = new PointSelectionDialog(otpProducer->getProducerPoints(system, group), this);
+    auto dialog = new PointSelectionDialog(otpProducer->getLocalPoints(system, group), this);
     if (dialog->exec() == QDialog::Rejected)
         return;
 
-    otpProducer->addProducerPoint(system, group, dialog->getPoint(), priority_t());
-    otpProducer->setProducerPointName(
+    otpProducer->addLocalPoint(system, group, dialog->getPoint(), priority_t());
+    otpProducer->setLocalPointName(
                 address_t{system, group, dialog->getPoint()},
                 QString("Point %1/%2/%3").arg(system).arg(group).arg(dialog->getPoint()));
 }
@@ -228,7 +228,7 @@ void GroupWindow::on_pbAddPoint_clicked()
 void GroupWindow::on_pbRemovePoint_clicked()
 {
     for (auto address : getSelectedAddress())
-        otpProducer->removeProducerPoint(address);
+        otpProducer->removeLocalPoint(address);
 
     on_tablePoints_itemSelectionChanged();
 }
@@ -243,7 +243,7 @@ void GroupWindow::on_tablePoints_itemSelectionChanged()
     auto address = getSelectedAddress().first();
 
     // - Name
-    ui->leName->setText(otpProducer->getProducerPointName(address));
+    ui->leName->setText(otpProducer->getLocalPointName(address));
 
     // - Priority
     auto priorityWidget = static_cast<PrioritySpinBox*>(ui->gbPriority->layout()->itemAt(0)->widget());
@@ -251,7 +251,7 @@ void GroupWindow::on_tablePoints_itemSelectionChanged()
         priorityWidget->setAddress(address);
 
     // - Reference Frame
-    auto parent = otpProducer->getProducerReferenceFrame(address);
+    auto parent = otpProducer->getLocalReferenceFrame(address);
     ui->cbParentDisable->setChecked(parent.value == address);
     ui->sbParentSystem->setValue(parent.value.system);
     ui->sbParentGroup->setValue(parent.value.group);
@@ -301,13 +301,13 @@ void GroupWindow::on_tablePoints_itemSelectionChanged()
 void GroupWindow::on_leName_textChanged(const QString &arg1)
 {
     if (getSelectedAddress().count() != 1) return;
-    otpProducer->setProducerPointName(getSelectedAddress().first(), arg1);
+    otpProducer->setLocalPointName(getSelectedAddress().first(), arg1);
 }
 
 void GroupWindow::on_sbParent_valueChanged()
 {
     if (getSelectedAddress().count() != 1) return;
-    auto referenceFrame = otpProducer->getProducerReferenceFrame(getSelectedAddress().first());
+    auto referenceFrame = otpProducer->getLocalReferenceFrame(getSelectedAddress().first());
     referenceFrame.timestamp = ui->cbParentDisable->isChecked() ? 0 :
             static_cast<OTP::timestamp_t>(QDateTime::currentDateTime().toMSecsSinceEpoch());
     if (ui->cbParentDisable->isChecked()) {
@@ -316,7 +316,7 @@ void GroupWindow::on_sbParent_valueChanged()
         referenceFrame.value = {ui->sbParentSystem->value(), ui->sbParentGroup->value(), ui->sbParentPoint->value()};
     }
 
-    otpProducer->setProducerReferenceFrame(getSelectedAddress().first(), referenceFrame);
+    otpProducer->setLocalReferenceFrame(getSelectedAddress().first(), referenceFrame);
 }
 
 void GroupWindow::on_sbParentSystem_valueChanged(int arg1)

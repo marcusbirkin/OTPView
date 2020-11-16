@@ -83,16 +83,16 @@ MainWindow::MainWindow(QWidget *parent) :
                           Settings::getInstance().getNetworkInterface(),
                           Settings::getInstance().getNetworkTransport(),
                           QList<system_t>(),
-                          Settings::getInstance().getComponentSettings(componentSettingsGroup_CONSUMER).Name,
                           Settings::getInstance().getComponentSettings(componentSettingsGroup_CONSUMER).CID,
+                          Settings::getInstance().getComponentSettings(componentSettingsGroup_CONSUMER).Name,
                           this));
 
     // OTP Consumer Interface
     connect(&Settings::getInstance(), &Settings::newNetworkInterface,
             [this](QNetworkInterface interface) {
-                otpConsumer->setConsumerNetworkInterface(interface);
+                otpConsumer->setNetworkInterface(interface);
 
-                connect(otpConsumer.get(), &OTP::Consumer::stateChangedConsumerNetworkInterface,
+                connect(otpConsumer.get(), &OTP::Consumer::stateChangedNetworkInterface,
                         [this]() {
                             updateStatusBar();
                 });
@@ -104,7 +104,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // OTP Consumer Transport
     connect(&Settings::getInstance(), &Settings::newNetworkTransport,
             [this](QAbstractSocket::NetworkLayerProtocol transport) {
-                otpConsumer->setConsumerNetworkTransport(transport);
+                otpConsumer->setNetworkTransport(transport);
                 updateStatusBar();
             });
     updateStatusBar();
@@ -112,23 +112,23 @@ MainWindow::MainWindow(QWidget *parent) :
     // OTP Consumer Name
     connect(ui->leConsumerName, &QLineEdit::textChanged,
             [this](const QString &arg1) {
-                otpConsumer->setConsumerName(arg1);
+                otpConsumer->setLocalName(arg1);
                 saveComponentDetails();
             });
-    ui->leConsumerName->setText(otpConsumer->getConsumerName());
+    ui->leConsumerName->setText(otpConsumer->getLocalName());
     ui->leConsumerName->setMaxLength(PDU::NAME_LENGTH);
 
     // OTP Consumer CID
     connect(ui->pbConsumerNewCID, &QPushButton::clicked,
             [this]() {
-                otpConsumer->setConsumerCID(cid_t::createUuid());
+                otpConsumer->setLocalCID(cid_t::createUuid());
             });
-    connect(otpConsumer.get(), &Consumer::newConsumerCID,
+    connect(otpConsumer.get(), &Consumer::newLocalCID,
             [this](const cid_t CID) {
                 ui->lblConsumerCID->setText(CID.toString());
                 saveComponentDetails();
             });
-    ui->lblConsumerCID->setText(otpConsumer->getConsumerCID().toString());
+    ui->lblConsumerCID->setText(otpConsumer->getLocalCID().toString());
 
     // OTP Components Table
     ui->tvComponents->setModel(new ComponentsModel(otpConsumer, this));
@@ -190,19 +190,19 @@ void MainWindow::updateStatusBar()
     if (otpConsumer)
     {
         message = QObject::tr("Selected interface: %1").arg(
-                    otpConsumer->getConsumerNetworkInterface().humanReadableName());
+                    otpConsumer->getNetworkInterface().humanReadableName());
 
-        if ((otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::IPv4Protocol) ||
-                (otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
+        if ((otpConsumer->getNetworkTransport() == QAbstractSocket::IPv4Protocol) ||
+                (otpConsumer->getNetworkTransport() == QAbstractSocket::AnyIPProtocol))
         {
-            auto status = otpConsumer->getConsumerNetworkinterfaceState(QAbstractSocket::IPv4Protocol);
+            auto status = otpConsumer->getNetworkinterfaceState(QAbstractSocket::IPv4Protocol);
             message.append(QString(" OTP-4 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
         }
 
-        if ((otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::IPv6Protocol) ||
-                (otpConsumer->getConsumerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
+        if ((otpConsumer->getNetworkTransport() == QAbstractSocket::IPv6Protocol) ||
+                (otpConsumer->getNetworkTransport() == QAbstractSocket::AnyIPProtocol))
         {
-            auto status = otpConsumer->getConsumerNetworkinterfaceState(QAbstractSocket::IPv6Protocol);
+            auto status = otpConsumer->getNetworkinterfaceState(QAbstractSocket::IPv6Protocol);
             message.append(QString(" OTP-6 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
         }
     }
@@ -212,7 +212,7 @@ void MainWindow::updateStatusBar()
 
 void MainWindow::saveComponentDetails()
 {
-    Settings::componentDetails_t details(otpConsumer->getConsumerName(), otpConsumer->getConsumerCID());
+    Settings::componentDetails_t details(otpConsumer->getLocalName(), otpConsumer->getLocalCID());
     Settings::getInstance().setComponentSettings(componentSettingsGroup_CONSUMER, details);
 }
 
@@ -221,7 +221,7 @@ bool MainWindow::openSystemWindow(system_t system)
     if (!system.isValid()) return false;
 
     // Already open?
-    if (otpConsumer->getConsumerSystems().contains(system))
+    if (otpConsumer->getLocalSystems().contains(system))
     {
         for (auto subWindow : ui->mdiArea->subWindowList())
         {
@@ -261,7 +261,7 @@ void MainWindow::on_actionNew_Producer_triggered()
 
 void MainWindow::on_actionNew_Consumer_triggered()
 {
-    auto dialog = new SystemSelectionDialog(otpConsumer->getConsumerSystems(), this);
+    auto dialog = new SystemSelectionDialog(otpConsumer->getLocalSystems(), this);
     if (dialog->exec() == QDialog::Rejected)
         return;
 

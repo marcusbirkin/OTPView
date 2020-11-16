@@ -32,9 +32,9 @@ PrioritySpinBox::PrioritySpinBox(
     connect(this->lineEdit(), SIGNAL(editingFinished()), this, SLOT(processInput()));
     connect(this->lineEdit(), SIGNAL(returnPressed()), this, SLOT(processInput()));
 
-    connect(otpProducer.get(), &Producer::updatedProducerPointPriority, this, [=](address_t address) {
+    connect(otpProducer.get(), &Producer::updatedLocalPointPriority, this, [=](address_t address) {
         if (this->address.isValid() && this->address == address) {
-            m_value = otpProducer.get()->getProducerPointPriority(address);
+            m_value = otpProducer.get()->getLocalPointPriority(address);
             lineEdit()->setText(textFromValue(m_value));
         }
     });
@@ -61,14 +61,14 @@ void PrioritySpinBox::setValue(value_t val)
         emit valueChanged(m_value);
         emit valueChanged(oldValue, m_value);
 
-        otpProducer->setProducerPointPriority(address, m_value);
+        otpProducer->setLocalPointPriority(address, m_value);
     }
 }
 
 void PrioritySpinBox::setAddress(OTP::address_t value)
 {
     address = value;
-    setValue(otpProducer->getProducerPointPriority(address));
+    setValue(otpProducer->getLocalPointPriority(address));
 }
 
 void PrioritySpinBox::stepBy(int steps)

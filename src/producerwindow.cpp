@@ -38,15 +38,15 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
     otpProducer.reset(new class Producer(
                           Settings::getInstance().getNetworkInterface(),
                           Settings::getInstance().getNetworkTransport(),
-                          Settings::getInstance().getComponentSettings(componentSettingsGroup).Name,
                           Settings::getInstance().getComponentSettings(componentSettingsGroup).CID,
+                          Settings::getInstance().getComponentSettings(componentSettingsGroup).Name,
                           Settings::getInstance().getTransformMessageRate(),
                           this));
 
     // OTP Producer Interface
     connect(&Settings::getInstance(), &Settings::newNetworkInterface,
             [this](QNetworkInterface interface) {
-                otpProducer->setProducerNetworkInterface(interface);
+                otpProducer->setNetworkInterface(interface);
                 updateStatusBar();
             });
     updateStatusBar();
@@ -54,7 +54,7 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
     // OTP Producer Transport
     connect(&Settings::getInstance(), &Settings::newNetworkTransport,
             [this](QAbstractSocket::NetworkLayerProtocol transport) {
-                otpProducer->setProducerNetworkTransport(transport);
+                otpProducer->setNetworkTransport(transport);
                 updateStatusBar();
             });
     updateStatusBar();
@@ -62,39 +62,39 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
     // OTP Producer Name
     connect(ui->leProducerName, &QLineEdit::textChanged,
             [this](const QString &arg1) {
-                otpProducer->setProducerName(arg1);
+                otpProducer->setLocalName(arg1);
                 saveComponentDetails();
                 updateWindowTitle();
             });
-    ui->leProducerName->setText(otpProducer->getProducerName());
+    ui->leProducerName->setText(otpProducer->getLocalName());
     ui->leProducerName->setMaxLength(PDU::NAME_LENGTH);
 
     // OTP Producer CID
     connect(ui->pbProducerNewCID, &QPushButton::clicked,
             [this]() {
-                otpProducer->setProducerCID(cid_t::createUuid());
+                otpProducer->setLocalCID(cid_t::createUuid());
             });
-    connect(otpProducer.get(), &Producer::newCID,
+    connect(otpProducer.get(), &Producer::newLocalCID,
             [this](const cid_t CID) {
                 ui->lblProducerCID->setText(CID.toString());
                 saveComponentDetails();
             });
-    ui->lblProducerCID->setText(otpProducer->getProducerCID().toString());
+    ui->lblProducerCID->setText(otpProducer->getLocalCID().toString());
 
     // OTP Producer System
-    otpProducer->addProducerSystem(static_cast<system_t>(ui->sbSystem->value()));
+    otpProducer->addLocalSystem(static_cast<system_t>(ui->sbSystem->value()));
     connect(ui->sbSystem, qOverload<OTP::system_t, OTP::system_t>(&SystemSpinBox::valueChanged),
         [this](OTP::system_t oldValue, OTP::system_t newValue) {
-            otpProducer->addProducerSystem(newValue);
+            otpProducer->addLocalSystem(newValue);
             for (auto subWindow : ui->mdiArea->subWindowList())
                 static_cast<GroupWindow*>(subWindow->widget())->setSystem(newValue);
-            otpProducer->removeProducerSystem(oldValue);
+            otpProducer->removeLocalSystem(oldValue);
         });
 
     // OTP Producer Transform Message Rate
     connect(&Settings::getInstance(), &Settings::newTransformMessageRate,
             [this](std::chrono::milliseconds value) {
-                otpProducer->setProducerTransformMsgRate(value);
+                otpProducer->setTransformMsgRate(value);
             });
 }
 
@@ -124,19 +124,19 @@ void ProducerWindow::updateStatusBar()
     if (otpProducer)
     {
         message = QObject::tr("Selected interface: %1").arg(
-                    otpProducer->getProducerNetworkInterface().humanReadableName());
+                    otpProducer->getNetworkInterface().humanReadableName());
 
-        if ((otpProducer->getProducerNetworkTransport() == QAbstractSocket::IPv4Protocol) ||
-                (otpProducer->getProducerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
+        if ((otpProducer->getNetworkTransport() == QAbstractSocket::IPv4Protocol) ||
+                (otpProducer->getNetworkTransport() == QAbstractSocket::AnyIPProtocol))
         {
-            auto status = otpProducer->getProducerNetworkinterfaceState(QAbstractSocket::IPv4Protocol);
+            auto status = otpProducer->getNetworkinterfaceState(QAbstractSocket::IPv4Protocol);
             message.append(QString(" OTP-4 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
         }
 
-        if ((otpProducer->getProducerNetworkTransport() == QAbstractSocket::IPv6Protocol) ||
-                (otpProducer->getProducerNetworkTransport() == QAbstractSocket::AnyIPProtocol))
+        if ((otpProducer->getNetworkTransport() == QAbstractSocket::IPv6Protocol) ||
+                (otpProducer->getNetworkTransport() == QAbstractSocket::AnyIPProtocol))
         {
-            auto status = otpProducer->getProducerNetworkinterfaceState(QAbstractSocket::IPv6Protocol);
+            auto status = otpProducer->getNetworkinterfaceState(QAbstractSocket::IPv6Protocol);
             message.append(QString(" OTP-6 (%1)").arg(status == QAbstractSocket::BoundState ? tr("OK") : tr("Error")));
         }
     }
@@ -155,14 +155,14 @@ this->setWindowTitle(
 
 void ProducerWindow::saveComponentDetails()
 {
-    Settings::componentDetails_t details(otpProducer->getProducerName(), otpProducer->getProducerCID());
+    Settings::componentDetails_t details(otpProducer->getLocalName(), otpProducer->getLocalCID());
     Settings::getInstance().setComponentSettings(componentSettingsGroup, details);
 }
 
 void ProducerWindow::on_actionNew_Group_triggered()
 {
     auto system = static_cast<system_t>(ui->sbSystem->value());
-    auto dialog = new GroupSelectionDialog(otpProducer->getProducerGroups(system), this);
+    auto dialog = new GroupSelectionDialog(otpProducer->getLocalGroups(system), this);
     if (dialog->exec() == QDialog::Rejected)
         return;
 

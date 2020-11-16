@@ -34,7 +34,7 @@ PointsTableModel::PointsTableModel(
     connect(otpProducer.get(), &Producer::newPoint, this, [=](cid_t, system_t system, group_t group, point_t point)
     {
         if (system == this->system && group == this->group) {
-            auto row = otpProducer->getProducerPoints(system, group).indexOf(point);
+            auto row = otpProducer->getLocalPoints(system, group).indexOf(point);
             beginInsertRows(QModelIndex(), row, row);
             endInsertRows();
         }
@@ -45,14 +45,14 @@ PointsTableModel::PointsTableModel(
 OTP::address_t PointsTableModel::getAddress(const QModelIndex &index) const
 {
     if (index.row() > rowCount(index)) return address_t();
-    auto pointList = otpProducer->getProducerPoints(system, group);
+    auto pointList = otpProducer->getLocalPoints(system, group);
     std::sort(pointList.begin(), pointList.end());
     return address_t(system, group, pointList.at(index.row()));
 }
 
 int PointsTableModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    return otpProducer->getProducerPoints(system, group).count();
+    return otpProducer->getLocalPoints(system, group).count();
 }
 
 int PointsTableModel::columnCount(const QModelIndex & /*parent*/) const
