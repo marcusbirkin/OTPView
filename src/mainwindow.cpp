@@ -91,6 +91,12 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&Settings::getInstance(), &Settings::newNetworkInterface,
             [this](QNetworkInterface interface) {
                 otpConsumer->setConsumerNetworkInterface(interface);
+
+                connect(otpConsumer.get(), &OTP::Consumer::stateChangedConsumerNetworkInterface,
+                        [this]() {
+                            updateStatusBar();
+                });
+
                 updateStatusBar();
             });
     updateStatusBar();

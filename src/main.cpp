@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     msgBox.exec();
 
     // Valid and up NIC
-    while (!Settings::getInstance().getNetworkInterface().isValid() && Settings::getInstance().getNetworkInterface().IsUp)
+    while (!OTP::SocketManager::isValid(Settings::getInstance().getNetworkInterface()))
     {
         auto dialog = new SettingsDialog();
         if (dialog->exec() == QDialog::Rejected)

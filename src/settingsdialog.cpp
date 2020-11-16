@@ -19,6 +19,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include "settings.h"
+#include "libs/OTPLib/socket.hpp"
 #include <QNetworkInterface>
 #include <QPushButton>
 
@@ -89,7 +90,7 @@ void SettingsDialog::populateInterfaceList()
     int currentIndex = -1;
     for (auto interface : QNetworkInterface::allInterfaces())
     {
-        if (interface.flags().testFlag(QNetworkInterface::IsUp) && interface.flags().testFlag(QNetworkInterface::CanMulticast))
+        if (OTP::SocketManager::isValid(interface))
         {
             QString ipAddrString;
             auto protocol = static_cast<QAbstractSocket::NetworkLayerProtocol>(ui->cbProtocol->itemData(ui->cbProtocol->currentIndex()).toInt());
