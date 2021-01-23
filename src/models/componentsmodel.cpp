@@ -166,7 +166,7 @@ ComponentsModel::ComponentsModel(
     connect(otpConsumer.get(), &Consumer::newComponent, this, &ComponentsModel::newComponent);
 
     // Existing Components
-    for (auto cid : otpConsumer->getComponents())
+    for (const auto &cid : otpConsumer->getComponents())
         emit otpConsumer.get()->newComponent(cid);
 }
 

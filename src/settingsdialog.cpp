@@ -88,13 +88,13 @@ void SettingsDialog::populateInterfaceList()
 {
     ui->cbInterface->clear();
     int currentIndex = -1;
-    for (auto interface : QNetworkInterface::allInterfaces())
+    for (const auto &interface : QNetworkInterface::allInterfaces())
     {
         if (OTP::SocketManager::isValid(interface))
         {
             QString ipAddrString;
             auto protocol = static_cast<QAbstractSocket::NetworkLayerProtocol>(ui->cbProtocol->itemData(ui->cbProtocol->currentIndex()).toInt());
-            for (auto addr : interface.addressEntries())
+            for (const auto &addr : interface.addressEntries())
             {
                 if ((addr.ip().protocol() == protocol) || (protocol == QAbstractSocket::AnyIPProtocol))
                 {

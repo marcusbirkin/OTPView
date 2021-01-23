@@ -74,18 +74,18 @@ LineChart::LineChart(std::shared_ptr<class OTP::Consumer> otpConsumer,
     axisX->setTitleText("Time");
     chartView->chart()->addAxis(axisX, Qt::AlignBottom);
     for (auto axis = axis_t::first; axis < axis_t::count; ++axis)
-        for (auto series : lineSeries[axis])
+        for (const auto &series : lineSeries[axis])
             series->attachAxis(axisX);
 
     // Y Axis Formating
     auto *axisY = new QValueAxis;
     chartView->chart()->addAxis(axisY, Qt::AlignLeft);
     for (auto axis = axis_t::first; axis < axis_t::count; ++axis)
-        for (auto series : lineSeries[axis])
+        for (const auto &series : lineSeries[axis])
             series->attachAxis(axisY);
 
     // Legend markers
-    for (auto marker : chartView->chart()->legend()->markers())
+    for (const auto &marker : chartView->chart()->legend()->markers())
         QObject::connect(marker, &QLegendMarker::clicked, this, &LineChart::markerClicked);
 
     // Updates
@@ -166,7 +166,7 @@ void LineChart::markerClicked()
 void LineChart::buttonToggled(int type, bool checked)
 {
     // Markers
-    for (auto marker : chartView->chart()->legend()->markers())
+    for (const auto &marker : chartView->chart()->legend()->markers())
     {
         marker->setVisible(false);
         marker->setLabelBrush(QBrush());
@@ -205,9 +205,9 @@ void LineChart::redraw()
     qreal yMax = 0;
     for (auto axis = axis_t::first; axis < axis_t::count; ++axis)
     {
-        for (auto series : lineSeries[axis])
+        for (const auto &series : lineSeries[axis])
         {
-            for (auto point : series->pointsVector())
+            for (const auto &point : series->pointsVector())
             {
                 // Find Y axis limits
                 if (point.x() > xMin.toMSecsSinceEpoch() && point.x() < xMax.toMSecsSinceEpoch())

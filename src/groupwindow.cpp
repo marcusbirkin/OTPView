@@ -150,7 +150,7 @@ GroupWindow::~GroupWindow()
 
 QObjectList findSpliters(const QObjectList &objList) {
     QObjectList ret;
-    for (auto child : objList) {
+    for (const auto &child : objList) {
         if (std::strcmp(child->metaObject()->className(), "QSplitter") == 0)
             ret.append(child);
         ret.append(findSpliters(child->children()));
@@ -163,7 +163,7 @@ void GroupWindow::showEvent(QShowEvent *event) {
     QSettings settings(QApplication::organizationName(), QApplication::applicationName());
     parentWidget()->restoreGeometry(settings.value("GroupWindow/geometry").toByteArray());
     // Restore all splitter sizes
-    for (auto obj : findSpliters(this->ui->gbPoints->children())) {
+    for (const auto &obj : findSpliters(this->ui->gbPoints->children())) {
         auto splitter = qobject_cast<QSplitter*>(obj);
         splitter->setSizes(
             settings.value(
@@ -195,7 +195,7 @@ void GroupWindow::setSystem(OTP::system_t newSystem)
     system = newSystem;
     otpProducer->addLocalSystem(newSystem);
     otpProducer->addLocalGroup(newSystem, group);
-    for (auto point : pointsList)
+    for (const auto &point : pointsList)
         otpProducer->addLocalPoint(newSystem, group, point, priority_t());
 
     qobject_cast<PointsTableModel*>(ui->tablePoints->model())->setSystem(newSystem);
@@ -204,7 +204,7 @@ void GroupWindow::setSystem(OTP::system_t newSystem)
 QList<address_t> GroupWindow::getSelectedAddress()
 {
     QList<address_t> ret;
-    for (auto index : ui->tablePoints->selectionModel()->selectedRows())
+    for (const auto &index : ui->tablePoints->selectionModel()->selectedRows())
     {
         auto model = qobject_cast<PointsTableModel*>(ui->tablePoints->model());
         if (model->getAddress(index).isValid())
@@ -227,7 +227,7 @@ void GroupWindow::on_pbAddPoint_clicked()
 
 void GroupWindow::on_pbRemovePoint_clicked()
 {
-    for (auto address : getSelectedAddress())
+    for (const auto &address : getSelectedAddress())
         otpProducer->removeLocalPoint(address);
 
     on_tablePoints_itemSelectionChanged();

@@ -223,7 +223,7 @@ bool MainWindow::openSystemWindow(system_t system)
     // Already open?
     if (otpConsumer->getLocalSystems().contains(system))
     {
-        for (auto subWindow : ui->mdiArea->subWindowList())
+        for (const auto &subWindow : ui->mdiArea->subWindowList())
         {
             auto systemWindow = reinterpret_cast<SystemWindow*>(subWindow->widget());
             if ( systemWindow->getSystem() == system)

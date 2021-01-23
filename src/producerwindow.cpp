@@ -86,7 +86,7 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
     connect(ui->sbSystem, qOverload<OTP::system_t, OTP::system_t>(&SystemSpinBox::valueChanged),
         [this](OTP::system_t oldValue, OTP::system_t newValue) {
             otpProducer->addLocalSystem(newValue);
-            for (auto subWindow : ui->mdiArea->subWindowList())
+            for (const auto &subWindow : ui->mdiArea->subWindowList())
                 static_cast<GroupWindow*>(subWindow->widget())->setSystem(newValue);
             otpProducer->removeLocalSystem(oldValue);
         });

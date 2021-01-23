@@ -392,7 +392,7 @@ SystemModel::SystemModel(
     connect(otpConsumer.get(), &Consumer::removedGroup, this, &SystemModel::removedGroup);
 
     // Add existing
-    for (auto group : otpConsumer->getGroups(system))
+    for (const auto &group : otpConsumer->getGroups(system))
         newGroup(cid_t(), system, group);
 
     /* Points */
@@ -402,8 +402,8 @@ SystemModel::SystemModel(
     connect(otpConsumer.get(), &Consumer::updatedPoint, this, &SystemModel::updatedPoint);
 
     // Add existing
-    for (auto group : otpConsumer->getGroups(system))
-        for (auto point : otpConsumer->getPoints(system, group))
+    for (const auto &group : otpConsumer->getGroups(system))
+        for (const auto &point : otpConsumer->getPoints(system, group))
             newPoint(cid_t(), system, group, point);
 }
 
