@@ -24,11 +24,13 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 CONFIG += c++17
 
+# Icons
+win32:RC_ICONS = $${PWD}/res/icon.ico
+macx:ICON = $${PWD}/res/icon.icns
+RESOURCES += res/OTPView.qrc
+
 include($$PWD/../version.pri)
 include($$PWD/../libs/libs.pri)
-
-RC_FILE = res/OTPView.rc
-RESOURCES += res/OTPView.qrc
 
 INCLUDEPATH += src
 
