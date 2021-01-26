@@ -20,8 +20,7 @@
 #define SPACIALSPINBOX_H
 
 #include <QAbstractSpinBox>
-#include "libs/OTPLib/otp.hpp"
-#include "libs/OTPLib/network/modules/modules.hpp"
+#include "OTPLib.hpp"
 
 class SpacialSpinBox : public QAbstractSpinBox
 {

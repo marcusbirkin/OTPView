@@ -19,7 +19,7 @@
 #include "settingsdialog.h"
 #include "ui_settingsdialog.h"
 #include "settings.h"
-#include "libs/OTPLib/socket.hpp"
+#include "OTPLib.hpp"
 #include <QNetworkInterface>
 #include <QPushButton>
 

@@ -16,59 +16,59 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef SYSTEMSPINBOX_H
-#define SYSTEMSPINBOX_H
+#ifndef GROUPSPINBOX_H
+#define GROUPSPINBOX_H
 
 #include <QAbstractSpinBox>
 #include <QLineEdit>
 #include <QList>
-#include "libs/OTPLib/const.hpp"
+#include "OTPLib.hpp"
 
-class SystemSpinBox : public QAbstractSpinBox
+class GroupSpinBox : public QAbstractSpinBox
 {
     Q_OBJECT
 public:
-    SystemSpinBox(QWidget* parent = nullptr) : SystemSpinBox(QList<OTP::system_t>(), parent) {}
-    SystemSpinBox(QList<OTP::system_t> usedSystems, QWidget* parent = nullptr);
+    GroupSpinBox(QWidget* parent = nullptr) : GroupSpinBox(QList<OTP::group_t>(), parent) {}
+    GroupSpinBox(QList<OTP::group_t> usedGroups, QWidget* parent = nullptr);
 
-    OTP::system_t value() const { return m_value; }
+    OTP::group_t value() const { return m_value; }
 
-    OTP::system_t minimum() const { return range.first; }
-    void setMinimum(OTP::system_t  min) { range.first = min; }
+    OTP::group_t minimum() const { return range.first; }
+    void setMinimum(OTP::group_t  min) { range.first = min; }
 
-    OTP::system_t maximum() const { return range.second; }
-    void setMaximum(OTP::system_t max) {  range.second = max; }
+    OTP::group_t maximum() const { return range.second; }
+    void setMaximum(OTP::group_t max) {  range.second = max; }
 
-    void setRange(OTP::system_t min, OTP::system_t max)
+    void setRange(OTP::group_t min, OTP::group_t max)
     {
         setMinimum(min);
         setMaximum(max);
     }
 
 public slots:
-    void setValue(OTP::system_t val);
+    void setValue(OTP::group_t val);
 
 signals:
     void valueChanged(int value);
-    void valueChanged(OTP::system_t value);
-    void valueChanged(OTP::system_t oldValue, OTP::system_t newValue);
+    void valueChanged(OTP::group_t value);
+    void valueChanged(OTP::group_t oldValue, OTP::group_t newValue);
 
 protected:
     void stepBy(int steps);
 
-    QValidator::State validate(const OTP::system_t &input) const;
+    QValidator::State validate(const OTP::group_t &input) const;
     QValidator::State validate(QString &input, int &pos) const;
 
-    OTP::system_t valueFromText(const QString &text) const;
-    QString textFromValue(OTP::system_t val) const;
+    OTP::group_t valueFromText(const QString &text) const;
+    QString textFromValue(OTP::group_t val) const;
 
     QAbstractSpinBox::StepEnabled stepEnabled() const {return StepUpEnabled | StepDownEnabled; }
 
 private:
-    QList<OTP::system_t> usedSystems;
+    QList<OTP::group_t> usedGroups;
 
-    std::pair<OTP::system_t,OTP::system_t> range;
-    OTP::system_t m_value;
+    std::pair<OTP::group_t,OTP::group_t> range;
+    OTP::group_t m_value;
 };
 
-#endif // SYSTEMSPINBOX_H
+#endif // GROUPSPINBOX_H

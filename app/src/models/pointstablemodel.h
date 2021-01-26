@@ -20,7 +20,7 @@
 #define POINTSTABLEMODEL_H
 
 #include <QAbstractTableModel>
-#include "libs/OTPLib/otp.hpp"
+#include "OTPLib.hpp"
 
 class PointsTableModel : public QAbstractTableModel
 {

@@ -16,40 +16,33 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef PRODUCERWINDOW_H
-#define PRODUCERWINDOW_H
+#ifndef GROUPSELECTIONDIALOG_H
+#define GROUPSELECTIONDIALOG_H
 
-#include <QMainWindow>
-#include <map>
-#include "libs/OTPLib/otp.hpp"
-#include "groupwindow.h"
+#include <QDialog>
+#include <QList>
+#include "OTPLib.hpp"
+#include "widgets/groupspinbox.h"
 
 namespace Ui {
-class ProducerWindow;
+class GroupSelectionDialog;
 }
 
-class ProducerWindow : public QMainWindow
+class GroupSelectionDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit ProducerWindow(QString componentSettingsGroup = "", QMainWindow *parent = nullptr);
-    ~ProducerWindow();
+    explicit GroupSelectionDialog(QList<OTP::group_t> usedGroups, QWidget *parent = nullptr);
+    ~GroupSelectionDialog();
+
+    OTP::group_t getGroup();
 
 private slots:
-    void showEvent(QShowEvent *event);
-    void closeEvent(QCloseEvent *event);
-    void on_actionNew_Group_triggered();
 
 private:
-    Ui::ProducerWindow *ui;
-    void updateStatusBar();
-    void updateWindowTitle();
-
-    QString componentSettingsGroup;
-    void saveComponentDetails();
-
-    std::shared_ptr<class OTP::Producer> otpProducer;
+    Ui::GroupSelectionDialog *ui;
+    GroupSpinBox *sbGroup = nullptr;
 };
 
-#endif // PRODUCERWINDOW_H
+#endif // GROUPSELECTIONDIALOG_H

@@ -16,33 +16,33 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef SYSTEMSELECTIONDIALOG_H
-#define SYSTEMSELECTIONDIALOG_H
+#ifndef POINTSELECTIONDIALOG_H
+#define POINTSELECTIONDIALOG_H
 
 #include <QDialog>
 #include <QList>
-#include "libs/OTPLib/otp.hpp"
-#include "widgets/systemspinbox.h"
+#include "OTPLib.hpp"
+#include "widgets/pointspinbox.h"
 
 namespace Ui {
-class SystemSelectionDialog;
+class PointSelectionDialog;
 }
 
-class SystemSelectionDialog : public QDialog
+class PointSelectionDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit SystemSelectionDialog(QList<OTP::system_t> usedSystems, QWidget *parent = nullptr);
-    ~SystemSelectionDialog();
+    explicit PointSelectionDialog(QList<OTP::point_t> usedPoint, QWidget *parent = nullptr);
+    ~PointSelectionDialog();
 
-    OTP::system_t getSystem();
+    OTP::point_t getPoint();
 
 private slots:
 
 private:
-    Ui::SystemSelectionDialog *ui;
-    SystemSpinBox *sbSystem = nullptr;
+    Ui::PointSelectionDialog *ui;
+    PointSpinBox *sbPoint = nullptr;
 };
 
-#endif // GROUPSELECTIONDIALOG_H
+#endif // POINTSELECTIONDIALOG_H

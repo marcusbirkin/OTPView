@@ -16,40 +16,40 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef SYSTEMWINDOW_H
-#define SYSTEMWINDOW_H
+#ifndef PRODUCERWINDOW_H
+#define PRODUCERWINDOW_H
 
-#include <QWidget>
-#include <QTreeWidgetItem>
-#include "libs/OTPLib/otp.hpp"
+#include <QMainWindow>
+#include <map>
+#include "OTPLib.hpp"
+#include "groupwindow.h"
 
 namespace Ui {
-class SystemWindow;
+class ProducerWindow;
 }
 
-class SystemWindow : public QWidget
+class ProducerWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit SystemWindow(
-            std::shared_ptr<class OTP::Consumer> otpConsumer,
-            OTP::system_t system,
-            QWidget *parent = nullptr);
-    ~SystemWindow();
-
-    OTP::system_t getSystem() const { return system; }
+    explicit ProducerWindow(QString componentSettingsGroup = "", QMainWindow *parent = nullptr);
+    ~ProducerWindow();
 
 private slots:
     void showEvent(QShowEvent *event);
     void closeEvent(QCloseEvent *event);
-    void on_tabWidget_tabCloseRequested(int index);
+    void on_actionNew_Group_triggered();
 
 private:
-    Ui::SystemWindow *ui;
+    Ui::ProducerWindow *ui;
+    void updateStatusBar();
+    void updateWindowTitle();
 
-    std::shared_ptr<class OTP::Consumer> otpConsumer;
-    OTP::system_t system;
+    QString componentSettingsGroup;
+    void saveComponentDetails();
+
+    std::shared_ptr<class OTP::Producer> otpProducer;
 };
 
-#endif // SYSTEMWINDOW_H
+#endif // PRODUCERWINDOW_H

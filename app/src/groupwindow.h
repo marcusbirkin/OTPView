@@ -22,7 +22,7 @@
 #include <QWidget>
 #include <QMainWindow>
 #include <memory>
-#include "libs/OTPLib/otp.hpp"
+#include "OTPLib.hpp"
 
 namespace Ui {
 class GroupWindow;

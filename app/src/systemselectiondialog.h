@@ -16,33 +16,33 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef GROUPSELECTIONDIALOG_H
-#define GROUPSELECTIONDIALOG_H
+#ifndef SYSTEMSELECTIONDIALOG_H
+#define SYSTEMSELECTIONDIALOG_H
 
 #include <QDialog>
 #include <QList>
-#include "libs/OTPLib/otp.hpp"
-#include "widgets/groupspinbox.h"
+#include "OTPLib.hpp"
+#include "widgets/systemspinbox.h"
 
 namespace Ui {
-class GroupSelectionDialog;
+class SystemSelectionDialog;
 }
 
-class GroupSelectionDialog : public QDialog
+class SystemSelectionDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit GroupSelectionDialog(QList<OTP::group_t> usedGroups, QWidget *parent = nullptr);
-    ~GroupSelectionDialog();
+    explicit SystemSelectionDialog(QList<OTP::system_t> usedSystems, QWidget *parent = nullptr);
+    ~SystemSelectionDialog();
 
-    OTP::group_t getGroup();
+    OTP::system_t getSystem();
 
 private slots:
 
 private:
-    Ui::GroupSelectionDialog *ui;
-    GroupSpinBox *sbGroup = nullptr;
+    Ui::SystemSelectionDialog *ui;
+    SystemSpinBox *sbSystem = nullptr;
 };
 
 #endif // GROUPSELECTIONDIALOG_H

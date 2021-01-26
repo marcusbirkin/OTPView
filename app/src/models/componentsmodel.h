@@ -19,7 +19,7 @@
 #ifndef COMPONENTSMODEL_H
 #define COMPONENTSMODEL_H
 #include <QAbstractItemModel>
-#include "libs/OTPLib/otp.hpp"
+#include "OTPLib.hpp"
 
 class ComponentsItem : public QObject
 {

@@ -25,7 +25,7 @@
 #include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
-#include "libs/OTPLib/otp.hpp"
+#include "OTPLib.hpp"
 
 using namespace QtCharts;
 

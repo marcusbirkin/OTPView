@@ -16,33 +16,40 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef POINTSELECTIONDIALOG_H
-#define POINTSELECTIONDIALOG_H
+#ifndef SYSTEMWINDOW_H
+#define SYSTEMWINDOW_H
 
-#include <QDialog>
-#include <QList>
-#include "libs/OTPLib/otp.hpp"
-#include "widgets/pointspinbox.h"
+#include <QWidget>
+#include <QTreeWidgetItem>
+#include "OTPLib.hpp"
 
 namespace Ui {
-class PointSelectionDialog;
+class SystemWindow;
 }
 
-class PointSelectionDialog : public QDialog
+class SystemWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PointSelectionDialog(QList<OTP::point_t> usedPoint, QWidget *parent = nullptr);
-    ~PointSelectionDialog();
+    explicit SystemWindow(
+            std::shared_ptr<class OTP::Consumer> otpConsumer,
+            OTP::system_t system,
+            QWidget *parent = nullptr);
+    ~SystemWindow();
 
-    OTP::point_t getPoint();
+    OTP::system_t getSystem() const { return system; }
 
 private slots:
+    void showEvent(QShowEvent *event);
+    void closeEvent(QCloseEvent *event);
+    void on_tabWidget_tabCloseRequested(int index);
 
 private:
-    Ui::PointSelectionDialog *ui;
-    PointSpinBox *sbPoint = nullptr;
+    Ui::SystemWindow *ui;
+
+    std::shared_ptr<class OTP::Consumer> otpConsumer;
+    OTP::system_t system;
 };
 
-#endif // POINTSELECTIONDIALOG_H
+#endif // SYSTEMWINDOW_H

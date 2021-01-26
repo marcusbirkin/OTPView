@@ -23,7 +23,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <memory>
-#include "libs/OTPLib/otp.hpp"
+#include "OTPLib.hpp"
 #include "producerwindow.h"
 #include "systemwindow.h"
 

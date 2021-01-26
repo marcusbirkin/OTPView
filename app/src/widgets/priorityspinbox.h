@@ -16,25 +16,22 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef SCALESPINBOX_H
-#define SCALESPINBOX_H
+#ifndef PRIORITYSPINBOX_H
+#define PRIORITYSPINBOX_H
 
 #include <QAbstractSpinBox>
 #include <QLineEdit>
 #include <QList>
-#include "libs/OTPLib/otp.hpp"
-#include "libs/OTPLib/network/modules/modules_const.hpp"
+#include "OTPLib.hpp"
 
-using namespace OTP::MODULES::STANDARD;
-class ScaleSpinBox : public QAbstractSpinBox
+class PrioritySpinBox : public QAbstractSpinBox
 {
     Q_OBJECT
 public:
-    typedef ScaleModule_t::scale_t value_t;
+    typedef OTP::priority_t value_t;
 
-    ScaleSpinBox(
+    PrioritySpinBox(
             std::shared_ptr<class OTP::Producer> otpProducer,
-            OTP::axis_t axis,
             QWidget* parent = nullptr);
 
     value_t value() const { return m_value; }
@@ -43,8 +40,8 @@ public:
     void setMinimum(value_t min) {
         range.first = std::clamp(
                     min,
-                    static_cast<value_t>(VALUES::RANGES::getRange(VALUES::SCALE).getMin()),
-                    static_cast<value_t>(VALUES::RANGES::getRange(VALUES::SCALE).getMax())
+                    static_cast<value_t>(OTP::RANGES::Priority.getMin()),
+                    static_cast<value_t>(OTP::RANGES::Priority.getMax())
                     );
     }
 
@@ -52,8 +49,8 @@ public:
     void setMaximum(value_t max) {
         range.second = std::clamp(
                     max,
-                    static_cast<value_t>(VALUES::RANGES::getRange(VALUES::SCALE).getMin()),
-                    static_cast<value_t>(VALUES::RANGES::getRange(VALUES::SCALE).getMax())
+                    static_cast<value_t>(OTP::RANGES::Priority.getMin()),
+                    static_cast<value_t>(OTP::RANGES::Priority.getMax())
                     );
     }
 
@@ -94,11 +91,10 @@ private slots:
 private:
     std::shared_ptr<class OTP::Producer> otpProducer;
     OTP::address_t address;
-    OTP::axis_t axis;
+    OTP::MODULES::STANDARD::VALUES::moduleValue_t moduleValue;
 
     std::pair<value_t,value_t> range = {std::numeric_limits<value_t>::min(),std::numeric_limits<value_t>::max()};
-    value_t m_value = ScaleModule_t::fromPercent(100);
-    QString suffix = "%";
+    value_t m_value;
 };
 
-#endif // SCALESPINBOX_H
+#endif // PRIORITYSPINBOX_H

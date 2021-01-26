@@ -19,7 +19,7 @@
 #ifndef SYSTEMMODEL_H
 #define SYSTEMMODEL_H
 #include <QAbstractItemModel>
-#include "libs/OTPLib/otp.hpp"
+#include "OTPLib.hpp"
 
 class SystemItem : public QObject
 {

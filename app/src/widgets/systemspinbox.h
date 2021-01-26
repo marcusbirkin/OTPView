@@ -16,59 +16,59 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-#ifndef POINTSPINBOX_H
-#define POINTSPINBOX_H
+#ifndef SYSTEMSPINBOX_H
+#define SYSTEMSPINBOX_H
 
 #include <QAbstractSpinBox>
 #include <QLineEdit>
 #include <QList>
-#include "libs/OTPLib/const.hpp"
+#include "OTPLib.hpp"
 
-class PointSpinBox : public QAbstractSpinBox
+class SystemSpinBox : public QAbstractSpinBox
 {
     Q_OBJECT
 public:
-    PointSpinBox(QWidget* parent = nullptr) : PointSpinBox(QList<OTP::point_t>(), parent) {}
-    PointSpinBox(QList<OTP::point_t> usedPoints, QWidget* parent = nullptr);
+    SystemSpinBox(QWidget* parent = nullptr) : SystemSpinBox(QList<OTP::system_t>(), parent) {}
+    SystemSpinBox(QList<OTP::system_t> usedSystems, QWidget* parent = nullptr);
 
-    OTP::point_t value() const { return m_value; }
+    OTP::system_t value() const { return m_value; }
 
-    OTP::point_t minimum() const { return range.first; }
-    void setMinimum(OTP::point_t  min) { range.first = min; }
+    OTP::system_t minimum() const { return range.first; }
+    void setMinimum(OTP::system_t  min) { range.first = min; }
 
-    OTP::point_t maximum() const { return range.second; }
-    void setMaximum(OTP::point_t max) {  range.second = max; }
+    OTP::system_t maximum() const { return range.second; }
+    void setMaximum(OTP::system_t max) {  range.second = max; }
 
-    void setRange(OTP::point_t min, OTP::point_t max)
+    void setRange(OTP::system_t min, OTP::system_t max)
     {
         setMinimum(min);
         setMaximum(max);
     }
 
 public slots:
-    void setValue(OTP::point_t val);
+    void setValue(OTP::system_t val);
 
 signals:
     void valueChanged(int value);
-    void valueChanged(OTP::point_t value);
-    void valueChanged(OTP::point_t oldValue, OTP::point_t newValue);
+    void valueChanged(OTP::system_t value);
+    void valueChanged(OTP::system_t oldValue, OTP::system_t newValue);
 
 protected:
     void stepBy(int steps);
 
-    QValidator::State validate(const OTP::point_t &input) const;
+    QValidator::State validate(const OTP::system_t &input) const;
     QValidator::State validate(QString &input, int &pos) const;
 
-    OTP::point_t valueFromText(const QString &text) const;
-    QString textFromValue(OTP::point_t val) const;
+    OTP::system_t valueFromText(const QString &text) const;
+    QString textFromValue(OTP::system_t val) const;
 
     QAbstractSpinBox::StepEnabled stepEnabled() const {return StepUpEnabled | StepDownEnabled; }
 
 private:
-    QList<OTP::point_t> usedPoints;
+    QList<OTP::system_t> usedSystems;
 
-    std::pair<OTP::point_t,OTP::point_t> range;
-    OTP::point_t m_value;
+    std::pair<OTP::system_t,OTP::system_t> range;
+    OTP::system_t m_value;
 };
 
-#endif // POINTSPINBOX_H
+#endif // SYSTEMSPINBOX_H

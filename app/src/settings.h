@@ -21,7 +21,7 @@
 
 #include <QApplication>
 #include <QNetworkInterface>
-#include "libs/OTPLib/otp.hpp"
+#include "OTPLib.hpp"
 
 class Settings final : public QObject
 {
