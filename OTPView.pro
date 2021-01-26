@@ -1,4 +1,7 @@
 TEMPLATE = subdirs
-SUBDIRS += \
-    app \
-    libs/OTPLib
+SUBDIRS += OTPView OTPLib
+
+OTPLib.subdir  = libs/OTPLib
+OTPView.subdir = app
+
+OTPView.depends = OTPLib
