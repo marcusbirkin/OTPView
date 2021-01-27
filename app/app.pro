@@ -29,6 +29,13 @@ win32:RC_ICONS = $${PWD}/res/icon.ico
 macx:ICON = $${PWD}/res/icon.icns
 RESOURCES += res/OTPView.qrc
 
+# Binary output
+CONFIG(debug, debug|release) {
+    DESTDIR = $$PWD/../build/debug
+} else {
+    DESTDIR = %%PWD/../build/release
+}
+
 include($$PWD/../version.pri)
 include($$PWD/../libs/libs.pri)
 

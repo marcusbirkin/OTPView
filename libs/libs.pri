@@ -1,10 +1,14 @@
 # OTPLib
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libs/OTPLib/src/release/ -lOTPLib
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libs/OTPLib/src/debug/ -lOTPLib
-else:unix: LIBS += -L$$OUT_PWD/../libs/OTPLib/src/ -lOTPLib
+LIBS += -L$$DESTDIR -lOTPLib
 
-INCLUDEPATH += $$PWD/../libs/OTPLib/src
-DEPENDPATH += $$PWD/../libs/OTPLib/src
+OTPLib_DIR = $$PWD/../libs/OTPLib
 
-INCLUDEPATH += $$PWD/../libs/OTPLib/
-HEADERS += $$PWD/../libs/OTPLib/OTPLib.hpp
+CONFIG(release, debug|release): OTPLib_LIBS = $${OTPLib_DIR}/build/release
+CONFIG(debug, debug|release): OTPLib_LIBS = $${OTPLib_DIR}/build/debug
+QMAKE_PRE_LINK += $$QMAKE_COPY $${OTPLib_LIBS}/* $$DESTDIR $$escape_expand(\\n\\t)
+
+INCLUDEPATH += $${OTPLib_DIR}/src
+DEPENDPATH += $${OTPLib_DIR}/src
+
+INCLUDEPATH += $${OTPLib_DIR}
+HEADERS += $${OTPLib_DIR}/OTPLib.hpp
