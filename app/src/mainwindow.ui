@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../res/OTPView.qrc">
+    <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -213,6 +217,8 @@
   <tabstop>leConsumerName</tabstop>
   <tabstop>pbConsumerNewCID</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../res/OTPView.qrc"/>
+ </resources>
  <connections/>
 </ui>
