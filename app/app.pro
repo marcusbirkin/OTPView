@@ -33,7 +33,7 @@ RESOURCES += res/OTPView.qrc
 CONFIG(debug, debug|release) {
     DESTDIR = $$PWD/../build/debug
 } else {
-    DESTDIR = %%PWD/../build/release
+    DESTDIR = $$PWD/../build/release
 }
 
 include($$PWD/../version.pri)
