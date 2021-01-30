@@ -40,21 +40,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle(
                 QString("%1 %2 - Main Window")
-                .arg(QApplication::applicationName())
-                .arg(QApplication::applicationVersion()));
+                .arg(QApplication::applicationName(), QApplication::applicationVersion()));
 
     // About
     connect(ui->actionAbout, &QAction::triggered, [this]() {
         QMessageBox::about(this, QString("About %1").arg(QApplication::applicationName()),
                            QString(
-                               "<style> h1,h2,h3,h4 { text-align: center; }</style>"
+                               "<style> h1,h2,h3,h4,h5 { text-align: center; }</style>"
                                "<p><h1>%1</h1>"
                                "<h2>Version: %2</h2>"
-                               "<h3>A QT Frontend for E1.59 (Entertainment Technology Object Transform Protocol (OTP))</h3>"
-                               "<h4>Marcus Birkin 2019 - 2020</h4>"
-                               "<h4><a href=\"https://github.com/marcusbirkin/OTPView\">https://github.com/marcusbirkin/OTPView</a></h4></p>")
-                           .arg(QApplication::applicationName())
-                           .arg(QApplication::applicationVersion())
+                               "<h3>A QT Frontend for ANSI E1.59:2021</h3>"
+                               "<h4>Entertainment Technology Object Transform Protocol (OTP)</h4>"
+                               "<h5>Marcus Birkin 2019 - 2021<br>"
+                               "<a href=\"https://github.com/marcusbirkin/OTPView\">https://github.com/marcusbirkin/OTPView</a></h5></p>")
+                           .arg(QApplication::applicationName(), QApplication::applicationVersion())
                            .append(
                                "<p>This program is free software: you can redistribute it and/or modify "
                                "it under the terms of the GNU Lesser General Public License as published by "
