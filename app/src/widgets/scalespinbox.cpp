@@ -35,7 +35,10 @@ ScaleSpinBox::ScaleSpinBox(
     connect(this->lineEdit(), SIGNAL(returnPressed()), this, SLOT(processInput()));
 
     connect(otpProducer.get(), &Producer::updatedScale, this, [=](address_t address, axis_t axis) {
-        if (this->address.isValid() && this->address == address) {
+        if (this->address.isValid() &&
+                std::tie(this->address, this->axis)
+                ==  std::tie(address, axis))
+        {
             m_value = otpProducer.get()->getLocalScale(address, axis).value;
             lineEdit()->setText(textFromValue(m_value));
         }

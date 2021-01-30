@@ -26,15 +26,13 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     QApplication::setOrganizationName("Marcus Birkin");
-    QApplication::setApplicationVersion(QString("%1 (%2 %3 %4)")
-                                        .arg(GIT_CURRENT_SHA1)
-                                        .arg(GIT_DATE_DATE)
-                                        .arg(GIT_DATE_MONTH)
-                                        .arg(GIT_DATE_YEAR));
+    QApplication::setApplicationVersion(
+                QString("%1 (%2 %3 %4)")
+                .arg(GIT_CURRENT_SHA1, GIT_DATE_DATE, GIT_DATE_MONTH, GIT_DATE_YEAR));
 
     // Warning
     QMessageBox msgBox;
-    msgBox.setText("Based upon the ESTA 15 June 2020 Draft<br>Document Number: CP/2018-1034r4");
+    msgBox.setText(QApplication::applicationName());
     msgBox.setInformativeText("Data transmitted is intended to coordinate visual and audio elements of a production and should not be used for safety critical applications.");
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setIcon(QMessageBox::Warning);
