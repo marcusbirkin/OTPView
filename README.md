@@ -15,6 +15,4 @@ used for safety critical applications.</b>"
 https://github.com/marcusbirkin/OTPView/releases
 
 #### CI Status
-| Linux | Windows | macOS |
-|-------|---------|-------|
-| [![Build status (Linux)](https://ci.appveyor.com/api/projects/status/y1abi0gt1ib2lmlx/branch/master?svg=true)](https://ci.appveyor.com/project/marcusbirkin/otpview-linux) | [![Build status (Windows)](https://ci.appveyor.com/api/projects/status/udsl1pusbho1o4c3/branch/master?svg=true)](https://ci.appveyor.com/project/marcusbirkin/otpview-windows) | [![Build status](https://ci.appveyor.com/api/projects/status/73d244cqvppw0mrw?svg=true)](https://ci.appveyor.com/project/marcusbirkin/otpview-macos)
+[![Build and Tests](https://github.com/marcusbirkin/OTPView/actions/workflows/qmake.yml/badge.svg)](https://github.com/marcusbirkin/OTPView/actions/workflows/qmake.yml)
