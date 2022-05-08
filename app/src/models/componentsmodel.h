@@ -29,6 +29,7 @@ public:
     typedef enum itemType_e {
         ComponentRootItem,
         ComponentSystemListItem,
+        ComponentModuleListItem,
 
         ComponentFirst,
         ComponentCID = ComponentFirst,
@@ -36,7 +37,8 @@ public:
         ComponentType,
         ComponentIP,
         ComponentSystemList,
-        ComponentLast = ComponentSystemList
+        ComponentModuleList,
+        ComponentLast = ComponentModuleList
     } itemType_t;
 
     explicit ComponentsItem(
