@@ -196,14 +196,19 @@ void GroupWindow::closeEvent(QCloseEvent *event)
 
 void GroupWindow::setSystem(OTP::system_t newSystem)
 {
-    auto pointsList = otpProducer->getLocalPoints(system, group);
-    otpProducer->removeLocalGroup(system, group);
-
+    const auto oldSystem = system;
     system = newSystem;
+
     otpProducer->addLocalSystem(newSystem);
     otpProducer->addLocalGroup(newSystem, group);
-    for (const auto &point : pointsList)
-        otpProducer->addLocalPoint(newSystem, group, point, priority_t());
+    auto pointsList = otpProducer->getLocalPoints(oldSystem, group);
+    for (const auto &point : pointsList) {
+        address_t oldAddress = {oldSystem, group, point};
+        address_t newAddress = {newSystem, group, point};
+        otpProducer->moveLocalPoint(oldAddress, newAddress);
+    }
+
+    otpProducer->removeLocalGroup(oldSystem, group);
 
     qobject_cast<PointsTableModel*>(ui->tablePoints->model())->setSystem(newSystem);
 }
