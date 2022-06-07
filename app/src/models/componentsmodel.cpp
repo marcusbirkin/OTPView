@@ -48,6 +48,7 @@ ComponentsItem::ComponentsItem(
     {
         case ComponentRootItem: break;
         case ComponentSystemListItem: break;
+        case ComponentModuleListItem: break;
         case ComponentCID: break;
         case ComponentName:
         {
@@ -69,7 +70,7 @@ ComponentsItem::ComponentsItem(
 
         case ComponentSystemList:
         {
-            connect(otpConsumer.get(), &Consumer::newSystem, [this](cid_t cid)
+            connect(otpConsumer.get(), &Consumer::newSystem, this, [this](cid_t cid)
             {
                 if (cid == this->CID)
                 {
@@ -81,7 +82,7 @@ ComponentsItem::ComponentsItem(
                     emit layoutChanged();
                 }
             });
-            connect(otpConsumer.get(), &Consumer::removedSystem, [this, CID](cid_t cid)
+            connect(otpConsumer.get(), &Consumer::removedSystem, this, [this, CID](cid_t cid)
             {
                 if (cid == CID)
                 {
@@ -91,6 +92,33 @@ ComponentsItem::ComponentsItem(
                     }
                 }
             });
+        } break;
+
+        case ComponentModuleList:
+        {
+            connect(otpConsumer.get(), qOverload<const cid_t&, const OTP::moduleList_t&>(&Consumer::updatedComponent),
+                    this, [this](cid_t cid, OTP::moduleList_t moduleList)
+            {
+                if (cid == this->CID)
+                {
+                    if (moduleList.count() < this->childItems.count())
+                        this->childItems.resize(moduleList.count());
+                    else
+                        for (int n = this->childItems.count(); n < moduleList.count(); ++n)
+                            this->childItems.append(
+                                        new ComponentsItem(this->otpConsumer, this->CID, ComponentModuleListItem, this));
+                    emit layoutChanged();
+                }
+            });
+
+            const auto moduleList = this->otpConsumer->getComponent(CID).getModuleList();
+            if (moduleList.count() < this->childItems.count())
+                this->childItems.resize(moduleList.count());
+            else
+                for (int n = this->childItems.count(); n < moduleList.count(); ++n)
+                    this->childItems.append(
+                                new ComponentsItem(this->otpConsumer, this->CID, ComponentModuleListItem, this));
+
         } break;
     }
 }
@@ -120,22 +148,53 @@ QVariant ComponentsItem::data(int column) const
     {
         case ComponentRootItem:
             return QString("Components");
+
         case ComponentCID:
             return QString("%1").arg(CID.toString());
+
         case ComponentName:
             return QString("Name: %1").arg(otpConsumer->getComponent(CID).getName().toString());
+
         case ComponentIP:
             return QString("IP: %1").arg(otpConsumer->getComponent(CID).getIPAddr().toString());
+
         case ComponentType:
             return QString("Type: %1").arg(
-                        otpConsumer->getComponent(CID).getType() == component_s::consumer ? QString("Consumer") : QString("Producer"));
+                        otpConsumer->getComponent(CID).getType()
+                        == component_s::consumer ? QString("Consumer") : QString("Producer"));
+
         case ComponentSystemList:
             if (otpConsumer->getComponent(CID).getType() == component_s::consumer)
                 return "Systems: N/A";
             else
-                return QString("Systems%1").arg(otpConsumer->getSystems(CID).isEmpty() ? ": None" : "");
+                return QString("Systems%1").arg(
+                            otpConsumer->getSystems(CID).isEmpty() ? ": None" : "");
+
         case ComponentSystemListItem:
             return QString::number(otpConsumer->getSystems(CID).value(row()));
+
+        case ComponentModuleList:
+        {
+            const auto moduleList = this->otpConsumer->getComponent(CID).getModuleList();
+            return QString("Modules (%1)%2").arg(
+                        (otpConsumer->getComponent(CID).getType() == component_s::consumer) ?
+                            QString("Advertised") : QString("Active"),
+                        moduleList.isEmpty() ? ": None" : "");
+        }
+
+        case ComponentModuleListItem:
+        {
+            const auto moduleList = this->otpConsumer->getComponent(CID).getModuleList();
+            auto moduleDescription = OTP::MODULES::getModuleDescription(moduleList.value(row()));
+            const auto manufacturerID = moduleList.value(row()).ManufacturerID;
+            const auto moduleNumber = moduleList.value(row()).ModuleNumber;
+            return QString("%1 (0x%2) / %3 (0x%4)")
+                    .arg(moduleDescription.Manufactuer)
+                    .arg(manufacturerID, manufacturerID.getSize() * 2, 16, QChar('0'))
+                    .arg(moduleDescription.Name)
+                    .arg(moduleNumber, moduleNumber.getSize() * 2, 16, QChar('0'));
+        }
+
         default:
             return QString("TODO");
     }
@@ -177,10 +236,10 @@ void ComponentsModel::newComponent(OTP::cid_t cid)
                 cid,
                 ComponentsItem::ComponentFirst,
                 rootItem);
-    connect(newItem, &ComponentsItem::dataChanged, [this]() {
+    connect(newItem, &ComponentsItem::dataChanged, this, [this]() {
         emit dataChanged(QModelIndex(),QModelIndex());
     });
-    connect(newItem, &ComponentsItem::layoutChanged, [this]() {
+    connect(newItem, &ComponentsItem::layoutChanged, this, [this]() {
         emit layoutChanged();
     });
     beginInsertRows(QModelIndex(), rootItem->childCount(), rootItem->childCount());
