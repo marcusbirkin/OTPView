@@ -400,6 +400,7 @@ SystemModel::SystemModel(
     connect(otpConsumer.get(), &Consumer::newPoint, this, &SystemModel::newPoint);
     connect(otpConsumer.get(), &Consumer::removedPoint, this, &SystemModel::removedPoint);
     connect(otpConsumer.get(), &Consumer::updatedPoint, this, &SystemModel::updatedPoint);
+    connect(otpConsumer.get(), &Consumer::expiredPoint, this, &SystemModel::updatedPoint);
 
     // Add existing
     for (const auto &group : otpConsumer->getGroups(system))
