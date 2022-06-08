@@ -48,6 +48,7 @@ public:
             ComponentsItem *parentItem = nullptr);
 
     void appendChild(ComponentsItem *item);
+    void removeChild(ComponentsItem *item);
     ComponentsItem *child(int row);
     int childCount() const;
     int columnCount() const  { return 1; }

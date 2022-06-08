@@ -49,7 +49,19 @@ ComponentsItem::ComponentsItem(
         case ComponentRootItem: break;
         case ComponentSystemListItem: break;
         case ComponentModuleListItem: break;
-        case ComponentCID: break;
+        case ComponentCID:
+        {
+            connect(otpConsumer.get(), &Consumer::removedComponent, this,
+                    [this](cid_t cid)
+            {
+                if (cid == this->CID) {
+                    for (const auto &child : qAsConst(childItems))
+                        removeChild(child);
+                    this->parentItem()->removeChild(this);
+                    emit layoutChanged();
+                }
+            });
+        }
         case ComponentName:
         {
             connect(otpConsumer.get(), qOverload<const cid_t&, const name_t&>(&Consumer::updatedComponent),
@@ -126,6 +138,11 @@ ComponentsItem::ComponentsItem(
 void ComponentsItem::appendChild(ComponentsItem *item)
 {
     childItems.append(item);
+}
+
+void ComponentsItem::removeChild(ComponentsItem *item)
+{
+    childItems.removeAll(item);
 }
 
 ComponentsItem *ComponentsItem::child(int row)
