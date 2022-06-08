@@ -21,18 +21,19 @@
 
 
 // Settings Strings
-static const QString S_GENERAL("GENERAL");
-static const QString S_GENERAL_SYSTEMREQUESTINTERVAL("SYSTEMREQUESTINTERVAL");
-static const QString S_GENERAL_SOURCERESOLUTION("RESOLUTION");
-static const QString S_GENERAL_TRANSFORM_RATE("TRANSFORMRATE");
+static const QString S_GENERAL = QStringLiteral("GENERAL");
+static const QString S_GENERAL_SYSTEMREQUESTINTERVAL= QStringLiteral("SYSTEMREQUESTINTERVAL");
+static const QString S_GENERAL_SOURCERESOLUTION = QStringLiteral("RESOLUTION");
+static const QString S_GENERAL_TRANSFORM_RATE = QStringLiteral("TRANSFORMRATE");
+static const QString S_GENERAL_REMOVE_EXPIRED_COMPONENTS = QStringLiteral("REMOVEEXPIREDCOMPONENTS");
 
-static const QString S_NETWORK("NETWORK");
-static const QString S_NETWORK_HARDWAREADDRESS("HARDWAREADDRESS");
-static const QString S_NETWORK_NAME("NAME");
-static const QString S_NETWORK_TRANSPORT("TRANSPORT");
+static const QString S_NETWORK = QStringLiteral("NETWORK");
+static const QString S_NETWORK_HARDWAREADDRESS = QStringLiteral("HARDWAREADDRESS");
+static const QString S_NETWORK_NAME = QStringLiteral("NAME");
+static const QString S_NETWORK_TRANSPORT = QStringLiteral("TRANSPORT");
 
-static const QString S_COMPONENT_NAME("NAME");
-static const QString S_COMPONENT_CID("CID");
+static const QString S_COMPONENT_NAME = QStringLiteral("NAME");
+static const QString S_COMPONENT_CID = QStringLiteral("CID");
 
 Settings::Settings() : QObject() {};
 
@@ -126,4 +127,19 @@ std::chrono::milliseconds Settings::getTransformMessageRate()
     settings.beginGroup(S_GENERAL);
     return std::chrono::milliseconds(
                 settings.value(S_GENERAL_TRANSFORM_RATE, static_cast<qlonglong>(OTP::OTP_TRANSFORM_TIMING_MAX.count())).toLongLong());
+}
+
+void Settings::setRemoveExpiredComponents(bool value)
+{
+    QSettings settings;
+    settings.beginGroup(S_GENERAL);
+    settings.setValue(S_GENERAL_REMOVE_EXPIRED_COMPONENTS, value);
+    settings.sync();
+}
+
+bool Settings::getRemoveExpiredComponents()
+{
+    QSettings settings;
+    settings.beginGroup(S_GENERAL);
+    return settings.value(S_GENERAL_REMOVE_EXPIRED_COMPONENTS, true).toBool();
 }

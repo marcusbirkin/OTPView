@@ -17,8 +17,17 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "componentsmodel.h"
+#include "settings.h"
+#include <QFont>
 
 using namespace OTP;
+
+static QFont italic()
+{
+    QFont font;
+    font.setItalic(true);
+    return font;
+}
 
 ComponentsItem::ComponentsItem(
         std::shared_ptr<class Consumer> otpConsumer,
@@ -49,7 +58,23 @@ ComponentsItem::ComponentsItem(
         case ComponentRootItem: break;
         case ComponentSystemListItem: break;
         case ComponentModuleListItem: break;
-        case ComponentCID: break;
+        case ComponentCID:
+        {
+            connect(otpConsumer.get(), &Consumer::removedComponent, this,
+                    [this](cid_t cid)
+            {
+                if (Settings::getInstance().getRemoveExpiredComponents()) {
+                    if (cid == this->CID) {
+                        for (const auto &child : qAsConst(childItems))
+                            removeChild(child);
+                        this->parentItem()->removeChild(this);
+                        emit layoutChanged();
+                    }
+                } else {
+                    emit dataChanged();
+                }
+            });
+        }
         case ComponentName:
         {
             connect(otpConsumer.get(), qOverload<const cid_t&, const name_t&>(&Consumer::updatedComponent),
@@ -128,6 +153,11 @@ void ComponentsItem::appendChild(ComponentsItem *item)
     childItems.append(item);
 }
 
+void ComponentsItem::removeChild(ComponentsItem *item)
+{
+    childItems.removeAll(item);
+}
+
 ComponentsItem *ComponentsItem::child(int row)
 {
     if (row < 0 || row > childCount())
@@ -140,64 +170,83 @@ int ComponentsItem::childCount() const
     return childItems.count();
 }
 
-QVariant ComponentsItem::data(int column) const
+QVariant ComponentsItem::data(int column, int role) const
 {
     if (column < 0 || column >= columnCount())
         return QVariant();
-    switch (type)
+
+    if (role == Qt::FontRole)
     {
-        case ComponentRootItem:
-            return QString("Components");
-
-        case ComponentCID:
-            return QString("%1").arg(CID.toString());
-
-        case ComponentName:
-            return QString("Name: %1").arg(otpConsumer->getComponent(CID).getName().toString());
-
-        case ComponentIP:
-            return QString("IP: %1").arg(otpConsumer->getComponent(CID).getIPAddr().toString());
-
-        case ComponentType:
-            return QString("Type: %1").arg(
-                        otpConsumer->getComponent(CID).getType()
-                        == component_s::consumer ? QString("Consumer") : QString("Producer"));
-
-        case ComponentSystemList:
-            if (otpConsumer->getComponent(CID).getType() == component_s::consumer)
-                return "Systems: N/A";
-            else
-                return QString("Systems%1").arg(
-                            otpConsumer->getSystems(CID).isEmpty() ? ": None" : "");
-
-        case ComponentSystemListItem:
-            return QString::number(otpConsumer->getSystems(CID).value(row()));
-
-        case ComponentModuleList:
-        {
-            const auto moduleList = this->otpConsumer->getComponent(CID).getModuleList();
-            return QString("Modules (%1)%2").arg(
-                        (otpConsumer->getComponent(CID).getType() == component_s::consumer) ?
-                            QString("Advertised") : QString("Active"),
-                        moduleList.isEmpty() ? ": None" : "");
-        }
-
-        case ComponentModuleListItem:
-        {
-            const auto moduleList = this->otpConsumer->getComponent(CID).getModuleList();
-            auto moduleDescription = OTP::MODULES::getModuleDescription(moduleList.value(row()));
-            const auto manufacturerID = moduleList.value(row()).ManufacturerID;
-            const auto moduleNumber = moduleList.value(row()).ModuleNumber;
-            return QString("%1 (0x%2) / %3 (0x%4)")
-                    .arg(moduleDescription.Manufactuer)
-                    .arg(manufacturerID, manufacturerID.getSize() * 2, 16, QChar('0'))
-                    .arg(moduleDescription.Name)
-                    .arg(moduleNumber, moduleNumber.getSize() * 2, 16, QChar('0'));
-        }
-
-        default:
-            return QString("TODO");
+        if (otpConsumer->isComponentExpired(CID))
+            return italic();
+        else
+            return QVariant();
     }
+
+    if (role == Qt::DisplayRole)
+    {
+        switch (type)
+        {
+            case ComponentRootItem:
+                return QString("Components");
+
+            case ComponentCID:
+                return QString("%1").arg(CID.toString());
+
+            case ComponentName:
+                return QString("Name: %1")
+                        .arg(otpConsumer->isComponentExpired(CID)
+                             ? QStringLiteral("Offline") : otpConsumer->getComponent(CID).getName().toString());
+
+            case ComponentIP:
+                return QString("IP: %1")
+                        .arg(otpConsumer->isComponentExpired(CID)
+                             ? QStringLiteral("Offline") : otpConsumer->getComponent(CID).getIPAddr().toString());
+
+            case ComponentType:
+                return QString("Type: %1")
+                        .arg(otpConsumer->isComponentExpired(CID)
+                            ? QStringLiteral("Offline") : otpConsumer->getComponent(CID).getType()
+                                == component_s::consumer ? QString("Consumer") : QString("Producer"));
+
+            case ComponentSystemList:
+                if (otpConsumer->getComponent(CID).getType() == component_s::consumer)
+                    return "Systems: N/A";
+                else
+                    return QString("Systems%1").arg(
+                                otpConsumer->getSystems(CID).isEmpty() ? ": None" : "");
+
+            case ComponentSystemListItem:
+                return QString::number(otpConsumer->getSystems(CID).value(row()));
+
+            case ComponentModuleList:
+            {
+                const auto moduleList = this->otpConsumer->getComponent(CID).getModuleList();
+                return QString("Modules (%1)%2").arg(
+                            (otpConsumer->getComponent(CID).getType() == component_s::consumer) ?
+                                QString("Advertised") : QString("Active"),
+                            moduleList.isEmpty() ? ": None" : "");
+            }
+
+            case ComponentModuleListItem:
+            {
+                const auto moduleList = this->otpConsumer->getComponent(CID).getModuleList();
+                auto moduleDescription = OTP::MODULES::getModuleDescription(moduleList.value(row()));
+                const auto manufacturerID = moduleList.value(row()).ManufacturerID;
+                const auto moduleNumber = moduleList.value(row()).ModuleNumber;
+                return QString("%1 (0x%2) / %3 (0x%4)")
+                        .arg(moduleDescription.Manufactuer)
+                        .arg(manufacturerID, manufacturerID.getSize() * 2, 16, QChar('0'))
+                        .arg(moduleDescription.Name)
+                        .arg(moduleNumber, moduleNumber.getSize() * 2, 16, QChar('0'));
+            }
+
+            default:
+                return QString("TODO");
+        }
+    }
+
+    return QVariant();
 }
 
 ComponentsItem *ComponentsItem::parentItem() const
@@ -231,6 +280,10 @@ ComponentsModel::ComponentsModel(
 
 void ComponentsModel::newComponent(OTP::cid_t cid)
 {
+    for (const auto &child : rootItem->children())
+        if (reinterpret_cast<ComponentsItem*>(child)->getCID() == cid)
+            return;
+
     auto newItem = new ComponentsItem(
                 this->otpConsumer,
                 cid,
@@ -252,12 +305,9 @@ QVariant ComponentsModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (role != Qt::DisplayRole)
-        return QVariant();
-
     ComponentsItem *item = static_cast<ComponentsItem*>(index.internalPointer());
 
-    return item->data(index.column());
+    return item->data(index.column(), role);
 }
 
 Qt::ItemFlags ComponentsModel::flags(const QModelIndex &index) const

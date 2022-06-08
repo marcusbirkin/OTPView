@@ -41,7 +41,7 @@ public:
         componentDetails_s() :
             CID(OTP::cid_t::createUuid())
         {
-            Name = QString("%1 %2").arg(QApplication::applicationName()).arg(QApplication::applicationVersion());
+            Name = QString("%1 %2").arg(QApplication::applicationName(), QApplication::applicationVersion());
         }
         componentDetails_s(QString name, OTP::cid_t CID) :
             Name(name),
@@ -57,6 +57,9 @@ public:
 
     void setTransformMessageRate(std::chrono::milliseconds interval);
     std::chrono::milliseconds getTransformMessageRate();
+
+    void setRemoveExpiredComponents(bool value);
+    bool getRemoveExpiredComponents();
 
 signals:
     void newNetworkInterface(QNetworkInterface);

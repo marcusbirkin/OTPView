@@ -48,14 +48,17 @@ public:
             ComponentsItem *parentItem = nullptr);
 
     void appendChild(ComponentsItem *item);
+    void removeChild(ComponentsItem *item);
     ComponentsItem *child(int row);
     int childCount() const;
     int columnCount() const  { return 1; }
-    QVariant data(int column = 0) const;
+    QVariant data(int column = 0, int role = Qt::DisplayRole) const;
     int row() const;
     ComponentsItem *parentItem() const;
 
     itemType_t getType() const { return type; };
+
+    OTP::cid_t getCID() const { return CID; };
 
 signals:
     void dataChanged();
