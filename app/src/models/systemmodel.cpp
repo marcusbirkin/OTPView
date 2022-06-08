@@ -191,14 +191,14 @@ QString SystemItem::getDataPositionRotationString() const
     }
 }
 
-QVariant SystemItem::data(int column, int roll) const
+QVariant SystemItem::data(int column, int role) const
 {
     if (column < 0 || column >= columnCount())
         return QVariant();
     switch (type)
     {
         case SystemRootItem:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("");
@@ -209,35 +209,35 @@ QVariant SystemItem::data(int column, int roll) const
 
         // Group
         case SystemGroupItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Group %1").arg(getGroup());
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Group %1").arg(getGroup());
             if (otpConsumer->isGroupExpired(getSystem(), getGroup()))
             {
-                if (roll == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
+                if (role == Qt::FontRole) return italic();
             }
             return QVariant();
 
         // Point
         case SystemPointItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Point %1").arg(getPoint());
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Point %1").arg(getPoint());
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
+                if (role == Qt::FontRole) return italic();
             }
             return QVariant();
 
         // Point Details
         case SystemPointDetailsItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Details");
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Details");
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
+                if (role == Qt::FontRole) return italic();
             }
             return QVariant();
         case SystemPointDetailsNameItem:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Name");
@@ -246,11 +246,11 @@ QVariant SystemItem::data(int column, int roll) const
                 }
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::FontRole) return italic();
             }
             return QVariant();
         case SystemPointDetailsLastSeenItem:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Last Seen");
@@ -259,12 +259,12 @@ QVariant SystemItem::data(int column, int roll) const
                 }
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::FontRole) return italic();
-                if (roll == Qt::BackgroundRole) return QColor(Qt::red);
+                if (role == Qt::FontRole) return italic();
+                if (role == Qt::BackgroundRole) return QColor(Qt::red);
             }
             return QVariant();
         case SystemPointDetailsReferenceFrameItem:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Reference Frame");
@@ -273,37 +273,37 @@ QVariant SystemItem::data(int column, int roll) const
                 }
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::FontRole) return italic();
             }
             return QVariant();
 
         // Point Position/Rotation
         case SystemPointPositionItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Position");
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Position");
             return QVariant();
         case SystemPointRotationItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Rotation");
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Rotation");
             return QVariant();
         case SystemPointPositionValueItem:
         case SystemPointRotationValueItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Value");
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Value");
             return QVariant();
         case SystemPointPositionVelcocityItem:
         case SystemPointRotationVelcocityItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Velcocity");
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Velcocity");
             return QVariant();
         case SystemPointPositionAccelItem:
         case SystemPointRotationAccelItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Acceleration");
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Acceleration");
             return QVariant();
 
         // Scale
         case SystemPointScaleItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Scale");
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Scale");
             return QVariant();
 
         case SystemPointAxis_X:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("X");
@@ -312,7 +312,7 @@ QVariant SystemItem::data(int column, int roll) const
                 }
             return QVariant();
         case SystemPointAxis_Y:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Y");
@@ -321,7 +321,7 @@ QVariant SystemItem::data(int column, int roll) const
                 }
             return QVariant();
         case SystemPointAxis_Z:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Z");
@@ -331,7 +331,7 @@ QVariant SystemItem::data(int column, int roll) const
             return QVariant();
 
         case SystemPointAxisDetails_Source:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Source");
@@ -341,7 +341,7 @@ QVariant SystemItem::data(int column, int roll) const
             return QVariant();
 
         case SystemPointAxisDetails_Priority:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Priority");
@@ -351,7 +351,7 @@ QVariant SystemItem::data(int column, int roll) const
             return QVariant();
 
         case SystemPointAxisDetails_Timestamp:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Timestamp");

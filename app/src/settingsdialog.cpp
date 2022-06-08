@@ -31,11 +31,11 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     setWindowFlag(Qt::WindowContextHelpButtonHint, false);
 
     // Interface Protocol
-    QObject::connect<void(QComboBox::*)(int)>(ui->cbProtocol, &QComboBox::currentIndexChanged, [=]() { checkSaveAllowed(); });
+    QObject::connect<void(QComboBox::*)(int)>(ui->cbProtocol, &QComboBox::currentIndexChanged, this, [=]() { checkSaveAllowed(); });
     populateProtocolList();
 
     // Interface list
-    QObject::connect<void(QComboBox::*)(int)>(ui->cbInterface, &QComboBox::currentIndexChanged, [=]() { checkSaveAllowed(); });
+    QObject::connect<void(QComboBox::*)(int)>(ui->cbInterface, &QComboBox::currentIndexChanged, this, [=]() { checkSaveAllowed(); });
     populateInterfaceList();
 
     // System Request Interval
@@ -44,6 +44,11 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     // Transform message interval
     ui->sbTransformTXRate->setRange(OTP::OTP_TRANSFORM_TIMING_MIN.count(), OTP::OTP_TRANSFORM_TIMING_MAX.count());
     ui->sbTransformTXRate->setValue(static_cast<int>(Settings::getInstance().getTransformMessageRate().count()));
+
+    // Remove expired components
+    ui->cbRemoveExpiredComponents->setCheckState(
+                Settings::getInstance().getRemoveExpiredComponents()
+                ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -65,6 +70,9 @@ void SettingsDialog::on_buttonBox_accepted()
 
     instance.setTransformMessageRate(
                 std::chrono::milliseconds(ui->sbTransformTXRate->value()));
+
+    instance.setRemoveExpiredComponents(
+                ui->cbRemoveExpiredComponents->checkState() == Qt::CheckState::Checked);
 
     this->close();
 }
@@ -110,9 +118,7 @@ void SettingsDialog::populateInterfaceList()
                     currentIndex = ui->cbInterface->count();
 
                 ui->cbInterface->addItem(
-                            QString("%1 (%2)")
-                            .arg(interface.humanReadableName())
-                            .arg(ipAddrString),
+                            QString("%1 (%2)").arg(interface.humanReadableName(), ipAddrString),
                             interface.name());
             }
         }
