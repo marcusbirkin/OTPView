@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+  <Name>OTPView</Name>
+  <ProductUrl>https://github.com/marcusbirkin/OTPView</ProductUrl>
+  <Version>v0.0.0</Version>
+  <Title>OTPView v0.0.0</Title>
+  <Publisher>Marcus Birkin</Publisher>
+  <StartMenuDir>OTPView</StartMenuDir>
+  <TargetDir>@ApplicationsDir@/OTPView</TargetDir>
+  <RunProgram>@ApplicationsDir@/OTPView/OTPView</RunProgram>
+  <SupportsModify>false</SupportsModify>
+  <WizardStyle>Modern</WizardStyle>
+  <ControlScript>controlscript.qs</ControlScript>
+</Installer>
