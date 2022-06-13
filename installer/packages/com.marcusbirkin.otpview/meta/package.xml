@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+  <DisplayName>OTPView</DisplayName>
+  <Description>Main Application</Description>
+  <Version>v0.0.0</Version>
+  <ReleaseDate>1970-01-01</ReleaseDate>
+  <Licenses>
+    <License name="GNU LESSER GENERAL PUBLIC LICENSE" file="license.txt" />
+  </Licenses>
+  <Default>true</Default>
+  <ForcedInstallation>true</ForcedInstallation>
+  <Script>installscript.qs</Script>
+  <SortingPriority>100</SortingPriority>
+</Package>
