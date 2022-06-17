@@ -39,6 +39,9 @@ LineChart::LineChart(std::shared_ptr<class OTP::Consumer> otpConsumer,
     otpConsumer(otpConsumer),
     address(address)
 {
+    // Set identifying name
+    QWidget::setObjectName(address.toString());
+
     // Layout
     this->setLayout(new QVBoxLayout(this));
 
@@ -60,7 +63,7 @@ LineChart::LineChart(std::shared_ptr<class OTP::Consumer> otpConsumer,
     setupLineSeries(ROTATION, "Rotation", *buttonLayoutRotation);
     setupLineSeries(ROTATION_VELOCITY, "Rotation Velocity", *buttonLayoutRotation);
     setupLineSeries(ROTATION_ACCELERATION, "Rotation Acceleration", *buttonLayoutRotation);
-    buttonGroup->buttons().first()->setChecked(true);
+    buttonGroup->buttons().at(0)->setChecked(true);
 
     // Chartview
     this->layout()->addWidget(chartView);

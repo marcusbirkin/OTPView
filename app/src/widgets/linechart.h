@@ -38,6 +38,8 @@ public:
             OTP::address_t address,
             QWidget *parent = nullptr);
 
+    OTP::address_t getAddress() const { return address; }
+
 signals:
 
 private slots:
