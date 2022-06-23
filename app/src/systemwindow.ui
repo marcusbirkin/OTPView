@@ -17,53 +17,15 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
-     <property name="tabPosition">
-      <enum>QTabWidget::North</enum>
-     </property>
      <property name="tabShape">
       <enum>QTabWidget::Triangular</enum>
      </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
      <property name="tabsClosable">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
-     <widget class="QWidget" name="Overview">
-      <attribute name="title">
-       <string>Overview</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item>
-        <widget class="QTreeView" name="tvDetails">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double click on values to open chart tab&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-         <property name="showDropIndicator" stdset="0">
-          <bool>false</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-         <property name="sortingEnabled">
-          <bool>true</bool>
-         </property>
-         <property name="headerHidden">
-          <bool>true</bool>
-         </property>
-         <attribute name="headerVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="headerShowSortIndicator" stdset="0">
-          <bool>false</bool>
-         </attribute>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+     <property name="movable">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
   </layout>

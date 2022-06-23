@@ -108,7 +108,8 @@ public:
         { return OTP::address_t(getSystem(), getGroup(), getPoint()); }
 
 private:
-    QString getDataPositionRotationString() const;
+    QString getValueString() const;
+    QString getOtherValuesString() const;
 
     std::shared_ptr<class OTP::Consumer> otpConsumer;
     OTP::address_t address;

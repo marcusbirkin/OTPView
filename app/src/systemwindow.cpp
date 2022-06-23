@@ -21,6 +21,7 @@
 #include "models/systemmodel.h"
 #include "widgets/linechart.h"
 #include <QSettings>
+#include <QHeaderView>
 
 using namespace OTP;
 
@@ -42,26 +43,41 @@ SystemWindow::SystemWindow(
     // Create system
     otpConsumer->addLocalSystem(system);
 
-    // Tree
-    ui->tvDetails->setModel(new SystemModel(otpConsumer, system, this));
-    ui->tvDetails->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    connect(ui->tvDetails, &QTreeView::doubleClicked, [this](const QModelIndex &index) {
-        if (ui->tvDetails->selectionModel()->currentIndex().column() != 1) return;
+    // Overview Tree tab
+    auto tvOverview = new QTreeView(this);
+    ui->tabWidget->addTab(tvOverview, QString("Overview"));
+    tvOverview->setModel(new SystemModel(otpConsumer, system, this));
+    tvOverview->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    tvOverview->setHeaderHidden(true);
+
+    //-Open history chart tab on address double click
+    connect(tvOverview, &QTreeView::doubleClicked, this, [this](const QModelIndex &index) {
         auto address = SystemItem::indexToItem(index)->getAddress();
         if (!address.isValid()) return;
 
-        // Open and switch to
-        auto idx = ui->tabWidget->addTab(new LineChart(this->otpConsumer, address, this), address.toString());
-        ui->tabWidget->setCurrentIndex(idx);
+        // Find existing chart tab
+        auto *tab = ui->tabWidget->findChild<LineChart*>(address.toString());
+        if (tab)
+            ui->tabWidget->setCurrentWidget(tab);
+
+        // or open new
+        if (!tab) {
+            auto idx = ui->tabWidget->addTab(new LineChart(this->otpConsumer, address, this), QString("History %1").arg(address.toString()));
+            ui->tabWidget->setCurrentIndex(idx);
+        }
     });
 
     // Tabs
     ui->tabWidget->setTabsClosable(true);
     ui->tabWidget->setMovable(true);
     // - Remove close button from first tab
+    // Remove close button on all defaultly opened tabs
     QTabBar *tabBar = ui->tabWidget->findChild<QTabBar *>();
-    tabBar->setTabButton(0, QTabBar::RightSide, nullptr);
-    tabBar->setTabButton(0, QTabBar::LeftSide, nullptr);
+    for (auto idx = 0; idx < ui->tabWidget->count(); ++idx)
+    {
+        tabBar->setTabButton(idx, QTabBar::RightSide, nullptr);
+        tabBar->setTabButton(idx, QTabBar::LeftSide, nullptr);
+    }
 }
 
 SystemWindow::~SystemWindow()
