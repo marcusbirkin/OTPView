@@ -33,7 +33,7 @@ class PointSelectionDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit PointSelectionDialog(QList<OTP::point_t> usedPoint, QWidget *parent = nullptr);
+    explicit PointSelectionDialog(const QList<OTP::point_t> &usedPoint, QWidget *parent = nullptr);
     ~PointSelectionDialog();
 
     OTP::point_t getPoint();

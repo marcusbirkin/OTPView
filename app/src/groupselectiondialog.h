@@ -33,7 +33,7 @@ class GroupSelectionDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit GroupSelectionDialog(QList<OTP::group_t> usedGroups, QWidget *parent = nullptr);
+    explicit GroupSelectionDialog(const QList<OTP::group_t> &usedGroups, QWidget *parent = nullptr);
     ~GroupSelectionDialog();
 
     OTP::group_t getGroup();

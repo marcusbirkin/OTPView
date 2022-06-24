@@ -33,7 +33,7 @@ class ProducerWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ProducerWindow(QString componentSettingsGroup = "", QMainWindow *parent = nullptr);
+    explicit ProducerWindow(const QString &componentSettingsGroup = "", QMainWindow *parent = nullptr);
     ~ProducerWindow();
 
 private slots:

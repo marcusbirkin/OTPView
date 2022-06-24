@@ -30,7 +30,7 @@ class PrioritySpinBox : public QAbstractSpinBox
 public:
     typedef OTP::priority_t value_t;
 
-    PrioritySpinBox(
+    explicit PrioritySpinBox(
             std::shared_ptr<class OTP::Producer> otpProducer,
             QWidget* parent = nullptr);
 

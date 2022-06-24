@@ -25,7 +25,7 @@
 
 using namespace OTP;
 
-ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *parent) :
+ProducerWindow::ProducerWindow(const QString &componentSettingsGroup, QMainWindow *parent) :
     QMainWindow(parent),
     ui(new Ui::ProducerWindow),
     componentSettingsGroup(componentSettingsGroup)

@@ -20,7 +20,7 @@
 
 using namespace OTP;
 
-GroupSpinBox::GroupSpinBox(QList<group_t> usedGroups, QWidget* parent) : QAbstractSpinBox(parent),
+GroupSpinBox::GroupSpinBox(const QList<group_t> &usedGroups, QWidget* parent) : QAbstractSpinBox(parent),
     usedGroups(usedGroups)
 {
     setRange(group_t::getMin(), group_t::getMax());

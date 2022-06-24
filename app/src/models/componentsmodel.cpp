@@ -100,7 +100,7 @@ ComponentsItem::ComponentsItem(
             {
                 if (cid == this->CID)
                 {
-                    if (this->otpConsumer->getComponent(cid).getType() == component_s::consumer)
+                    if (this->otpConsumer->getComponent(cid).getType() == component_t::consumer)
                         return; // Consumers don't send system lists
 
                     this->childItems.append(
@@ -208,10 +208,10 @@ QVariant ComponentsItem::data(int column, int role) const
                 return QString("Type: %1")
                         .arg(otpConsumer->isComponentExpired(CID)
                             ? QStringLiteral("Offline") : otpConsumer->getComponent(CID).getType()
-                                == component_s::consumer ? QString("Consumer") : QString("Producer"));
+                                == component_t::consumer ? QString("Consumer") : QString("Producer"));
 
             case ComponentSystemList:
-                if (otpConsumer->getComponent(CID).getType() == component_s::consumer)
+                if (otpConsumer->getComponent(CID).getType() == component_t::consumer)
                     return "Systems: N/A";
                 else
                     return QString("Systems%1").arg(
@@ -224,7 +224,7 @@ QVariant ComponentsItem::data(int column, int role) const
             {
                 const auto moduleList = this->otpConsumer->getComponent(CID).getModuleList();
                 return QString("Modules (%1)%2").arg(
-                            (otpConsumer->getComponent(CID).getType() == component_s::consumer) ?
+                            (otpConsumer->getComponent(CID).getType() == component_t::consumer) ?
                                 QString("Advertised") : QString("Active"),
                             moduleList.isEmpty() ? ": None" : "");
             }

@@ -21,7 +21,7 @@
 
 using namespace OTP;
 
-GroupSelectionDialog::GroupSelectionDialog(QList<OTP::group_t> usedGroups, QWidget *parent) :
+GroupSelectionDialog::GroupSelectionDialog(const QList<OTP::group_t> &usedGroups, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::GroupSelectionDialog)
 {

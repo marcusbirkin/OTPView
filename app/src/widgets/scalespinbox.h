@@ -31,7 +31,7 @@ class ScaleSpinBox : public QAbstractSpinBox
 public:
     typedef ScaleModule_t::scale_t value_t;
 
-    ScaleSpinBox(
+    explicit ScaleSpinBox(
             std::shared_ptr<class OTP::Producer> otpProducer,
             OTP::axis_t axis,
             QWidget* parent = nullptr);

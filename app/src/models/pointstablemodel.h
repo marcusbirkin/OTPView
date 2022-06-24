@@ -26,7 +26,7 @@ class PointsTableModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    PointsTableModel(
+    explicit PointsTableModel(
             std::shared_ptr<class OTP::Producer> otpProducer,
             OTP::system_t system,
             OTP::group_t group,

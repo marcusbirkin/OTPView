@@ -29,7 +29,7 @@ class GroupSpinBox : public QAbstractSpinBox
     Q_OBJECT
 public:
     GroupSpinBox(QWidget* parent = nullptr) : GroupSpinBox(QList<OTP::group_t>(), parent) {}
-    GroupSpinBox(QList<OTP::group_t> usedGroups, QWidget* parent = nullptr);
+    explicit GroupSpinBox(const QList<OTP::group_t> &usedGroups, QWidget* parent = nullptr);
 
     OTP::group_t value() const { return m_value; }
 

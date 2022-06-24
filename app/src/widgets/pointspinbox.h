@@ -29,7 +29,7 @@ class PointSpinBox : public QAbstractSpinBox
     Q_OBJECT
 public:
     PointSpinBox(QWidget* parent = nullptr) : PointSpinBox(QList<OTP::point_t>(), parent) {}
-    PointSpinBox(QList<OTP::point_t> usedPoints, QWidget* parent = nullptr);
+    explicit PointSpinBox(const QList<OTP::point_t> &usedPoints, QWidget* parent = nullptr);
 
     OTP::point_t value() const { return m_value; }
 

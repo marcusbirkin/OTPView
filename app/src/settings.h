@@ -36,14 +36,14 @@ public:
     void setNetworkTransport(QAbstractSocket::NetworkLayerProtocol transport);
     QAbstractSocket::NetworkLayerProtocol getNetworkTransport();
 
-    typedef struct componentDetails_s
+    typedef struct componentDetails_t
     {
-        componentDetails_s() :
+        componentDetails_t() :
             CID(OTP::cid_t::createUuid())
         {
             Name = QString("%1 %2").arg(QApplication::applicationName(), QApplication::applicationVersion());
         }
-        componentDetails_s(QString name, OTP::cid_t CID) :
+        componentDetails_t(const QString &name, OTP::cid_t CID) :
             Name(name),
             CID(CID) {}
         QString Name;
