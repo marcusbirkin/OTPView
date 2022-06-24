@@ -74,7 +74,7 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
             this, [this]() {
                 otpProducer->setLocalCID(cid_t::createUuid());
             });
-    connect(otpProducer.get(), &Producer::newLocalCID,
+    connect(otpProducer.get(), &Producer::newLocalCID, this,
             [this](const cid_t CID) {
                 ui->lblProducerCID->setText(CID.toString());
                 saveComponentDetails();
@@ -147,10 +147,10 @@ void ProducerWindow::updateStatusBar()
 void ProducerWindow::updateWindowTitle()
 {
 this->setWindowTitle(
-            QString("%1 %2 - Producer - (%3)")
-                .arg(QApplication::applicationName())
-                .arg(QApplication::applicationVersion())
-                .arg(ui->leProducerName->text()));
+            QString("%1 %2 - Producer - (%3)").arg(
+                    QApplication::applicationName(),
+                    QApplication::applicationVersion(),
+                    ui->leProducerName->text()));
 }
 
 void ProducerWindow::saveComponentDetails()

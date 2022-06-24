@@ -55,11 +55,11 @@ public:
 
 
 public slots:
-    void setValue(value_t val);
+    void setValue(SpacialSpinBox::value_t val);
     void setAddress(OTP::address_t);
 
 signals:
-    void valueChanged(value_t value);
+    void valueChanged(SpacialSpinBox::value_t value);
 
 protected:
     void stepBy(int steps);

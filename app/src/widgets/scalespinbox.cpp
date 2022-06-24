@@ -130,7 +130,7 @@ ScaleSpinBox::value_t ScaleSpinBox::valueFromText(const QString &text, bool *ok)
 
 QString ScaleSpinBox::textFromValue(value_t val) const
 {
-    return QString("%1 %2")
-            .arg(ScaleModule_t::toPercentString(val))
-            .arg(suffix);
+    return QString("%1 %2").arg(
+                ScaleModule_t::toPercentString(val),
+                suffix);
 }

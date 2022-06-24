@@ -25,9 +25,10 @@ SystemSpinBox::SystemSpinBox(QList<system_t> usedSystems, QWidget* parent) : QAb
 {
     setRange(system_t::getMin(), system_t::getMax());
     setValue(system_t::getMin());
-    while (QValidator::Invalid == validate(value())) stepBy(1);
+    while (QValidator::Invalid == validate(value()))
+        SystemSpinBox::stepBy(1);
 
-    connect(this->lineEdit(), &QLineEdit::textEdited,
+    connect(this->lineEdit(), &QLineEdit::textEdited, this,
         [this]() {
             QString input = lineEdit()->text();
             int pos = 0;
