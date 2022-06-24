@@ -74,7 +74,8 @@ ComponentsItem::ComponentsItem(
                     emit dataChanged();
                 }
             });
-        }
+        } break;
+
         case ComponentName:
         {
             connect(otpConsumer.get(), qOverload<const cid_t&, const name_t&>(&Consumer::updatedComponent),
