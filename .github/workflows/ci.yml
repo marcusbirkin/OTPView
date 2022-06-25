@@ -23,6 +23,7 @@ jobs:
       with:
         version: ${{ matrix.qtltsver }}
         modules: 'qtcharts'
+        aqtversion: '==2.0.0'
 
     - name: MSVC Environment Setup
       if: startsWith(matrix.os, 'windows')
