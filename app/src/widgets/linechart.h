@@ -27,7 +27,9 @@
 #include <QtCharts/QLineSeries>
 #include "OTPLib.hpp"
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 using namespace QtCharts;
+#endif
 
 class LineChart : public QWidget
 {

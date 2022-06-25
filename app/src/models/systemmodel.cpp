@@ -57,7 +57,9 @@ SystemItem *SystemItem::child(int row)
 {
     if (row < 0 || row >= childCount())
         return nullptr;
-    return *(childItems.cbegin() + row);
+    auto childItem = childItems.begin();
+    std::advance(childItem,row);
+    return *(childItem);
 }
 
 int SystemItem::childCount() const
