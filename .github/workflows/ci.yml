@@ -3,9 +3,15 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build_linux:
-    runs-on: ubuntu-latest
-
+  build:
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        qtltsver: ['5.15.2', '6.2.4']
+        
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -15,54 +21,20 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.14.0
       with:
-        modules: 'qtcharts'
-
-    - name: Create Makefile
-      run: qmake
-
-    - name: Build
-      run: make
-
-  build_windows:
-    runs-on: windows-latest
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
-
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2.14.0
-      with:
+        version: ${{ matrix.qtltsver }}
         modules: 'qtcharts'
 
     - name: MSVC Environment Setup
+      if: startsWith(matrix.os, 'windows')
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Create Makefile
       run: qmake
 
-    - name: Build
+    - name: Build (nmake)
+      if: (startsWith(matrix.os, 'windows'))
       run: nmake
-
-  build_macos:
-    runs-on: macos-latest
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
-
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2.14.0
-      with:
-        modules: 'qtcharts'
-        setup-python: 'false'
-
-    - name: Create Makefile
-      run: qmake
-
-    - name: Build
+      
+    - name: Build (make)
+      if: (!startsWith(matrix.os, 'windows'))
       run: make
