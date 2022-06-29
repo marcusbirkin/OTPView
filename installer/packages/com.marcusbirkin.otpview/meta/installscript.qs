@@ -1,9 +1,4 @@
-function Component()
-{
-	if (systemInfo.productType === "windows") { 
-		installer.installationFinished.connect(this, Component.prototype.installVCRedist); 
-	}
-}
+function Component(){}
 
 Component.prototype.createOperations = function()
 {
@@ -11,8 +6,10 @@ Component.prototype.createOperations = function()
 	component.createOperations();
 
 	// Start menu links
-	if (systemInfo.productType === "windows") {
-		// Application
+	if (systemInfo.kernelType === "winnt") {
+		// Windows
+
+		// Main Application
 		component.addOperation("CreateShortcut", 
 			"@TargetDir@/OTPView.exe",
 			"@StartMenuDir@/OTPView.lnk",
@@ -29,18 +26,19 @@ Component.prototype.createOperations = function()
 			"iconPath=@TargetDir@/maintenancetool.exe",
 			"iconId=0",
 			"description=Uninstall OTPView");
+	} else if (systemInfo.kernelType === "darwin") {
+		// macOS (Future Support)
+	} else {
+		// Linux
+		component.addElevatedOperation("Execute", 
+			"desktop-file-edit", "@TargetDir@/OTPView.desktop", 
+			"--set-key=Exec", "--set-value=@TargetDir@/AppRun");
+		component.addElevatedOperation("Execute", 
+			"desktop-file-edit", "@TargetDir@/OTPView.desktop",
+			"--set-icon=@TargetDir@/OTPView.png");
+		component.addElevatedOperation("Execute", 
+			"desktop-file-install", "@TargetDir@/OTPView.desktop");
+		component.addElevatedOperation("Execute", 
+			"update-desktop-database");
 	}
-}
-
-Component.prototype.installVCRedist = function()
-{
-	//Install Microsoft Visual C++ Redistributable
-	console.log("Installing Microsoft Visual C++ Redistributable");
-	var targetDir = installer.value("TargetDir");
-	var msvc = QDesktopServices.findFiles(targetDir, "vc_redist.x??.exe");
-	msvc.forEach((binary) => {
-		console.log("Execute " + binary + " /quiet /norestart");
-		installer.gainAdminRights();
-		installer.execute(binary, "/quiet", "/norestart");
-	});
 }

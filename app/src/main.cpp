@@ -25,6 +25,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    QApplication::setApplicationName("OTPView");
     QApplication::setOrganizationName("Marcus Birkin");
     QApplication::setApplicationVersion(
                 QString("%1 (%2 %3 %4)")
