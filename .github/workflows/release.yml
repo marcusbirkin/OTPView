@@ -6,8 +6,31 @@ on:
     - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
-  release_windows:
-    runs-on: windows-latest
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: false
+
+  build_release:
+    name: Build release
+    needs: create_release
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
 
     steps:
     - name: Checkout
@@ -23,38 +46,41 @@ jobs:
         aqtversion: '==2.0.0'
 
     - name: MSVC Environment Setup
+      if: runner.os == 'Windows'
       uses: ilammy/msvc-dev-cmd@v1
 
     - name: Create Makefile
       run: qmake
 
-    - name: Build
+    - name: Build (nmake)
+      if: runner.os == 'Windows'
       run: nmake
-      
+
+    - name: Build (make)
+      if: runner.os != 'Windows'
+      run: make
+
     - name: Installer
+      shell: pwsh
       run: |
           $qtifw = (Get-ChildItem -Path "$Env:IQTA_TOOLS\QtInstallerFramework" -Directory).FullName
-          installer\createInstaller.ps1 "$qtifw/bin" "$Env:Qt5_DIR/bin"
+          ./installer/createInstaller.ps1 "$qtifw"
+
+    - name: Locate Release Asset
       shell: pwsh
-      
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: ${{ github.ref }}
-        draft: true
-        prerelease: false
-        
+      run: |
+            $FullName = (Get-ChildItem -Path ".\installer\OTPView*" -File).FullName
+            $Name = (Get-ChildItem -Path ".\installer\OTPView*" -File).Name
+            Add-Content -Path $env:GITHUB_ENV -Value "ASSET_PATH=$FullName"
+            Add-Content -Path $env:GITHUB_ENV -Value "ASSET_NAME=$Name"
+
     - name: Upload Release Asset
-      id: upload-release-asset 
+      id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: "./installer/OTPView ${{ github.ref_name }}.exe"
-        asset_name: "OTPView ${{ github.ref_name }}.exe"
+        upload_url: ${{ needs.create_release.outputs.upload_url }}
+        asset_path: ${{ env.ASSET_PATH }}
+        asset_name: ${{ env.ASSET_NAME }}
         asset_content_type: application/octet-stream

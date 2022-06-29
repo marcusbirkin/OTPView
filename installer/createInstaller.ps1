@@ -2,14 +2,27 @@ Param (
 	[string]$qtframeworkdir,
 	[string]$qtdir
 )
-If (-not($qtframeworkdir)) { Throw "Requires QT Installer Framework binaries location"}
-If (-not($qtdir)) { Throw "Requires QT binaries location"}
+If (-not($qtframeworkdir)) { Throw "Requires QT Installer Framework location" }
+If (-not($qtdir)) {
+	If (Test-Path -Path Env:Qt6_DIR) {
+		$qtdir = (Get-ChildItem -Path Env:Qt6_DIR).Value
+	}
+	ElseIf (Test-Path -Path Env:Qt5_DIR) {
+		$qtdir = (Get-ChildItem -Path Env:Qt5_DIR).Value
+	}
+	Else {
+		Throw "Requires QT location or QT5_DIR/QT6_DIR enviroment variable"
+	}
+}
+
+$qtdir = (Resolve-Path "$qtdir")
+$qtframeworkdir = (Resolve-Path "$qtframeworkdir")
 
 # Stop on any error
 $ErrorActionPreference = "Stop"
 
 # https://gist.github.com/MattUebel/2292484
-function Get-BinaryType {
+Function Get-BinaryType {
 	<#
 		.SYNOPSIS
 			Gets the binary executable type for a given set of files
@@ -29,7 +42,7 @@ function Get-BinaryType {
 			#ignoring any non-terminating errors
 			Get-ChildItem $env:windir -filter *.exe | Get-BinaryType -ErrorAction SilentlyContinue
 		.EXAMPLE
-			#From a 32bit process on a 64 bit Windows install, attempts to get the binary type of all exe files 
+			#From a 32bit process on a 64 bit Windows install, attempts to get the binary type of all exe files
 			#in the windows system32 directory by bypassing filesystem redirection using "sysnative",
 			#ignoring any non-terminating errors, and finally showing the file name and binary type
 			Get-ChildItem $env:windir\sysnative -filter *.exe | Get-BinaryType -ErrorAction SilentlyContinue -passthrough | select Name,BinaryType
@@ -41,22 +54,22 @@ function Get-BinaryType {
 	#>
 
 	[CmdletBinding(
-			SupportsShouldProcess   = $false,
-			ConfirmImpact       = "none",
-			DefaultParameterSetName = ""
+		SupportsShouldProcess = $false,
+		ConfirmImpact = "none",
+		DefaultParameterSetName = ""
 	)]
 
 	param
 	(
 		[Parameter(
-			HelpMessage             = "Enter binary file(s) to examine",
-			Position            = 0,
-			Mandatory               = $true,
-			ValueFromPipeline           = $true,
+			HelpMessage = "Enter binary file(s) to examine",
+			Position = 0,
+			Mandatory = $true,
+			ValueFromPipeline = $true,
 			ValueFromPipelineByPropertyName = $true
 		)]
 		[ValidateNotNullOrEmpty()]
-		[ValidateScript({Test-Path $_.FullName})]
+		[ValidateScript({ Test-Path $_.FullName })]
 		[IO.FileInfo[]]
 		$Path,
 
@@ -65,14 +78,12 @@ function Get-BinaryType {
 		$PassThrough
 	)
 
-	begin 
-	{
-		try
-		{
+	begin {
+		try {
 			#add the enum for the binary types
 			#Using more user friendly names since they won't likely be used outside this context
 			Add-Type "
-				public enum BinaryType 
+				public enum BinaryType
 				{
 					BIT32 = 0, // A 32-bit Windows-based application,           SCS_32BIT_BINARY
 					DOS   = 1, // An MS-DOS – based application,            SCS_DOS_BINARY
@@ -85,11 +96,10 @@ function Get-BinaryType {
 		}
 		catch {} #type already been loaded, do nothing
 
-		try
-		{
+		try {
 			# create the win32 signature
-			$Signature = 
-				'[DllImport("kernel32.dll")]
+			$Signature =
+			'[DllImport("kernel32.dll")]
 					public static extern bool GetBinaryType(
 						string lpApplicationName,
 						ref int lpBinaryType
@@ -104,32 +114,26 @@ function Get-BinaryType {
 		catch {} #type already been loaded, do nothing
 	}
 
-	process 
-	{
-		foreach ($Item in $Path)
-		{
+	process {
+		foreach ($Item in $Path) {
 			$ReturnedType = -1
 			Write-Verbose "Attempting to get type for file: $($Item.FullName)"
 			$Result = [Win32Utils.BinaryType]::GetBinaryType($Item.FullName, [ref] $ReturnedType)
 
 			#if the function returned $false, indicating an error, or the binary type wasn't returned
-			if (!$Result -or ($ReturnedType -eq -1))
-			{
+			if (!$Result -or ($ReturnedType -eq -1)) {
 				Write-Error "Failed to get binary type for file $($Item.FullName)"
 			}
-			else
-			{
+			else {
 				$ToReturn = [BinaryType]$ReturnedType
-				if ($PassThrough) 
-				{
+				if ($PassThrough) {
 					#get the file object, attach a property indicating the type, and passthru to pipeline
 					Get-Item $Item.FullName -Force |
-						Add-Member -MemberType noteproperty -Name BinaryType -Value $ToReturn -Force -PassThru 
+					Add-Member -MemberType noteproperty -Name BinaryType -Value $ToReturn -Force -PassThru
 				}
-				else
-				{ 
+				else {
 					#Put enum object directly into pipeline
-					$ToReturn 
+					$ToReturn
 				}
 			}
 		}
@@ -137,104 +141,345 @@ function Get-BinaryType {
 }
 
 # Check for QT Installer Framework
-Write-Host "Looking for binarycreator.exe in $qtframeworkdir"
-If (-not [bool](get-command "$qtframeworkdir/binarycreator.exe").Path) {
-	Write-Error "binarycreator.exe not found in $qtframeworkdir"
+# @return full path to binarcycreator
+Function checkQtInstallerBinaryCreator {
+	If ($IsLinux) {
+		$binarycreator = "binarycreator"
+	}
+	ElseIf ($IsMacOS) {
+		Write-Error "Unsupported OS"
+		Exit 1
+	}
+	ElseIf ($IsWindows) {
+		$binarycreator = "binarycreator.exe"
+	}
+
+	Write-Host -NoNewline "Looking for $binarycreator in $qtframeworkdir..."
+	Try {
+		$ret = (get-command "$qtframeworkdir/bin/$binarycreator").Path
+	}
+	Catch {
+		Write-Error "Not Found"
+		Exit 1
+	}
+	Write-Host "Found"
+	Return $ret
 }
 
-# Check for QT
-Write-Host "Looking for windeployqt.exe in $qtdir"
-If (-not [bool](get-command "$qtdir/windeployqt.exe").Path) {
-	Write-Error "windeployqt.exe not found in $qtdir"
+# Check for deployqt and download if appropriate (Linux)
+# @return full path to deployqt
+Function checkDeployQt {
+	If ($IsLinux) {
+		Write-Host -NoNewline "Looking for linuxdeployqt in $PSScriptRoot..."
+		try {
+			$ret = (get-command "$PSScriptRoot/linuxdeploy-x86_64.AppImage").Path
+		}
+		catch {
+			Write-Host -NoNewline "Not Found, downloading..."
+			Push-Location (Resolve-Path "$PSScriptRoot")
+			Invoke-WebRequest `
+				"https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage" `
+				-OutFile linuxdeploy-x86_64.AppImage
+			Invoke-WebRequest `
+				"https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage" `
+				-OutFile linuxdeploy-plugin-qt-x86_64.AppImage
+			chmod +x linuxdeploy*.AppImage
+			Pop-Location
+		}
+
+		Try {
+			$ret = (get-command "$PSScriptRoot/linuxdeploy-x86_64.AppImage").Path
+		}
+		Catch {
+			Write-Error "Not Found"
+			Exit 1
+		}
+		Write-Host "Found"
+		Return $ret
+	}
+	ElseIf ($IsMacOS) {
+		Write-Error "Unsupported OS"
+		Exit 1
+	}
+	ElseIf ($IsWindows) {
+		Write-Host -NoNewline "Looking for windeployqt.exe in $qtdir..."
+		try {
+			$ret = (get-command "$qtdir/bin/windeployqt.exe").Path
+		}
+		catch {
+			Write-Error "Not Found"
+			Exit 1
+		}
+		Write-Host "Found"
+		Return $ret
+	}
 }
 
-# Check for GIT
-if (-not [bool](get-command git).Path) {
-	Write-Error "Git not found"
+# Check system has QMake
+# @return Full path to QMake
+Function checkQMake {
+	If ($IsLinux) {
+		$qmake = "qmake"
+	}
+	ElseIf ($IsMacOS) {
+		Write-Error "Unsupported OS"
+		Exit 1
+	}
+	ElseIf ($IsWindows) {
+		$qmake = "qmake.exe"
+	}
+
+	Write-Host -NoNewline "Looking for $qmake in $qtdir..."
+	Try {
+		$ret = (get-command "$qtdir/bin/$qmake").Path
+	}
+	Catch {
+		Write-Error "Not Found"
+		Exit 1
+	}
+	Write-Host "Found"
+	Return $ret
 }
 
-# OTPView
-$appDir = (Resolve-Path "$PSScriptRoot/..")
-$appPackageDir = (Resolve-Path "$PSScriptRoot/packages/com.marcusbirkin.otpview")
-$appBinary = "$appDir/build/release/OTPView.exe"
-
-# -Copy ( and cleanup) Licence file
-Get-Content "$appDir\LICENSE"  | Foreach {$_.TrimStart()}  | Foreach {$_.TrimEnd()}  | Set-Content "$appPackageDir/meta/license.txt"
-
-# -Copy binaries
-Copy-Item $appBinary -Destination "$appPackageDir/data"
-& $qtdir\windeployqt.exe --no-compiler-runtime --dir "$appPackageDir/data" $appBinary
-$appBit = Get-BinaryType $appBinary
-Write-Host "Application bitness $appBit"
-If ($appBit -eq "BIT32") {
-	Write-Host "Downloading MSVC x86"
-	Invoke-WebRequest https://aka.ms/vs/17/release/vc_redist.x86.exe -OutFile "$appPackageDir/data/vc_redist.x86.exe"
-} ElseIf ($appBit -eq "BIT64") {
-	Write-Host "Downloading MSVC x64"
-	Invoke-WebRequest https://aka.ms/vs/17/release/vc_redist.x64.exe -OutFile "$appPackageDir/data/vc_redist.x64.exe"
-}
-Else {
-	Write-Error "Unknown bitness $appBit"
+# Check system has Git
+# @return Full path to Git
+Function checkGit {
+	Write-Host -NoNewline "Looking for Git..."
+	Try {
+		$ret = (get-command git).Path
+	}
+	Catch {
+		Write-Error "Not Found"
+		Exit 1
+	}
+	Write-Host "Found"
+	Return $ret
 }
 
-# -Version number and release date
-$appVersion = (git --git-dir="$appDir/.git" describe --always --tags)
-$appDate = (git show -s --date=format:"%Y-%m-%d" --format="%cd" $appVersion)
-Write-Host "OTPView Version $appVersion"
-Write-Host "OTPView Release date $appDate"
-$appPackage = (Resolve-Path "$PSScriptRoot/packages/com.marcusbirkin.otpview/meta/package.xml")
-Write-Host "Updating $appPackage"
-$appPackageXML = [xml](get-content $appPackage)
-$appPackageXML.Package.Version = $appVersion
-$appPackageXML.Package.ReleaseDate = $appDate
-$appPackageXML.Save($appPackage)
+# Setup OTPLib in package directory
+Function setupApplication {
+	Write-Host "Setting up OTPView..."
 
-# OTPLib
-$libdir = (Resolve-Path "$PSScriptRoot/../libs/OTPLib")
-$libPackageDir = (Resolve-Path "$PSScriptRoot/packages/com.marcusbirkin.otplib")
-$libBinary = "$libdir/build/release/OTPLib.dll"
+	$appDir = (Resolve-Path "$PSScriptRoot/..")
+	$appPackageDir = (Resolve-Path "$PSScriptRoot/packages/com.marcusbirkin.otpview")
+	$appPackageBinaryDir = "$appPackageDir/data"
+	$appBinaryDir = "$appDir/build/release"
 
-# -Copy ( and cleanup) Licence file
-Get-Content "$libdir/LICENSE"  | Foreach {$_.TrimStart()}  | Foreach {$_.TrimEnd()}  | Set-Content "$libPackageDir/meta/license.txt"
+	If ($IsLinux) {
+		$appBinary = "OTPView"
+		$appIcon = (Resolve-Path "$appDir/app/res/icon.png")
+	}
+	ElseIf ($IsMacOS) {
+		Write-Error "Unsupported OS"
+		Exit 1
+	}
+	ElseIf ($IsWindows) {
+		$appBinary = "OTPView.exe"
+		$appBit = Get-BinaryType "$appBinaryDir/$appBinary"
+		$global:appBit = $appBit
+	}
 
-# -Copy binaries
-Copy-Item $libBinary -Destination "$libPackageDir/data"
-& $qtdir\windeployqt.exe --no-compiler-runtime --dir "$libPackageDir/data" $libBinary
+	# Copy (and cleanup) Licence file
+	Get-Content "$appDir\LICENSE" | ForEach-Object { $_.TrimStart() }  | ForEach-Object { $_.TrimEnd() }  | Set-Content "$appPackageDir/meta/license.txt"
 
-# -Version number and release date
-$libVersion = (git --git-dir="$libdir/.git" describe --always --tags)
-$libDate = (git show -s --date=format:"%Y-%m-%d" --format="%cd" $appVersion)
-Write-Host "OTPLib Version $libVersion"
-Write-Host "OTPLib Release date $libDate"
-$libPackage = (Resolve-Path "$PSScriptRoot/packages/com.marcusbirkin.otplib/meta/package.xml")
-Write-Host "Updating $libPackage"
-$libPackageXML = [xml](get-content $libPackage)
-$libPackageXML.Package.Version = $libVersion
-$libPackageXML.Package.ReleaseDate = $libDate
-$libPackageXML.Save($libPackage)
+	# Copy binaries and dependencies
+	If ($IsLinux) {
+		write-host $Env:LD_LIBRARY_PATH
+		$Env:LD_LIBRARY_PATH = "$qtdir/lib:$Env:LD_LIBRARY_PATH"
+		write-host $Env:LD_LIBRARY_PATH
+		$Env:QMAKE = checkQMake
+		$deployqt = checkDeployQt
+		& $deployqt --appdir $appPackageBinaryDir `
+			--executable="$appBinaryDir/$appBinary" `
+			--exclude-library=*OTPLib* `
+			--plugin=qt `
+			--icon-file="$appicon" --icon-filename="OTPView" `
+			--create-desktop-file
 
-# Installer
+		if ($LASTEXITCODE -ne 0) {
+			Write-Error "Deployment failed"
+			Exit 1
+		}
+	}
+	ElseIf ($IsMacOS) {
+		Write-Error "Unsupported OS"
+		Exit 1
+	}
+	ElseIf ($IsWindows) {
+		Copy-Item "$appBinaryDir/$appBinary" -Destination "$appPackageBinaryDir"
+		$deployqt = checkDeployQt
+		& $deployqt --no-compiler-runtime --dir $appPackageBinaryDir "$appBinaryDir/$appBinary"
+		if ($LASTEXITCODE -ne 0) {
+			Write-Error "Deployment failed"
+			Exit 1
+		}
+	}
 
-# -Version number (Use the same as the application)
-$installConfig = (Resolve-Path "$PSScriptRoot/config/config.xml")
-Write-Host "Updating $installConfig"
-$installConfigXML = [xml](get-content $installConfig)
-$installConfigXML.Installer.Version = $appVersion
-$installConfigXML.Installer.Title = "OTPView $appVersion"
-If ($appBit -eq "BIT32") {
-	$installConfigXML.Installer.TargetDir = "@ApplicationsDirX86@/OTPView"
-	$installConfigXML.Installer.RunProgram = "@ApplicationsDirX86@/OTPView/OTPView"
-} ElseIf ($appBit -eq "BIT64") {
-	$installConfigXML.Installer.TargetDir = "@ApplicationsDirX64@/OTPView"
-	$installConfigXML.Installer.RunProgram = "@ApplicationsDirX64@/OTPView/OTPView"
+	# Version number and release date
+	$appVersion = (git --git-dir="$appDir/.git" describe --always --tags)
+	$global:appVersion = $appVersion
+	$appDate = (git --git-dir="$appDir/.git" show -s --date=format:"%Y-%m-%d" --format="%cd" $appVersion)
+	Write-Host "OTPView Version $appVersion"
+	Write-Host "OTPView Release date $appDate"
+	$appPackage = (Resolve-Path "$appPackageDir/meta/package.xml")
+	Write-Host "Updating $appPackage"
+	$appPackageXML = [xml](get-content $appPackage)
+	$appPackageXML.Package.Version = $appVersion
+	$appPackageXML.Package.ReleaseDate = $appDate
+	$appPackageXML.Save($appPackage)
 }
-Else {
+
+# Setup OTPLib in package directory
+Function setupLibrary {
+	Write-Host "Setting up OTPLib..."
+
+	$libdir = (Resolve-Path "$PSScriptRoot/../libs/OTPLib")
+	$libPackageDir = (Resolve-Path "$PSScriptRoot/packages/com.marcusbirkin.otplib")
+	$libBinaryDir = "$libdir/build/release"
+	If ($IsLinux) {
+		$libBinary = "libOTPLib.so*"
+		$libPackageBinaryDir = "$libPackageDir/data/usr/lib"
+		$Env:LD_LIBRARY_PATH = "$libPackageBinaryDir"
+	}
+	ElseIf ($IsMacOS) {
+		Write-Error "Unsupported OS"
+		Exit 1
+	}
+	ElseIf ($IsWindows) {
+		$libBinary = "OTPLib.dll"
+		$libPackageBinaryDir = "$libPackageDir/data"
+	}
+
+	# Copy (and cleanup) Licence file
+	Get-Content "$libdir/LICENSE" | ForEach-Object { $_.TrimStart() }  | ForEach-Object { $_.TrimEnd() }  | Set-Content "$libPackageDir/meta/license.txt"
+
+	# Copy binaries
+	If (!(Test-Path $libPackageBinaryDir)) {
+		Write-Host "Creating folder $libPackageBinaryDir"
+		[void](New-Item -Type Directory -Path $libPackageBinaryDir)
+	}
+	Write-Host "Copying $libBinaryDir/$libBinary to $libPackageBinaryDir"
+	Copy-Item $libBinaryDir/$libBinary -Destination "$libPackageBinaryDir"
+
+	# Version number and release date
+	$libVersion = (git --git-dir="$libdir/.git" describe --always --tags)
+	$libDate = (git --git-dir="$libdir/.git" show -s --date=format:"%Y-%m-%d" --format="%cd" $libVersion)
+	Write-Host "OTPLib Version $libVersion"
+	Write-Host "OTPLib Release date $libDate"
+	$libPackage = (Resolve-Path "$libPackageDir/meta/package.xml")
+	Write-Host "Updating $libPackage"
+	$libPackageXML = [xml](get-content $libPackage)
+	$libPackageXML.Package.Version = $libVersion
+	$libPackageXML.Package.ReleaseDate = $libDate
+	$libPackageXML.Save($libPackage)
+}
+
+# Setup MSVC in package directory
+Function setupMSVC {
+	Write-Host "Setting up Microsoft Visual C++ Redistributable..."
+
+	$msvcPackageDir = (Resolve-Path "$PSScriptRoot/packages/com.microsoft.vcredist")
+	$msvcPackageBinaryDir = "$msvcPackageDir/data"
+
+	Write-Host "Application bitness $appBit"
+	If ($global:appBit -eq "BIT32") {
+		$msvcBinary = "vc_redist.x86.exe"
+	}
+	ElseIf ($global:appBit -eq "BIT64") {
+
+		$msvcBinary = "vc_redist.x64.exe"
+	}
+	Else {
+		Write-Error "Unknown bitness $appBit"
+		Exit 1
+	}
+
+	If (!(Test-Path $msvcPackageBinaryDir)) {
+		Write-Host "Creating folder $msvcPackageBinaryDir"
+		[void](New-Item -Type Directory -Path $msvcPackageBinaryDir)
+	}
+
+	Write-Host "Downloading Microsoft Visual C++ Redistributable $msvcBinary"
+	Invoke-WebRequest "https://aka.ms/vs/17/release/$msvcBinary" -OutFile "$msvcPackageBinaryDir/$msvcBinary"
+
+	# Version number and release date
+	$msvcVersion = (Get-Item "$msvcPackageBinaryDir/$msvcBinary").VersionInfo.ProductVersion
+	$msvcDate = ((Get-AuthenticodeSignature "$msvcPackageBinaryDir/$msvcBinary").TimeStamperCertificate.NotBefore).toString(“yyyy-MM-dd”)
+	Write-Host "MSVC Version $msvcVersion"
+	Write-Host "MSVC Release date $msvcDate"
+	$msvcPackage = (Resolve-Path "$msvcPackageDir/meta/package.xml")
+	Write-Host "Updating $msvcPackage"
+	$msvcPackageXML = [xml](get-content $msvcPackage)
+	$msvcPackageXML.Package.Version = $msvcVersion
+	$msvcPackageXML.Package.ReleaseDate = $msvcDate
+	$msvcPackageXML.Save($msvcPackage)
+}
+
+# Create the actual installer
+Function createInstaller {
+	# Version number (Use the same as the application)
+	$installConfig = (Resolve-Path "$PSScriptRoot/config/config.xml")
+	Write-Host "Updating $installConfig"
+	$installConfigXML = [xml](get-content $installConfig)
+	$installConfigXML.Installer.Version = $global:appVersion
+	$installConfigXML.Installer.Title = "OTPView $appVersion"
+
+	# Destination folder and post install run
 	$installConfigXML.Installer.TargetDir = "@ApplicationsDir@/OTPView"
-	$installConfigXML.Installer.RunProgram = "@ApplicationsDir@/OTPView/OTPView"
-}
-$installConfigXML.Save($installConfig)
+	$installConfigXML.Installer.RunProgram = "@TargetDir@/OTPView"
+	If ($IsLinux) {
+		$installConfigXML.Installer.RunProgram = "@TargetDir@/AppRun"
+	}
+	ElseIf ($IsMacOS) {
+		Write-Error "Unsupported OS"
+		Exit 1
+	}
+	ElseIf ($IsWindows) {
+		If ($global:appBit -eq "BIT32") {
+			$installConfigXML.Installer.TargetDir = "@ApplicationsDirX86@/OTPView"
+		}
+		ElseIf ($global:appBit -eq "BIT64") {
+			$installConfigXML.Installer.TargetDir = "@ApplicationsDirX64@/OTPView"
+		}
+	}
 
-# -Create
-$packagesDir = (Resolve-Path "$PSScriptRoot/packages")
-$installerExe = "$PSScriptRoot/OTPView $appVersion.exe"
-& $qtframeworkdir\binarycreator.exe --verbose --config "$installConfig" --packages "$packagesDir" $installerExe
+	# Save config.xml
+	$installConfigXML.Save($installConfig)
+
+	# Create
+	$packagesDir = (Resolve-Path "$PSScriptRoot/packages")
+	$installerBinary = "$PSScriptRoot/OTPView $appVersion"
+	If ($IsLinux) {
+		$installerBinary = "$installerBinary (Linux $(uname -m))"
+	}
+	ElseIf ($IsMacOS) {
+		$installerBinary = "$installerBinary (macOS $(uname -m)).app"
+	}
+	ElseIf ($IsWindows) {
+		If ($global:appBit -eq "BIT32") {
+			$installerBinary = "$installerBinary (Windows x86).exe"
+		}
+		ElseIf ($global:appBit -eq "BIT64") {
+			$installerBinary = "$installerBinary (Windows x64).exe"
+		}
+	}
+
+	$binarycreator = checkQtInstallerBinaryCreator
+	& $binarycreator --verbose --config "$installConfig" --packages "$packagesDir" "$installerBinary"
+}
+
+# Check prerequisites
+[void](checkQtInstallerBinaryCreator)
+[void](checkQMake)
+[void](checkDeployQt)
+[void](checkGit)
+
+# Setup packages for installer
+setupLibrary
+setupApplication
+If ($IsWindows) {
+	setupMSVC
+}
+
+# Create the installer
+createInstaller

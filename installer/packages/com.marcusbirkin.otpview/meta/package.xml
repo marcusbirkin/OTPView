@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Package>
   <DisplayName>OTPView</DisplayName>
   <Description>Main Application</Description>
@@ -11,4 +11,5 @@
   <ForcedInstallation>true</ForcedInstallation>
   <Script>installscript.qs</Script>
   <SortingPriority>100</SortingPriority>
+  <Dependencies>com.marcusbirkin.otplib</Dependencies>
 </Package>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <Package>
   <DisplayName>OTPLib</DisplayName>
   <Description>Support library</Description>
@@ -8,5 +8,4 @@
     <License name="GNU LESSER GENERAL PUBLIC LICENSE" file="license.txt" />
   </Licenses>
   <Default>true</Default>
-  <ForcedInstallation>true</ForcedInstallation>
 </Package>
