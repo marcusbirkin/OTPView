@@ -147,8 +147,7 @@ Function checkQtInstallerBinaryCreator {
 		$binarycreator = "binarycreator"
 	}
 	ElseIf ($IsMacOS) {
-		Write-Error "Unsupported OS"
-		Exit 1
+		$binarycreator = "binarycreator"
 	}
 	ElseIf ($IsWindows) {
 		$binarycreator = "binarycreator.exe"
@@ -198,8 +197,16 @@ Function checkDeployQt {
 		Return $ret
 	}
 	ElseIf ($IsMacOS) {
-		Write-Error "Unsupported OS"
-		Exit 1
+		Write-Host -NoNewline "Looking for macdeployqt in $qtdir..."
+		try {
+			$ret = (get-command "$qtdir/bin/macdeployqt").Path
+		}
+		catch {
+			Write-Error "Not Found"
+			Exit 1
+		}
+		Write-Host "Found"
+		Return $ret
 	}
 	ElseIf ($IsWindows) {
 		Write-Host -NoNewline "Looking for windeployqt.exe in $qtdir..."
@@ -222,8 +229,7 @@ Function checkQMake {
 		$qmake = "qmake"
 	}
 	ElseIf ($IsMacOS) {
-		Write-Error "Unsupported OS"
-		Exit 1
+		$qmake = "qmake"
 	}
 	ElseIf ($IsWindows) {
 		$qmake = "qmake.exe"
@@ -238,6 +244,51 @@ Function checkQMake {
 		Exit 1
 	}
 	Write-Host "Found"
+	Return $ret
+}
+
+# Check system has AppDmg, and download if not
+# @return Full path to appdmg
+Function checkAppdmg {
+	$appDmg = "appdmg"
+
+	Write-Host -NoNewline "Looking for $appDmg..."
+	Try {
+		$ret = (get-command $appDmg).Path
+	} Catch {
+		Write-Host "Not Found"
+	}
+	if ($ret) {
+		Write-Host "Found"
+		Return $ret
+	}
+
+	$npmBin = $(npm bin)
+	Write-Host -NoNewline "Looking for $appDmg in $npmBin..."
+	Try {
+		$ret = (get-command "$npmBin/$appDmg").Path
+	} Catch {
+		Write-Host "Not Found"
+	}
+	if ($ret) {
+		Write-Host "Found"
+		Return $ret
+	}
+
+	Write-Host "Installing $appDmg"
+	& npm install --location=local $appDmg | Out-Default
+
+	$npmBin = $(npm bin)
+	Write-Host -NoNewline "Looking for $appDmg in $npmBin..."
+	Try {
+		$ret = (get-command "$npmBin/$appDmg").Path
+	}
+	Catch {
+		Write-Error "Not Found"
+		Exit 1
+	}
+	Write-Host "Found"
+
 	Return $ret
 }
 
@@ -270,8 +321,7 @@ Function setupApplication {
 		$appIcon = (Resolve-Path "$appDir/app/res/icon.png")
 	}
 	ElseIf ($IsMacOS) {
-		Write-Error "Unsupported OS"
-		Exit 1
+		$appBinary = "OTPView.app"
 	}
 	ElseIf ($IsWindows) {
 		$appBinary = "OTPView.exe"
@@ -294,7 +344,8 @@ Function setupApplication {
 			--exclude-library=*OTPLib* `
 			--plugin=qt `
 			--icon-file="$appicon" --icon-filename="OTPView" `
-			--create-desktop-file
+			--create-desktop-file `
+			| Out-Default
 
 		if ($LASTEXITCODE -ne 0) {
 			Write-Error "Deployment failed"
@@ -302,13 +353,20 @@ Function setupApplication {
 		}
 	}
 	ElseIf ($IsMacOS) {
-		Write-Error "Unsupported OS"
-		Exit 1
+		$libPackageDir = (Resolve-Path "$PSScriptRoot/packages/com.marcusbirkin.otplib")
+		$libPackageBinaryDir = "$libPackageDir/data"
+		Copy-Item "$appBinaryDir/$appBinary" -Destination "$appPackageBinaryDir" -Recurse
+		$deployqt = checkDeployQt
+		& $deployqt "$appPackageBinaryDir/$appBinary" "-libpath=$libPackageBinaryDir" | Out-Default
+		if ($LASTEXITCODE -ne 0) {
+			Write-Error "Deployment failed"
+			Exit 1
+		}
 	}
 	ElseIf ($IsWindows) {
 		Copy-Item "$appBinaryDir/$appBinary" -Destination "$appPackageBinaryDir"
 		$deployqt = checkDeployQt
-		& $deployqt --no-compiler-runtime --dir $appPackageBinaryDir "$appBinaryDir/$appBinary"
+		& $deployqt --no-compiler-runtime --dir $appPackageBinaryDir "$appBinaryDir/$appBinary" | Out-Default
 		if ($LASTEXITCODE -ne 0) {
 			Write-Error "Deployment failed"
 			Exit 1
@@ -342,8 +400,8 @@ Function setupLibrary {
 		$Env:LD_LIBRARY_PATH = "$libPackageBinaryDir"
 	}
 	ElseIf ($IsMacOS) {
-		Write-Error "Unsupported OS"
-		Exit 1
+		$libBinary = "libOTPLib*.dylib"
+		$libPackageBinaryDir = "$libPackageDir/data"
 	}
 	ElseIf ($IsWindows) {
 		$libBinary = "OTPLib.dll"
@@ -417,34 +475,44 @@ Function setupMSVC {
 
 # Create the actual installer
 Function createInstaller {
-	# Version number (Use the same as the application)
-	$installConfig = (Resolve-Path "$PSScriptRoot/config/config.xml")
-	Write-Host "Updating $installConfig"
-	$installConfigXML = [xml](get-content $installConfig)
-	$installConfigXML.Installer.Version = $global:appVersion
-	$installConfigXML.Installer.Title = "OTPView $appVersion"
+	# Open config and set Version number (Use the same as the application)
+	if ($IsMacOS) {
+		$installConfig = (Resolve-Path "$PSScriptRoot/config/appdmg.json")
+		Write-Host "Updating $installConfig"
+		$installConfigJSON = Get-Content $installConfig | ConvertFrom-Json
+		$installConfigJSON.title = "OTPView $appVersion"
+	} else {
+		$installConfig = (Resolve-Path "$PSScriptRoot/config/config.xml")
+		Write-Host "Updating $installConfig"
+		$installConfigXML = [xml](get-content $installConfig)
+		$installConfigXML.Installer.Version = $global:appVersion
+		$installConfigXML.Installer.Title = "OTPView $appVersion"
+	}
 
 	# Destination folder and post install run
-	$installConfigXML.Installer.TargetDir = "@ApplicationsDir@/OTPView"
-	$installConfigXML.Installer.RunProgram = "@TargetDir@/OTPView"
-	If ($IsLinux) {
-		$installConfigXML.Installer.RunProgram = "@TargetDir@/AppRun"
-	}
-	ElseIf ($IsMacOS) {
-		Write-Error "Unsupported OS"
-		Exit 1
-	}
-	ElseIf ($IsWindows) {
-		If ($global:appBit -eq "BIT32") {
-			$installConfigXML.Installer.TargetDir = "@ApplicationsDirX86@/OTPView"
+	if (-not $IsMacOS) {
+		$installConfigXML.Installer.TargetDir = "@ApplicationsDir@/OTPView"
+		$installConfigXML.Installer.RunProgram = "@TargetDir@/OTPView"
+		If ($IsLinux) {
+			$installConfigXML.Installer.RunProgram = "@TargetDir@/AppRun"
 		}
-		ElseIf ($global:appBit -eq "BIT64") {
-			$installConfigXML.Installer.TargetDir = "@ApplicationsDirX64@/OTPView"
+		ElseIf ($IsWindows) {
+			If ($global:appBit -eq "BIT32") {
+				$installConfigXML.Installer.TargetDir = "@ApplicationsDirX86@/OTPView"
+			}
+			ElseIf ($global:appBit -eq "BIT64") {
+				$installConfigXML.Installer.TargetDir = "@ApplicationsDirX64@/OTPView"
+			}
 		}
 	}
 
-	# Save config.xml
-	$installConfigXML.Save($installConfig)
+	# Save config
+	if ($IsMacOS) {
+		$installConfigJSON | ConvertTo-Json | Out-File $installConfig
+	}
+	Else {
+		$installConfigXML.Save($installConfig)
+	}
 
 	# Create
 	$packagesDir = (Resolve-Path "$PSScriptRoot/packages")
@@ -453,7 +521,7 @@ Function createInstaller {
 		$installerBinary = "$installerBinary (Linux $(uname -m))"
 	}
 	ElseIf ($IsMacOS) {
-		$installerBinary = "$installerBinary (macOS $(uname -m)).app"
+		$installerBinary = "$installerBinary (macOS $(uname -m)).dmg"
 	}
 	ElseIf ($IsWindows) {
 		If ($global:appBit -eq "BIT32") {
@@ -464,12 +532,23 @@ Function createInstaller {
 		}
 	}
 
-	$binarycreator = checkQtInstallerBinaryCreator
-	& $binarycreator --verbose --config "$installConfig" --packages "$packagesDir" "$installerBinary"
+	If ($IsMacOS) {
+		$appDmg = checkAppdmg
+		& $appDmg "$installConfig" "$installerBinary" | Out-Default
+	}
+	Else {
+		$binarycreator = checkQtInstallerBinaryCreator
+		& $binarycreator --verbose --config "$installConfig" --packages "$packagesDir" "$installerBinary" | Out-Default
+	}
 }
 
 # Check prerequisites
-[void](checkQtInstallerBinaryCreator)
+if (-not $IsMacOS) {
+	[void](checkQtInstallerBinaryCreator)
+}
+Else {
+	[void](checkAppdmg)
+}
 [void](checkQMake)
 [void](checkDeployQt)
 [void](checkGit)

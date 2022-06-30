@@ -1,0 +1,26 @@
+{
+  "title": "OTPView",
+  "icon": "../../app/res/icon.icns",
+  "background": "../../app/res/icon.png",
+  "window": {
+    "size": {
+      "width": 385,
+      "height": 500
+    }
+  },
+  "contents": [
+    {
+      "x": 256,
+      "y": 400,
+      "type": "link",
+      "path": "/Applications"
+    },
+    {
+      "x": 128,
+      "y": 400,
+      "type": "file",
+      "path": "../packages/com.marcusbirkin.otpview/data/OTPView.app"
+    }
+  ],
+  "format": "UDRO"
+}
