@@ -237,9 +237,9 @@ QVariant ComponentsItem::data(int column, int role) const
                 const auto moduleNumber = moduleList.value(row()).ModuleNumber;
                 return QString("%1 (0x%2) / %3 (0x%4)")
                         .arg(moduleDescription.Manufactuer)
-                        .arg(manufacturerID, manufacturerID.getSize() * 2, 16, QChar('0'))
+                        .arg(manufacturerID, static_cast<unsigned int>(manufacturerID.getSize()) * 2, 16, QChar('0'))
                         .arg(moduleDescription.Name)
-                        .arg(moduleNumber, moduleNumber.getSize() * 2, 16, QChar('0'));
+                        .arg(moduleNumber, static_cast<unsigned int>(moduleNumber.getSize()) * 2, 16, QChar('0'));
             }
 
             default:
