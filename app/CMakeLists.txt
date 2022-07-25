@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 # Icon
 set(${PROJECT_NAME}_ICON_PNG "${PROJECT_SOURCE_DIR}/app/res/icon.png" CACHE FILEPATH "${PROJECT_NAME} Icon (PNG Format)")
-set(${PROJECT_NAME}_ICON_ICNS "${PROJECT_SOURCE_DIR}/app/res/icon.icns" CACHE FILEPATH "${PROJECT_NAME} Icon (macOS ICNS Format)")
+set(${PROJECT_NAME}_ICON_ICNS "${PROJECT_SOURCE_DIR}/app/res/icon_alt.icns" CACHE FILEPATH "${PROJECT_NAME} Icon (macOS ICNS Format)")
 set(${PROJECT_NAME}_ICON_ICO "${PROJECT_SOURCE_DIR}/app/res/icon.ico" CACHE FILEPATH "${PROJECT_NAME} Icon (Windows ICO Format)") 
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
