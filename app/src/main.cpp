@@ -25,11 +25,9 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    QApplication::setApplicationName("OTPView");
-    QApplication::setOrganizationName("Marcus Birkin");
-    QApplication::setApplicationVersion(
-                QString("%1 (%2 %3 %4)")
-                .arg(GIT_CURRENT_SHA1, GIT_DATE_DATE, GIT_DATE_MONTH, GIT_DATE_YEAR));
+    QApplication::setApplicationName(VER_PRODUCTNAME_STR);
+    QApplication::setOrganizationName(VER_COMPANYNAME_STR);
+    QApplication::setApplicationVersion(VER_PRODUCTVERSION_STR);
 
     // Warning
     QMessageBox msgBox;
