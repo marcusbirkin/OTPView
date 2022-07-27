@@ -10,14 +10,14 @@ jobs:
       fail-fast: false
       matrix:
         # https://github.com/actions/virtual-environments#available-environments
-        os: [ubuntu-latest, windows-latest, macos-latest, macos-10.15]
+        os: [ubuntu-latest, windows-latest, macos-latest, macos-11]
         qtltsver: ['5.15.2', '6.2.4'] # Qt LTS versions
         include:
           - os: macos-latest
             xcode: latest-stable
           # Target the same macOS setup as release workflow
-          - os: macos-10.15 
-            xcode: '10.3' # Supports macOS Mojave onwards
+          - os: macos-11 
+            xcode: '11.7' # Supports macOS 10.15.2 (Catalina) onwards
 
     steps:
     - name: Checkout
