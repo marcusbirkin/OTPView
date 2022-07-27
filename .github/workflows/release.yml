@@ -43,6 +43,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         submodules: recursive
+        fetch-depth: 0
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v2.14.0
@@ -50,6 +51,10 @@ jobs:
         modules: 'qtcharts'
         tools: 'desktop,tools_ifw,""'
         aqtversion: '==2.0.0'
+
+    - name: Locate Qt Installer Framework
+      shell: pwsh
+      run: echo "IFW_ROOT=$((Get-ChildItem -Path "$Env:IQTA_TOOLS\QtInstallerFramework" -Directory).FullName)" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: MSVC Environment Setup
       if: runner.os == 'Windows'
@@ -65,30 +70,54 @@ jobs:
       if: runner.os == 'macOS'
       run: sudo xcode-select --switch /Library/Developer/CommandLineTools
 
-    - name: Create Makefile
-      run: qmake
+    - name: Configure Build
+      shell: bash
+      run: |
+        if [[ -n "${Qt5_DIR}" ]]; then export CMAKE_PREFIX_PATH=${Qt5_DIR}; fi
+        if [[ -n "${Qt6_DIR}" ]]; then export CMAKE_PREFIX_PATH=${Qt6_DIR}; fi
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release 
 
-    - name: Build (nmake)
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Package
+      env:
+        CPACK_IFW_ROOT: ${{ env.IFW_ROOT }}
+      run: cmake --build build --config Release --target package
+
+    - name: Locate and Package Debug Symbols
       if: runner.os == 'Windows'
-      run: nmake
-
-    - name: Build (make)
-      if: runner.os != 'Windows'
-      run: make
-
-    - name: Installer
       shell: pwsh
       run: |
-          $qtifw = (Get-ChildItem -Path "$Env:IQTA_TOOLS\QtInstallerFramework" -Directory).FullName
-          ./installer/createInstaller.ps1 "$qtifw"
+            $ArchiveName = (Get-ChildItem -Path "./build/OTPView-*.exe" -File).Name -replace ".exe", "-debug.zip"
+            if (Test-Path $ArchiveName) { Remove-Item $ArchiveName }
+            Get-ChildItem -Path "build" -Filter *.pdb -r | ForEach-Object -Process { 
+              Compress-Archive -Path $_  -DestinationPath $ArchiveName -Update -Verbose 
+            }
+            $FullName = (Get-ChildItem -Path $ArchiveName -File).FullName
+            $Name = (Get-ChildItem -Path $ArchiveName -File).Name
+            Add-Content -Path $env:GITHUB_ENV -Value "DEBUG_ASSET_PATH=$FullName"
+            Add-Content -Path $env:GITHUB_ENV -Value "DEBUG_ASSET_NAME=$Name"
+
+    - name: Upload Debug Symbols
+      if: runner.os == 'Windows'
+      id: upload-debug-symbols
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create_release.outputs.upload_url }}
+        asset_path: ${{ env.DEBUG_ASSET_PATH }}
+        asset_name: ${{ env.DEBUG_ASSET_NAME }}
+        asset_content_type: application/octet-stream
 
     - name: Locate Release Asset
       shell: pwsh
       run: |
-            $FullName = (Get-ChildItem -Path ".\installer\OTPView*" -File).FullName
-            $Name = (Get-ChildItem -Path ".\installer\OTPView*" -File).Name
-            Add-Content -Path $env:GITHUB_ENV -Value "ASSET_PATH=$FullName"
-            Add-Content -Path $env:GITHUB_ENV -Value "ASSET_NAME=$Name"
+            $FullName = (Get-ChildItem -Path "./build/OTPView-*" -File).FullName
+            $Name = (Get-ChildItem -Path "./build/OTPView-*" -File).Name
+            Add-Content -Path $env:GITHUB_ENV -Value "RELEASE_ASSET_PATH=$FullName"
+            Add-Content -Path $env:GITHUB_ENV -Value "RELEASE_ASSET_NAME=$Name"
 
     - name: Upload Release Asset
       id: upload-release-asset
@@ -97,6 +126,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ needs.create_release.outputs.upload_url }}
-        asset_path: ${{ env.ASSET_PATH }}
-        asset_name: ${{ env.ASSET_NAME }}
+        asset_path: ${{ env.RELEASE_ASSET_PATH }}
+        asset_name: ${{ env.RELEASE_ASSET_NAME }}
         asset_content_type: application/octet-stream

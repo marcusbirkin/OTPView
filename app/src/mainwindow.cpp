@@ -51,9 +51,9 @@ MainWindow::MainWindow(QWidget *parent) :
                                "<h2>Version: %2</h2>"
                                "<h3>A QT Frontend for ANSI E1.59:2021</h3>"
                                "<h4>Entertainment Technology Object Transform Protocol (OTP)</h4>"
-                               "<h5>Marcus Birkin 2019 - 2021<br>"
+                               "<h5>%3<br>"
                                "<a href=\"https://github.com/marcusbirkin/OTPView\">https://github.com/marcusbirkin/OTPView</a></h5></p>")
-                           .arg(QApplication::applicationName(), QApplication::applicationVersion())
+                           .arg(QApplication::applicationName(), QApplication::applicationVersion(), VER_LEGALCOPYRIGHT_STR)
                            .append(
                                "<p>This program is free software: you can redistribute it and/or modify "
                                "it under the terms of the GNU Lesser General Public License as published by "

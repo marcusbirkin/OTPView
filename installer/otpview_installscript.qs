@@ -11,23 +11,23 @@ Component.prototype.createOperations = function()
 
 		// Main Application
 		component.addOperation("CreateShortcut", 
-			"@TargetDir@/OTPView.exe",
+			"@TargetDir@/bin/OTPView.exe",
 			"@StartMenuDir@/OTPView.lnk",
 			"workingDirectory=@TargetDir@",
-			"iconPath=@TargetDir@/OTPView.exe",
+			"iconPath=@TargetDir@/bin/OTPView.exe",
 			"iconId=0",
 			"description=Start OTPView");
 			
 		// Uninstaller
 		component.addOperation("CreateShortcut", 
-			"@TargetDir@/maintenancetool.exe",
+			"@TargetDir@/Uninstaller.exe",
 			"@StartMenuDir@/Uninstall OTPView.lnk",
 			"workingDirectory=@TargetDir@",
-			"iconPath=@TargetDir@/maintenancetool.exe",
+			"iconPath=@TargetDir@/Uninstaller.exe",
 			"iconId=0",
 			"description=Uninstall OTPView");
 	} else if (systemInfo.kernelType === "darwin") {
-		// macOS (Future Support)
+		// macOS
 	} else {
 		// Linux
 		component.addElevatedOperation("Execute", 
