@@ -29,7 +29,7 @@ class SystemSpinBox : public QAbstractSpinBox
     Q_OBJECT
 public:
     SystemSpinBox(QWidget* parent = nullptr) : SystemSpinBox(QList<OTP::system_t>(), parent) {}
-    SystemSpinBox(QList<OTP::system_t> usedSystems, QWidget* parent = nullptr);
+    explicit SystemSpinBox(const QList<OTP::system_t> &usedSystems, QWidget* parent = nullptr);
 
     OTP::system_t value() const { return m_value; }
 

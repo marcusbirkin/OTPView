@@ -25,7 +25,7 @@
 
 using namespace OTP;
 
-ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *parent) :
+ProducerWindow::ProducerWindow(const QString &componentSettingsGroup, QMainWindow *parent) :
     QMainWindow(parent),
     ui(new Ui::ProducerWindow),
     componentSettingsGroup(componentSettingsGroup)
@@ -45,7 +45,7 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
 
     // OTP Producer Interface
     connect(&Settings::getInstance(), &Settings::newNetworkInterface,
-            [this](QNetworkInterface interface) {
+            this, [this](QNetworkInterface interface) {
                 otpProducer->setNetworkInterface(interface);
                 updateStatusBar();
             });
@@ -53,7 +53,7 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
 
     // OTP Producer Transport
     connect(&Settings::getInstance(), &Settings::newNetworkTransport,
-            [this](QAbstractSocket::NetworkLayerProtocol transport) {
+            this, [this](QAbstractSocket::NetworkLayerProtocol transport) {
                 otpProducer->setNetworkTransport(transport);
                 updateStatusBar();
             });
@@ -61,7 +61,7 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
 
     // OTP Producer Name
     connect(ui->leProducerName, &QLineEdit::textChanged,
-            [this](const QString &arg1) {
+            this, [this](const QString &arg1) {
                 otpProducer->setLocalName(arg1);
                 saveComponentDetails();
                 updateWindowTitle();
@@ -71,10 +71,10 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
 
     // OTP Producer CID
     connect(ui->pbProducerNewCID, &QPushButton::clicked,
-            [this]() {
+            this, [this]() {
                 otpProducer->setLocalCID(cid_t::createUuid());
             });
-    connect(otpProducer.get(), &Producer::newLocalCID,
+    connect(otpProducer.get(), &Producer::newLocalCID, this,
             [this](const cid_t CID) {
                 ui->lblProducerCID->setText(CID.toString());
                 saveComponentDetails();
@@ -84,16 +84,16 @@ ProducerWindow::ProducerWindow(QString componentSettingsGroup, QMainWindow *pare
     // OTP Producer System
     otpProducer->addLocalSystem(static_cast<system_t>(ui->sbSystem->value()));
     connect(ui->sbSystem, qOverload<OTP::system_t, OTP::system_t>(&SystemSpinBox::valueChanged),
-        [this](OTP::system_t oldValue, OTP::system_t newValue) {
-            otpProducer->addLocalSystem(newValue);
-            for (const auto &subWindow : ui->mdiArea->subWindowList())
-                static_cast<GroupWindow*>(subWindow->widget())->setSystem(newValue);
-            otpProducer->removeLocalSystem(oldValue);
-        });
+            this, [this](OTP::system_t oldValue, OTP::system_t newValue) {
+                otpProducer->addLocalSystem(newValue);
+                for (const auto &subWindow : ui->mdiArea->subWindowList())
+                    static_cast<GroupWindow*>(subWindow->widget())->setSystem(newValue);
+                otpProducer->removeLocalSystem(oldValue);
+            });
 
     // OTP Producer Transform Message Rate
     connect(&Settings::getInstance(), &Settings::newTransformMessageRate,
-            [this](std::chrono::milliseconds value) {
+            this, [this](std::chrono::milliseconds value) {
                 otpProducer->setTransformMsgRate(value);
             });
 }
@@ -147,10 +147,10 @@ void ProducerWindow::updateStatusBar()
 void ProducerWindow::updateWindowTitle()
 {
 this->setWindowTitle(
-            QString("%1 %2 - Producer - (%3)")
-                .arg(QApplication::applicationName())
-                .arg(QApplication::applicationVersion())
-                .arg(ui->leProducerName->text()));
+            QString("%1 %2 - Producer - (%3)").arg(
+                    QApplication::applicationName(),
+                    QApplication::applicationVersion(),
+                    ui->leProducerName->text()));
 }
 
 void ProducerWindow::saveComponentDetails()

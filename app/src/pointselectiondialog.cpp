@@ -21,7 +21,7 @@
 
 using namespace OTP;
 
-PointSelectionDialog::PointSelectionDialog(QList<OTP::point_t> usedPoint, QWidget *parent) :
+PointSelectionDialog::PointSelectionDialog(const QList<OTP::point_t> &usedPoint, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::PointSelectionDialog)
 {

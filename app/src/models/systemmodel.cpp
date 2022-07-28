@@ -57,7 +57,9 @@ SystemItem *SystemItem::child(int row)
 {
     if (row < 0 || row >= childCount())
         return nullptr;
-    return childItems.values().at(row);
+    auto childItem = childItems.begin();
+    std::advance(childItem,row);
+    return *(childItem);
 }
 
 int SystemItem::childCount() const
@@ -70,18 +72,29 @@ int SystemItem::columnCount() const
     return columnLast + 1;
 }
 
-int getAxis(SystemItem::itemType_t type)
+inline int getAxis(SystemItem::itemType_t type)
 {
     switch (type)
     {
         case SystemItem::SystemPointAxis_X: return axis_t::X;
         case SystemItem::SystemPointAxis_Y: return axis_t::Y;
-        case SystemItem::SystemPointAxis_Z:  return axis_t::Z;
+        case SystemItem::SystemPointAxis_Z: return axis_t::Z;
         default: return -1;
     }
 }
 
-QString SystemItem::getDataPositionRotationString() const
+inline QString getAxisString(SystemItem::itemType_t type)
+{
+    switch (type)
+    {
+        case SystemItem::SystemPointAxis_X: return QString("X");
+        case SystemItem::SystemPointAxis_Y: return QString("Y");
+        case SystemItem::SystemPointAxis_Z: return QString("Z");
+        default: return QString();
+    }
+}
+
+QString SystemItem::getValueString() const
 {
     auto axis = getAxis(this->getType());
     if (axis == -1) axis = getAxis(this->parentItem()->getType());
@@ -191,53 +204,132 @@ QString SystemItem::getDataPositionRotationString() const
     }
 }
 
-QVariant SystemItem::data(int column, int roll) const
+QString getOtherValuesStringHelper(QMap<cid_t, Consumer::Scale_t> container)
+{
+    QString ret = "Other sources";
+
+    if (!container.count())
+        return ret.append("\r\nNone");
+
+    for (const auto &item : container)
+        ret.append(
+            QString("\r\n%1 %2 (%3)")
+                    .arg(
+                        item.sourceCID.toString(),
+                        QString::number(item.value),
+                        item));
+    return ret;
+}
+
+template <class T>
+QString getOtherValuesStringHelper(T container)
+{
+    QString ret = "Other sources";
+
+    if (!container.count())
+        return ret.append("\r\nNone");
+
+    for (const auto &item : container)
+        ret.append(
+            QString("\r\n%1 %2%3")
+                    .arg(
+                        item.sourceCID.toString(),
+                        QString::number(item.value),
+                        item.unit));
+
+    return ret;
+}
+
+QString SystemItem::getOtherValuesString() const
+{
+    auto axis = getAxis(this->getType());
+    if (axis == -1) axis = getAxis(this->parentItem()->getType());
+    if (axis == -1) return QString("???");
+
+    switch (type)
+    {
+        case SystemPointAxis_X:
+        case SystemPointAxis_Y:
+        case SystemPointAxis_Z:
+        {
+            switch (this->parentItem()->getType())
+            {
+                case SystemPointPositionValueItem:
+                    return getOtherValuesStringHelper(otpConsumer->getPositions(getAddress(), axis_t(axis), true, true));
+
+                case SystemPointPositionVelcocityItem:
+                    return getOtherValuesStringHelper(otpConsumer->getPositionVelocitys(getAddress(), axis_t(axis), true, true));
+
+                case SystemPointPositionAccelItem:
+                    return getOtherValuesStringHelper(otpConsumer->getPositionAccelerations(getAddress(), axis_t(axis), true, true));
+
+                case SystemPointRotationValueItem:
+                    return getOtherValuesStringHelper(otpConsumer->getRotations(getAddress(), axis_t(axis), true, true));
+
+                case SystemPointRotationVelcocityItem:
+                    return getOtherValuesStringHelper(otpConsumer->getRotationVelocitys(getAddress(), axis_t(axis), true, true));
+
+                case SystemPointRotationAccelItem:
+                    return getOtherValuesStringHelper(otpConsumer->getRotationAccelerations(getAddress(), axis_t(axis), true, true));
+
+                case SystemPointScaleItem:
+                    return getOtherValuesStringHelper(otpConsumer->getScales(getAddress(), axis_t(axis), true));
+
+                default: return QString("");
+            }
+        }
+
+        default: return QString("???");
+    }
+}
+
+QVariant SystemItem::data(int column, int role) const
 {
     if (column < 0 || column >= columnCount())
         return QVariant();
     switch (type)
     {
         case SystemRootItem:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("");
                     case columnDetails: return QString("");
                     default: return QString("???");
                 }
-            return QVariant();
+            break;
 
         // Group
         case SystemGroupItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Group %1").arg(getGroup());
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Group %1").arg(getGroup());
             if (otpConsumer->isGroupExpired(getSystem(), getGroup()))
             {
-                if (roll == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
+                if (role == Qt::FontRole) return italic();
             }
-            return QVariant();
+            break;
 
         // Point
         case SystemPointItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Point %1").arg(getPoint());
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Point %1").arg(getPoint());
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
+                if (role == Qt::FontRole) return italic();
             }
-            return QVariant();
+            break;
 
         // Point Details
         case SystemPointDetailsItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Details");
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Details");
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::DisplayRole && column == columnDetails) return QString("(Expired)");
+                if (role == Qt::FontRole) return italic();
             }
-            return QVariant();
+            break;
         case SystemPointDetailsNameItem:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Name");
@@ -246,11 +338,11 @@ QVariant SystemItem::data(int column, int roll) const
                 }
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::FontRole) return italic();
             }
-            return QVariant();
+            break;
         case SystemPointDetailsLastSeenItem:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Last Seen");
@@ -259,12 +351,12 @@ QVariant SystemItem::data(int column, int roll) const
                 }
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::FontRole) return italic();
-                if (roll == Qt::BackgroundRole) return QColor(Qt::red);
+                if (role == Qt::FontRole) return italic();
+                if (role == Qt::BackgroundRole) return QColor(Qt::red);
             }
-            return QVariant();
+            break;
         case SystemPointDetailsReferenceFrameItem:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Reference Frame");
@@ -273,93 +365,86 @@ QVariant SystemItem::data(int column, int roll) const
                 }
             if (otpConsumer->isPointExpired(getSystem(), getGroup(), getPoint()))
             {
-                if (roll == Qt::FontRole) return italic();
+                if (role == Qt::FontRole) return italic();
             }
-            return QVariant();
+            break;
 
         // Point Position/Rotation
         case SystemPointPositionItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Position");
-            return QVariant();
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Position");
+            break;
         case SystemPointRotationItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Rotation");
-            return QVariant();
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Rotation");
+            break;
         case SystemPointPositionValueItem:
         case SystemPointRotationValueItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Value");
-            return QVariant();
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Value");
+            break;
         case SystemPointPositionVelcocityItem:
         case SystemPointRotationVelcocityItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Velcocity");
-            return QVariant();
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Velcocity");
+            break;
         case SystemPointPositionAccelItem:
         case SystemPointRotationAccelItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Acceleration");
-            return QVariant();
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Acceleration");
+            break;
 
         // Scale
         case SystemPointScaleItem:
-            if (roll == Qt::DisplayRole && column == columnFirst) return QString("Scale");
-            return QVariant();
+            if (role == Qt::DisplayRole && column == columnFirst) return QString("Scale");
+            break;
 
         case SystemPointAxis_X:
-            if (roll == Qt::DisplayRole)
-                switch (column)
-                {
-                    case columnFirst: return QString("X");
-                    case columnDetails: return getDataPositionRotationString();
-                    default: return QString("???");
-                }
-            return QVariant();
         case SystemPointAxis_Y:
-            if (roll == Qt::DisplayRole)
-                switch (column)
-                {
-                    case columnFirst: return QString("Y");
-                    case columnDetails: return getDataPositionRotationString();
-                    default: return QString("???");
-                }
-            return QVariant();
         case SystemPointAxis_Z:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
+            {
                 switch (column)
                 {
-                    case columnFirst: return QString("Z");
-                    case columnDetails: return getDataPositionRotationString();
+                    case columnFirst: return getAxisString(type);
+                    case columnDetails: return getValueString();
+
                     default: return QString("???");
                 }
-            return QVariant();
+            }
+            if (role == Qt::ToolTipRole)
+                return getOtherValuesString();
+            break;
 
         case SystemPointAxisDetails_Source:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
-                    case columnFirst: return QString("Source");
-                    case columnDetails: return getDataPositionRotationString();
+                    case columnFirst: return QString("Winning Source");
+                    case columnDetails: return getValueString();
                     default: return QString("???");
                 }
-            return QVariant();
+            break;
 
         case SystemPointAxisDetails_Priority:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Priority");
-                    case columnDetails: return getDataPositionRotationString();
+                    case columnDetails: return getValueString();
                     default: return QString("???");
                 }
-            return QVariant();
+            break;
 
         case SystemPointAxisDetails_Timestamp:
-            if (roll == Qt::DisplayRole)
+            if (role == Qt::DisplayRole)
                 switch (column)
                 {
                     case columnFirst: return QString("Timestamp");
-                    case columnDetails: return getDataPositionRotationString();
+                    case columnDetails: return getValueString();
                     default: return QString("???");
                 }
-            return QVariant();
-        }
+            break;
+    } // switch (type)
+
+    // Default tooltip
+    if (role == Qt::ToolTipRole)
+        return QString("Double click point to open history chart");
 
     return QVariant();
 }
@@ -372,7 +457,9 @@ SystemItem *SystemItem::parentItem() const
 int SystemItem::row() const
 {
     if (parentItem())
-        return parentItem()->childItems.values().indexOf(const_cast<SystemItem*>(this));
+        return std::distance(
+                    parentItem()->childItems.cbegin(),
+                    std::find(parentItem()->childItems.cbegin(), parentItem()->childItems.cend(), this));
 
     return 0;
 }
@@ -400,6 +487,7 @@ SystemModel::SystemModel(
     connect(otpConsumer.get(), &Consumer::newPoint, this, &SystemModel::newPoint);
     connect(otpConsumer.get(), &Consumer::removedPoint, this, &SystemModel::removedPoint);
     connect(otpConsumer.get(), &Consumer::updatedPoint, this, &SystemModel::updatedPoint);
+    connect(otpConsumer.get(), &Consumer::expiredPoint, this, &SystemModel::updatedPoint);
 
     // Add existing
     for (const auto &group : otpConsumer->getGroups(system))
@@ -576,7 +664,7 @@ void SystemModel::newGroup(cid_t cid, system_t system, group_t group)
     if (rootItem->containsChildKey(group)) return;
     auto groupItem = new SystemItem(this->otpConsumer, address_t(system, group, point_t()), SystemItem::SystemGroupItem, rootItem);
 
-    auto newRow = rowCount(rootIndex);
+    auto newRow = SystemModel::rowCount(rootIndex);
     for (; newRow > 0; --newRow)
         if (rootItem->child(newRow - 1)->getGroup() < group) break;
     beginInsertRows(rootIndex, newRow, newRow);
@@ -620,7 +708,7 @@ void SystemModel::newPoint(cid_t cid, system_t system, group_t group, point_t po
     newPointRotation(pointItem);
     newPointScale(pointItem);
 
-    auto newRow = rowCount(groupIndex);
+    auto newRow = SystemModel::rowCount(groupIndex);
     for (; newRow > 0; --newRow)
         if (groupItem->child(newRow - 1)->getPoint() < point) break;
     beginInsertRows(groupIndex, newRow, newRow);

@@ -29,8 +29,8 @@
 
 using namespace OTP;
 
-const static QString componentSettingsGroup_CONSUMER = "CONSUMER";
-const static QString componentSettingsGroup_PRODUCER = "PRODUCER";
+const auto componentSettingsGroup_CONSUMER = QStringLiteral("CONSUMER");
+const auto componentSettingsGroup_PRODUCER = QStringLiteral("PRODUCER");
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
                 .arg(QApplication::applicationName(), QApplication::applicationVersion()));
 
     // About
-    connect(ui->actionAbout, &QAction::triggered, [this]() {
+    connect(ui->actionAbout, &QAction::triggered, this, [this]() {
         QMessageBox::about(this, QString("About %1").arg(QApplication::applicationName()),
                            QString(
                                "<style> h1,h2,h3,h4,h5 { text-align: center; }</style>"
@@ -51,9 +51,9 @@ MainWindow::MainWindow(QWidget *parent) :
                                "<h2>Version: %2</h2>"
                                "<h3>A QT Frontend for ANSI E1.59:2021</h3>"
                                "<h4>Entertainment Technology Object Transform Protocol (OTP)</h4>"
-                               "<h5>Marcus Birkin 2019 - 2021<br>"
+                               "<h5>%3<br>"
                                "<a href=\"https://github.com/marcusbirkin/OTPView\">https://github.com/marcusbirkin/OTPView</a></h5></p>")
-                           .arg(QApplication::applicationName(), QApplication::applicationVersion())
+                           .arg(QApplication::applicationName(), QApplication::applicationVersion(), VER_LEGALCOPYRIGHT_STR)
                            .append(
                                "<p>This program is free software: you can redistribute it and/or modify "
                                "it under the terms of the GNU Lesser General Public License as published by "
@@ -68,11 +68,11 @@ MainWindow::MainWindow(QWidget *parent) :
                                )
                            );
     });
-    connect(ui->actionAbout_OTPLib, &QAction::triggered,
+    connect(ui->actionAbout_OTPLib, &QAction::triggered, this,
             [this]() {
                 QMessageBox::about(this, QString("About OTPLib"),OTPLib::getAbout());
             });
-    connect(ui->actionAbout_QT, &QAction::triggered,
+    connect(ui->actionAbout_QT, &QAction::triggered, this,
             [this]() {
                 QMessageBox::aboutQt(this);
             });
@@ -87,11 +87,11 @@ MainWindow::MainWindow(QWidget *parent) :
                           this));
 
     // OTP Consumer Interface
-    connect(&Settings::getInstance(), &Settings::newNetworkInterface,
+    connect(&Settings::getInstance(), &Settings::newNetworkInterface, this,
             [this](QNetworkInterface interface) {
                 otpConsumer->setNetworkInterface(interface);
 
-                connect(otpConsumer.get(), &OTP::Consumer::stateChangedNetworkInterface,
+                connect(otpConsumer.get(), &OTP::Consumer::stateChangedNetworkInterface, this,
                         [this]() {
                             updateStatusBar();
                 });
@@ -101,7 +101,7 @@ MainWindow::MainWindow(QWidget *parent) :
     updateStatusBar();
 
     // OTP Consumer Transport
-    connect(&Settings::getInstance(), &Settings::newNetworkTransport,
+    connect(&Settings::getInstance(), &Settings::newNetworkTransport, this,
             [this](QAbstractSocket::NetworkLayerProtocol transport) {
                 otpConsumer->setNetworkTransport(transport);
                 updateStatusBar();
@@ -109,7 +109,7 @@ MainWindow::MainWindow(QWidget *parent) :
     updateStatusBar();
 
     // OTP Consumer Name
-    connect(ui->leConsumerName, &QLineEdit::textChanged,
+    connect(ui->leConsumerName, &QLineEdit::textChanged, this,
             [this](const QString &arg1) {
                 otpConsumer->setLocalName(arg1);
                 saveComponentDetails();
@@ -118,11 +118,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->leConsumerName->setMaxLength(PDU::NAME_LENGTH);
 
     // OTP Consumer CID
-    connect(ui->pbConsumerNewCID, &QPushButton::clicked,
+    connect(ui->pbConsumerNewCID, &QPushButton::clicked, this,
             [this]() {
                 otpConsumer->setLocalCID(cid_t::createUuid());
             });
-    connect(otpConsumer.get(), &Consumer::newLocalCID,
+    connect(otpConsumer.get(), &Consumer::newLocalCID, this,
             [this](const cid_t CID) {
                 ui->lblConsumerCID->setText(CID.toString());
                 saveComponentDetails();
@@ -135,12 +135,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // System requests
     QTimer *timer = new QTimer(this);
-    connect(timer, &QTimer::timeout,
+    connect(timer, &QTimer::timeout, this,
         [this]() {
            otpConsumer->UpdateOTPMap();
         });
     timer->start(Settings::getInstance().getSystemRequestInterval());
-    connect(&Settings::getInstance(), &Settings::newSystemRequestInterval,
+    connect(&Settings::getInstance(), &Settings::newSystemRequestInterval, this,
             [timer](std::chrono::seconds value) {
                 timer->setInterval(value);
             });

@@ -15,4 +15,4 @@ used for safety critical applications.</b>"
 https://github.com/marcusbirkin/OTPView/releases
 
 #### CI Status
-[![Build and Tests](https://github.com/marcusbirkin/OTPView/actions/workflows/qmake.yml/badge.svg)](https://github.com/marcusbirkin/OTPView/actions/workflows/qmake.yml)
+[![Build and Tests](https://github.com/marcusbirkin/OTPView/actions/workflows/ci.yml/badge.svg)](https://github.com/marcusbirkin/OTPView/actions/workflows/ci.yml)

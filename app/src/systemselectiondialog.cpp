@@ -21,7 +21,7 @@
 
 using namespace OTP;
 
-SystemSelectionDialog::SystemSelectionDialog(QList<OTP::system_t> usedSystems, QWidget *parent) :
+SystemSelectionDialog::SystemSelectionDialog(const QList<OTP::system_t> &usedSystems, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SystemSelectionDialog)
 {

@@ -28,7 +28,7 @@ class SpacialSpinBox : public QAbstractSpinBox
 public:
     typedef qint32 value_t;
 
-    SpacialSpinBox(
+    explicit SpacialSpinBox(
             std::shared_ptr<class OTP::Producer> otpProducer,
             OTP::axis_t axis,
             OTP::MODULES::STANDARD::VALUES::moduleValue_t moduleValue,
@@ -55,11 +55,11 @@ public:
 
 
 public slots:
-    void setValue(value_t val);
+    void setValue(SpacialSpinBox::value_t val);
     void setAddress(OTP::address_t);
 
 signals:
-    void valueChanged(value_t value);
+    void valueChanged(SpacialSpinBox::value_t value);
 
 protected:
     void stepBy(int steps);

@@ -20,14 +20,15 @@
 
 using namespace OTP;
 
-GroupSpinBox::GroupSpinBox(QList<group_t> usedGroups, QWidget* parent) : QAbstractSpinBox(parent),
+GroupSpinBox::GroupSpinBox(const QList<group_t> &usedGroups, QWidget* parent) : QAbstractSpinBox(parent),
     usedGroups(usedGroups)
 {
     setRange(group_t::getMin(), group_t::getMax());
     setValue(group_t::getMin());
-    while (QValidator::Invalid == validate(value())) stepBy(1);
+    while (QValidator::Invalid == validate(value()))
+        GroupSpinBox::stepBy(1);
 
-    connect(this->lineEdit(), &QLineEdit::textEdited,
+    connect(this->lineEdit(), &QLineEdit::textEdited, this,
         [this]() {
             QString input = lineEdit()->text();
             int pos = 0;

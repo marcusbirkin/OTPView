@@ -1,0 +1,131 @@
+name: Release
+
+on:
+  push:
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: false
+
+  build_release:
+    name: Build release
+    needs: create_release
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # https://github.com/actions/virtual-environments#available-environments
+        os: [ubuntu-latest, windows-latest, macos-10.15] 
+        include:
+          # Target oldest Xcode available, in oldest available macos runner, for widest OS support
+          # https://github.com/actions/virtual-environments/blob/main/images/macos/macos-10.15-Readme.md#xcode
+          - os: macos-10.15 
+            xcode: '10.3' # Supports macOS Mojave onwards
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.14.0
+      with:
+        modules: 'qtcharts'
+        tools: 'desktop,tools_ifw,""'
+        aqtversion: '==2.0.0'
+
+    - name: Locate Qt Installer Framework
+      shell: pwsh
+      run: echo "IFW_ROOT=$((Get-ChildItem -Path "$Env:IQTA_TOOLS\QtInstallerFramework" -Directory).FullName)" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf8 -Append
+
+    - name: MSVC Environment Setup
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Xcode Environment Setup
+      if: runner.os == 'macOS'
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: ${{ matrix.xcode }}
+
+    - name: Xcode Command Line Tools Setup
+      if: runner.os == 'macOS'
+      run: sudo xcode-select --switch /Library/Developer/CommandLineTools
+
+    - name: Configure Build
+      shell: bash
+      run: |
+        if [[ -n "${Qt5_DIR}" ]]; then export CMAKE_PREFIX_PATH=${Qt5_DIR}; fi
+        if [[ -n "${Qt6_DIR}" ]]; then export CMAKE_PREFIX_PATH=${Qt6_DIR}; fi
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release 
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Package
+      env:
+        CPACK_IFW_ROOT: ${{ env.IFW_ROOT }}
+      run: cmake --build build --config Release --target package
+
+    - name: Locate and Package Debug Symbols
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+            $ArchiveName = (Get-ChildItem -Path "./build/OTPView-*.exe" -File).Name -replace ".exe", "-debug.zip"
+            if (Test-Path $ArchiveName) { Remove-Item $ArchiveName }
+            Get-ChildItem -Path "build" -Filter *.pdb -r | ForEach-Object -Process { 
+              Compress-Archive -Path $_  -DestinationPath $ArchiveName -Update -Verbose 
+            }
+            $FullName = (Get-ChildItem -Path $ArchiveName -File).FullName
+            $Name = (Get-ChildItem -Path $ArchiveName -File).Name
+            Add-Content -Path $env:GITHUB_ENV -Value "DEBUG_ASSET_PATH=$FullName"
+            Add-Content -Path $env:GITHUB_ENV -Value "DEBUG_ASSET_NAME=$Name"
+
+    - name: Upload Debug Symbols
+      if: runner.os == 'Windows'
+      id: upload-debug-symbols
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create_release.outputs.upload_url }}
+        asset_path: ${{ env.DEBUG_ASSET_PATH }}
+        asset_name: ${{ env.DEBUG_ASSET_NAME }}
+        asset_content_type: application/octet-stream
+
+    - name: Locate Release Asset
+      shell: pwsh
+      run: |
+            $FullName = (Get-ChildItem -Path "./build/OTPView-*" -File).FullName
+            $Name = (Get-ChildItem -Path "./build/OTPView-*" -File).Name
+            Add-Content -Path $env:GITHUB_ENV -Value "RELEASE_ASSET_PATH=$FullName"
+            Add-Content -Path $env:GITHUB_ENV -Value "RELEASE_ASSET_NAME=$Name"
+
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create_release.outputs.upload_url }}
+        asset_path: ${{ env.RELEASE_ASSET_PATH }}
+        asset_name: ${{ env.RELEASE_ASSET_NAME }}
+        asset_content_type: application/octet-stream

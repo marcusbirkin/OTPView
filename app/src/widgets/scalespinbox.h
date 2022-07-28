@@ -31,7 +31,7 @@ class ScaleSpinBox : public QAbstractSpinBox
 public:
     typedef ScaleModule_t::scale_t value_t;
 
-    ScaleSpinBox(
+    explicit ScaleSpinBox(
             std::shared_ptr<class OTP::Producer> otpProducer,
             OTP::axis_t axis,
             QWidget* parent = nullptr);
@@ -68,12 +68,12 @@ public:
     }
 
 public slots:
-    void setValue(value_t val);
+    void setValue(ScaleSpinBox::value_t val);
     void setAddress(OTP::address_t);
 
 signals:
-    void valueChanged(value_t value);
-    void valueChanged(value_t oldValue, value_t newValue);
+    void valueChanged(ScaleSpinBox::value_t value);
+    void valueChanged(ScaleSpinBox::value_t oldValue, ScaleSpinBox::value_t newValue);
 
 protected:
     void stepBy(int steps);

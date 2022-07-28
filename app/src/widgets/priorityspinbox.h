@@ -30,7 +30,7 @@ class PrioritySpinBox : public QAbstractSpinBox
 public:
     typedef OTP::priority_t value_t;
 
-    PrioritySpinBox(
+    explicit PrioritySpinBox(
             std::shared_ptr<class OTP::Producer> otpProducer,
             QWidget* parent = nullptr);
 
@@ -66,12 +66,12 @@ public:
     }
 
 public slots:
-    void setValue(value_t val);
+    void setValue(PrioritySpinBox::value_t val);
     void setAddress(OTP::address_t);
 
 signals:
-    void valueChanged(value_t value);
-    void valueChanged(value_t oldValue, value_t newValue);
+    void valueChanged(PrioritySpinBox::value_t value);
+    void valueChanged(PrioritySpinBox::value_t oldValue, PrioritySpinBox::value_t newValue);
 
 protected:
     void stepBy(int steps);

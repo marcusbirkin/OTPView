@@ -91,7 +91,7 @@ public:
     SystemItem *child(int row);
     int childCount() const;
     int columnCount() const;
-    QVariant data(int column = 0, int roll = Qt::DisplayRole) const;
+    QVariant data(int column = 0, int role = Qt::DisplayRole) const;
     int row() const;
     SystemItem *parentItem() const;
     static SystemItem* indexToItem(QModelIndex index)
@@ -108,7 +108,8 @@ public:
         { return OTP::address_t(getSystem(), getGroup(), getPoint()); }
 
 private:
-    QString getDataPositionRotationString() const;
+    QString getValueString() const;
+    QString getOtherValuesString() const;
 
     std::shared_ptr<class OTP::Consumer> otpConsumer;
     OTP::address_t address;

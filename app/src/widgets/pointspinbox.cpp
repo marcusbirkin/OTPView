@@ -20,14 +20,15 @@
 
 using namespace OTP;
 
-PointSpinBox::PointSpinBox(QList<point_t> usedPoints, QWidget* parent) : QAbstractSpinBox(parent),
+PointSpinBox::PointSpinBox(const QList<point_t> &usedPoints, QWidget* parent) : QAbstractSpinBox(parent),
     usedPoints(usedPoints)
 {
     setRange(point_t::getMin(), point_t::getMax());
     setValue(point_t::getMin());
-    while (QValidator::Invalid == validate(value())) stepBy(1);
+    while (QValidator::Invalid == validate(value()))
+        PointSpinBox::stepBy(1);
 
-    connect(this->lineEdit(), &QLineEdit::textEdited,
+    connect(this->lineEdit(), &QLineEdit::textEdited, this,
         [this]() {
             QString input = lineEdit()->text();
             int pos = 0;

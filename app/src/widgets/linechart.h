@@ -27,7 +27,9 @@
 #include <QtCharts/QLineSeries>
 #include "OTPLib.hpp"
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 using namespace QtCharts;
+#endif
 
 class LineChart : public QWidget
 {
@@ -37,6 +39,8 @@ public:
             std::shared_ptr<class OTP::Consumer> otpConsumer,
             OTP::address_t address,
             QWidget *parent = nullptr);
+
+    OTP::address_t getAddress() const { return address; }
 
 signals:
 

@@ -25,7 +25,6 @@
 #include <QtCharts/QValueAxis>
 #include <QLegendMarker>
 
-using namespace QtCharts;
 using namespace OTP;
 using namespace MODULES::STANDARD::VALUES;
 
@@ -39,6 +38,9 @@ LineChart::LineChart(std::shared_ptr<class OTP::Consumer> otpConsumer,
     otpConsumer(otpConsumer),
     address(address)
 {
+    // Set identifying name
+    QWidget::setObjectName(address.toString());
+
     // Layout
     this->setLayout(new QVBoxLayout(this));
 
@@ -60,7 +62,7 @@ LineChart::LineChart(std::shared_ptr<class OTP::Consumer> otpConsumer,
     setupLineSeries(ROTATION, "Rotation", *buttonLayoutRotation);
     setupLineSeries(ROTATION_VELOCITY, "Rotation Velocity", *buttonLayoutRotation);
     setupLineSeries(ROTATION_ACCELERATION, "Rotation Acceleration", *buttonLayoutRotation);
-    buttonGroup->buttons().first()->setChecked(true);
+    buttonGroup->buttons().at(0)->setChecked(true);
 
     // Chartview
     this->layout()->addWidget(chartView);
@@ -205,9 +207,9 @@ void LineChart::redraw()
     qreal yMax = 0;
     for (auto axis = axis_t::first; axis < axis_t::count; ++axis)
     {
-        for (const auto &series : lineSeries[axis])
+        for (const auto &series : qAsConst(lineSeries[axis]))
         {
-            for (const auto &point : series->pointsVector())
+            for (const auto &point : series->points())
             {
                 // Find Y axis limits
                 if (point.x() > xMin.toMSecsSinceEpoch() && point.x() < xMax.toMSecsSinceEpoch())

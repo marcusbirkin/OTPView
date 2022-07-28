@@ -178,12 +178,14 @@ QString SpacialSpinBox::textFromValue(value_t val) const
 {
     switch (moduleValue) {
         case VALUES::POSITION:
-            return QString("%1 %2").arg(QString::number(val)).arg(
+            return QString("%1 %2").arg(
+                        QString::number(val),
                         otpProducer->getUnitString(
                             otpProducer->getLocalPosition(address, axis).scale,
                             moduleValue));
         default:
-            return QString("%1 %2").arg(QString::number(val)).arg(
+            return QString("%1 %2").arg(
+                        QString::number(val),
                         otpProducer->getUnitString(
                             moduleValue));
     }
