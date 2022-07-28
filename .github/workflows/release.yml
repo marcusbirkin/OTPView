@@ -66,10 +66,6 @@ jobs:
       with:
         xcode-version: ${{ matrix.xcode }}
 
-    - name: Xcode Command Line Tools Setup
-      if: runner.os == 'macOS'
-      run: sudo xcode-select --switch /Library/Developer/CommandLineTools
-
     - name: Configure Build
       shell: bash
       run: |
